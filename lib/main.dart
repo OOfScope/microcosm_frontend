@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:web/web.dart';
-import 'dart:js_util';
 
 void main() {
 
@@ -16,7 +15,6 @@ void main() {
   });
   final cookieMap = Map.fromEntries(entity);  
   print(cookieMap);
-  console.dir(jsify(cookieMap));
   
   runApp(MyApp());
 }
