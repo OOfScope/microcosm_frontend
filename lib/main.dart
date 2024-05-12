@@ -16,7 +16,9 @@ void main() {
   final cookieMap = Map.fromEntries(entity);  
   print(cookieMap);
   print(document.URL);
-  
+  print(document);
+  print("---");
+  console.dir(document);
   runApp(MyApp());
 }
 
