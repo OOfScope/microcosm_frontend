@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:admin/screens/dashboard/components/header.dart';
+import 'package:admin/screens/main/components/header.dart';
 import '../../constants.dart';
 
 class ProfileScreen extends StatelessWidget {
