@@ -4,8 +4,20 @@ import 'package:admin/screens/main/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:web/web.dart';
+import 'dart:js_util';
 
 void main() {
+
+  final cookie = document.cookie;
+  final entity = cookie.split("; ").map((item) {
+    final split = item.split("=");
+    return MapEntry(split[0], split[1]);
+  });
+  final cookieMap = Map.fromEntries(entity);  
+  print(cookieMap);
+  console.dir(jsify(cookieMap));
+  
   runApp(MyApp());
 }
 
