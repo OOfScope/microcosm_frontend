@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+typedef void IndexCallback(int index);
+
 class SideMenu extends StatelessWidget {
+  final IndexCallback onNavButtonPressed;
+
   const SideMenu({
     Key? key,
+    required this.onNavButtonPressed,
   }) : super(key: key);
 
   @override
@@ -17,42 +22,17 @@ class SideMenu extends StatelessWidget {
           DrawerListTile(
             title: "Dashboard",
             svgSrc: "assets/icons/menu_dashboard.svg",
-            press: () {},
-          ),
-          DrawerListTile(
-            title: "Transaction",
-            svgSrc: "assets/icons/menu_tran.svg",
-            press: () {},
-          ),
-          DrawerListTile(
-            title: "Task",
-            svgSrc: "assets/icons/menu_task.svg",
-            press: () {},
-          ),
-          DrawerListTile(
-            title: "Documents",
-            svgSrc: "assets/icons/menu_doc.svg",
-            press: () {},
-          ),
-          DrawerListTile(
-            title: "Store",
-            svgSrc: "assets/icons/menu_store.svg",
-            press: () {},
-          ),
-          DrawerListTile(
-            title: "Notification",
-            svgSrc: "assets/icons/menu_notification.svg",
-            press: () {},
+            press: () => onNavButtonPressed(0),
           ),
           DrawerListTile(
             title: "Profile",
             svgSrc: "assets/icons/menu_profile.svg",
-            press: () {},
+            press: () => onNavButtonPressed(1),
           ),
           DrawerListTile(
             title: "Settings",
             svgSrc: "assets/icons/menu_setting.svg",
-            press: () {},
+            press: () => onNavButtonPressed(2),
           ),
         ],
       ),
