@@ -6,7 +6,7 @@ import '../../constants.dart';
 import '../main/components/header.dart';
 
 import 'components/recent_files.dart';
-import 'components/storage_details.dart';
+import 'components/leaderboard.dart';
 
 class DashboardScreen extends StatelessWidget {
   @override
@@ -33,7 +33,7 @@ class DashboardScreen extends StatelessWidget {
                       RecentFiles(),
                       if (Responsive.isMobile(context))
                         SizedBox(height: defaultPadding),
-                      if (Responsive.isMobile(context)) StorageDetails(),
+                      if (Responsive.isMobile(context)) Leaderboard(),
                     ],
                   ),
                 ),
@@ -43,7 +43,7 @@ class DashboardScreen extends StatelessWidget {
                 if (!Responsive.isMobile(context))
                   Expanded(
                     flex: 2,
-                    child: StorageDetails(),
+                    child: Leaderboard(),
                   ),
               ],
             )
