@@ -1,4 +1,4 @@
-import 'package:admin/screens/dashboard/components/account_details.dart';
+import 'package:admin/screens/main/components/account_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -33,6 +33,8 @@ class Leaderboard extends StatelessWidget {
               rank: '1', name: 'Angelina Jolieeeeeeeeeee', score: '100'),
           account_info_card(rank: '2', name: 'Tom Hanks', score: '80'),
           account_info_card(rank: '3', name: 'Tom Cruise', score: '60'),
+          account_info_card(rank: '4', name: 'Tom Cruise', score: '60'),
+          account_info_card(rank: '5', name: 'Tom Cruise', score: '60'),
         ],
       ),
     );

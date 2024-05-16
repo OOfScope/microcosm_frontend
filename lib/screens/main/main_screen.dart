@@ -1,3 +1,4 @@
+import 'package:admin/constants.dart';
 import 'package:admin/controllers/MenuAppController.dart';
 import 'package:admin/responsive.dart';
 import 'package:admin/screens/dashboard/dashboard_screen.dart';
@@ -5,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:admin/screens/settings/settings_screen.dart';
 import 'package:admin/screens/profile/profile_screen.dart';
-
+import 'package:admin/screens/main/components/leaderboard.dart';
+import 'package:admin/screens/main/components/others.dart';
 import 'components/side_menu.dart';
 
 class MainScreen extends StatefulWidget {
@@ -57,8 +59,21 @@ class _MainScreenState extends State<MainScreen> {
               ),
             Expanded(
               // It takes 5/6 part of the screen
-              flex: 5,
+              flex: 4,
               child: page,
+            ),
+            Expanded(
+              // It takes 1/6 part of the screen
+              flex: 1,
+              child: Column(
+                children: [
+                  SizedBox(height: defaultPadding),
+                  Leaderboard(),
+                  SizedBox(height: defaultPadding),
+                  Other(),
+                  SizedBox(height: defaultPadding),
+                ],
+              ),
             ),
           ],
         ),
