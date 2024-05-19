@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
+import 'package:admin/screens/main/components/search_button.dart';
+import 'package:admin/screens/main/components/chat_widget.dart';
 import '../../../constants.dart';
 
 class Other extends StatelessWidget {
@@ -22,7 +23,7 @@ class Other extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Text(
-            "Other",
+            "Chat with AI",
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
@@ -32,16 +33,21 @@ class Other extends StatelessWidget {
           ),
           SizedBox(height: defaultPadding),
           Container(
-              height: 400,
-              padding: EdgeInsets.only(
-                left: defaultPadding,
-                right: defaultPadding,
+            height: 350,
+            padding: EdgeInsets.only(
+              left: defaultPadding,
+              right: defaultPadding,
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: ChatWidget(
+                msg: "Hello, how can I help you?",
+                chatIndex: 1,
               ),
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Text(
-                    "What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-                  )))
+            ),
+          ),
+          SizedBox(height: defaultPadding),
+          SearchButton(),
         ],
       ),
     );
