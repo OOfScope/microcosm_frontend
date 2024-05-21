@@ -27,9 +27,7 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     // Here we need vfertical scrollable menu games
                     children: [
-                      MyFiles(),
                       SizedBox(height: defaultPadding),
-                      RecentFiles(),
                     ],
                   ),
                 ),
