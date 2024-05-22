@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
 class Owly extends StatelessWidget {
+  var bb;
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -12,6 +13,7 @@ class Owly extends StatelessWidget {
           appBar: AppBar(title: Text('Image Selection')),
           body: ImageSelectionWidget(
             imageUrl: 'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg',
+            onSelectionComplete: (Rect value) { print(value); },
           ),
         ),
       ),
@@ -21,16 +23,15 @@ class Owly extends StatelessWidget {
 
 
 
-class ImageSelectionWidget extends StatefulWidget {
+class ImageSelectionWidget extends StatelessWidget {
   final String imageUrl;
+  final ValueChanged<Rect> onSelectionComplete;
 
-  ImageSelectionWidget({required this.imageUrl});
+  ImageSelectionWidget({
+    required this.imageUrl,
+    required this.onSelectionComplete,
+  });
 
-  @override
-  _ImageSelectionWidgetState createState() => _ImageSelectionWidgetState();
-}
-
-class _ImageSelectionWidgetState extends State<ImageSelectionWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -43,13 +44,19 @@ class _ImageSelectionWidgetState extends State<ImageSelectionWidget> {
             .updateSelection(details.localPosition);
       },
       onPanEnd: (details) {
-        Provider.of<SelectionModel>(context, listen: false).endSelection();
+        final selectionModel =
+            Provider.of<SelectionModel>(context, listen: false);
+        selectionModel.endSelection();
+        if (onSelectionComplete != null) {
+          final boundingBox = selectionModel.boundingBox;
+          onSelectionComplete(boundingBox);
+        }
       },
       child: Stack(
         children: [
           Center(
             child: Image.network(
-              widget.imageUrl,
+              imageUrl,
               fit: BoxFit.cover,
             ),
           ),
@@ -68,8 +75,8 @@ class _ImageSelectionWidgetState extends State<ImageSelectionWidget> {
 }
 
 class SelectionPainter extends CustomPainter {
-  final Offset? start;
-  final Offset? end;
+  final Offset start;
+  final Offset end;
   final List<Offset> points;
 
   SelectionPainter(this.start, this.end, this.points);
@@ -90,7 +97,7 @@ class SelectionPainter extends CustomPainter {
         ..color = Colors.blue.withOpacity(0.3)
         ..style = PaintingStyle.fill;
 
-      final rect = Rect.fromPoints(start!, end!);
+      final rect = Rect.fromPoints(start, end);
       canvas.drawRect(rect, rectPaint);
     }
   }
@@ -102,8 +109,8 @@ class SelectionPainter extends CustomPainter {
 }
 
 class SelectionModel extends ChangeNotifier {
-  Offset? _start;
-  Offset? _end;
+  late Offset _start;
+  late Offset _end;
   List<Offset> _points = [];
 
   void startSelection(Offset position) {
@@ -123,7 +130,14 @@ class SelectionModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Offset? get start => _start;
-  Offset? get end => _end;
+  Offset get start => _start;
+  Offset get end => _end;
   List<Offset> get points => _points;
+
+  Rect get boundingBox {
+    if (_start == null || _end == null) {
+      return Rect.zero;
+    }
+    return Rect.fromPoints(_start, _end);
+  }
 }
