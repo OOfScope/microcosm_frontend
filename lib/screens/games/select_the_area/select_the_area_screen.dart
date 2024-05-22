@@ -109,8 +109,8 @@ class SelectionPainter extends CustomPainter {
 }
 
 class SelectionModel extends ChangeNotifier {
-  late Offset _start;
-  late Offset _end;
+  Offset _start = Offset(0, 0);
+  late Offset _end = Offset(0, 0);
   List<Offset> _points = [];
 
   void startSelection(Offset position) {
