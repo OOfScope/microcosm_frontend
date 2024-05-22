@@ -13,6 +13,7 @@ void main() {
   return MapEntry(split[0], split[1]);
   });
   final cookieMap = Map.fromEntries(entity);
+  print("cookie:\n")
   print(cookieMap);
   print(document.URL);
   print(document);
