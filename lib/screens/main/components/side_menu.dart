@@ -34,6 +34,11 @@ class SideMenu extends StatelessWidget {
             svgSrc: "assets/icons/menu_setting.svg",
             press: () => onNavButtonPressed(2),
           ),
+          DrawerListTile(
+            title: "Roadmap_Test",
+            svgSrc: "assets/icons/menu_dashboard.svg",
+            press: () => onNavButtonPressed(3),
+          ),
         ],
       ),
     );
@@ -59,7 +64,6 @@ class DrawerListTile extends StatelessWidget {
       horizontalTitleGap: 0.0,
       leading: SvgPicture.asset(
         svgSrc,
-        colorFilter: ColorFilter.mode(Colors.white54, BlendMode.srcIn),
         height: 16,
       ),
       title: Text(

@@ -8,19 +8,18 @@ import 'package:provider/provider.dart';
 import 'package:web/web.dart';
 
 void main() {
-
-  if (kReleaseMode){
-  final cookie = document!.cookie;
-  final entity = cookie.split("; ").map((item) {
-  final split = item.split("=");
-  return MapEntry(split[0], split[1]);
-  });
-  final cookieMap = Map.fromEntries(entity);
-  print("cookie:\n");
-  print(cookieMap);
-  print(document);
-  print("---");
-  console.dir(document);
+  if (kReleaseMode) {
+    final cookie = document.cookie;
+    final entity = cookie.split("; ").map((item) {
+      final split = item.split("=");
+      return MapEntry(split[0], split[1]);
+    });
+    final cookieMap = Map.fromEntries(entity);
+    print("cookie:\n");
+    print(cookieMap);
+    print(document);
+    print("---");
+    console.dir(document);
   }
   runApp(MyApp());
 }

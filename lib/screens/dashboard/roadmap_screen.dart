@@ -1,12 +1,8 @@
-import 'package:admin/screens/dashboard/components/my_fields.dart';
 import 'package:flutter/material.dart';
-
 import '../../constants.dart';
 import '../main/components/header.dart';
 
-import 'components/recent_files.dart';
-
-class DashboardScreen extends StatelessWidget {
+class RoadmapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
