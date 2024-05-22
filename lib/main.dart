@@ -1,12 +1,15 @@
 import 'package:admin/constants.dart';
 import 'package:admin/controllers/MenuAppController.dart';
 import 'package:admin/screens/main/main_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:web/web.dart';
 
 void main() {
+
+  if (kReleaseMode){
   final cookie = document!.cookie;
   final entity = cookie.split("; ").map((item) {
   final split = item.split("=");
@@ -15,10 +18,10 @@ void main() {
   final cookieMap = Map.fromEntries(entity);
   print("cookie:\n");
   print(cookieMap);
-  print(document.URL);
   print(document);
   print("---");
   console.dir(document);
+  }
   runApp(MyApp());
 }
 

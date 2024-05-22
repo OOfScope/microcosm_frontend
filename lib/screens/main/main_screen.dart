@@ -2,6 +2,7 @@ import 'package:admin/constants.dart';
 import 'package:admin/controllers/MenuAppController.dart';
 import 'package:admin/responsive.dart';
 import 'package:admin/screens/dashboard/dashboard_screen.dart';
+import 'package:admin/screens/games/select_the_area/select_the_area_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:admin/screens/settings/settings_screen.dart';
@@ -10,10 +11,15 @@ import 'package:admin/screens/main/components/leaderboard.dart';
 import 'package:admin/screens/main/components/others.dart';
 import 'components/side_menu.dart';
 
+
+
 class MainScreen extends StatefulWidget {
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
+
+
+
 
 class _MainScreenState extends State<MainScreen> {
   var _selectedPage = 0;
@@ -26,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
         page = DashboardScreen();
         break;
       case 1:
-        page = ProfileScreen();
+        page = Owly();
         break;
       case 2:
         page = SettingsScreen();
