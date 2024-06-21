@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-class Owly extends StatelessWidget {
+class SelectTheAreaGame extends StatelessWidget {
   var bb;
   @override
   Widget build(BuildContext context) {

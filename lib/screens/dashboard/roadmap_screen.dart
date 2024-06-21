@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_levels_scrolling_map/game_levels_scrolling_map.dart';
 import 'package:game_levels_scrolling_map/model/point_model.dart';
-import 'package:admin/screens/games/drag_and_drop/drag_and_drop.dart';
-import 'package:admin/screens/games/select_the_area/select_the_area_screen.dart';
-import 'package:admin/screens/games/quiz/quiz.dart';
 
 typedef void IndexCallback(int index);
 
