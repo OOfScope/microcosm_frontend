@@ -12,16 +12,17 @@ class Owly extends StatelessWidget {
         home: Scaffold(
           appBar: AppBar(title: Text('Image Selection')),
           body: ImageSelectionWidget(
-            imageUrl: 'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg',
-            onSelectionComplete: (Rect value) { print(value); },
+            imageUrl:
+                'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg',
+            onSelectionComplete: (Rect value) {
+              print(value);
+            },
           ),
         ),
       ),
     );
   }
 }
-
-
 
 class ImageSelectionWidget extends StatelessWidget {
   final String imageUrl;
@@ -63,8 +64,8 @@ class ImageSelectionWidget extends StatelessWidget {
           Consumer<SelectionModel>(
             builder: (context, selectionModel, child) {
               return CustomPaint(
-                painter: SelectionPainter(
-                    selectionModel.start, selectionModel.end, selectionModel.points),
+                painter: SelectionPainter(selectionModel.start,
+                    selectionModel.end, selectionModel.points),
               );
             },
           ),

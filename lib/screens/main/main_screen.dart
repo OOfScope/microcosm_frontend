@@ -2,14 +2,14 @@ import 'package:admin/constants.dart';
 import 'package:admin/controllers/MenuAppController.dart';
 import 'package:admin/responsive.dart';
 import 'package:admin/screens/dashboard/roadmap_screen.dart';
-import 'package:admin/screens/games/select_the_area/select_the_area_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:admin/screens/settings/settings_screen.dart';
 import 'package:admin/screens/profile/profile_screen.dart';
 import 'package:admin/screens/main/components/leaderboard.dart';
 import 'package:admin/screens/main/components/others.dart';
-import 'package:admin/screens/dashboard/roadmap_test.dart';
+import 'package:admin/screens/games/drag_and_drop/drag_and_drop.dart';
+
 import 'components/side_menu.dart';
 
 class MainScreen extends StatefulWidget {
@@ -20,32 +20,32 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   var _selectedPage = 0;
 
+  void upNavBarId(int index) {
+    setState(() {
+      _selectedPage = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget page;
     switch (_selectedPage) {
       case 0:
-        page = RoadmapScreen();
+        page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
-        page = Owly();
+        page = ProfileScreen();
         break;
       case 2:
         page = SettingsScreen();
         break;
       case 3:
-        page = MapVerticalExample();
+        page = DragAndDropGame(onNavButtonPressed: upNavBarId);
         break;
       default:
         // If you ever add a new destination to the navigation rail
         // and forget to update this code, the program crashes in development
         throw UnimplementedError('no widget for $_selectedPage');
-    }
-
-    void upNavBarId(int index) {
-      setState(() {
-        _selectedPage = index;
-      });
     }
 
     return Scaffold(
