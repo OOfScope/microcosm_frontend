@@ -12,6 +12,7 @@ class Leaderboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 270,
       padding: EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: secondaryColor,

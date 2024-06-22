@@ -10,6 +10,7 @@ import 'package:admin/screens/main/components/leaderboard.dart';
 import 'package:admin/screens/main/components/others.dart';
 import 'package:admin/screens/games/drag_and_drop/drag_and_drop.dart';
 import 'package:admin/screens/games/select_the_area/select_the_area_screen.dart';
+import 'package:admin/screens/games/memory/memory_screen.dart';
 import 'package:admin/screens/games/quiz/quiz.dart';
 import 'components/side_menu.dart';
 
@@ -49,6 +50,9 @@ class _MainScreenState extends State<MainScreen> {
       case 5:
         page = QuizGame();
         break;
+      case 10:
+        page = MemoryGame();
+        break;
       default:
         // If you ever add a new destination to the navigation rail
         // and forget to update this code, the program crashes in development
@@ -79,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
               flex: 1,
               child: Column(
                 children: [
-                  SizedBox(height: defaultPadding),
+                  SizedBox(height: 2 * defaultPadding),
                   Leaderboard(),
                   SizedBox(height: defaultPadding),
                   Flexible(child: Other()),

@@ -34,6 +34,11 @@ class SideMenu extends StatelessWidget {
             svgSrc: "assets/icons/menu_setting.svg",
             press: () => onNavButtonPressed(2),
           ),
+          DrawerListTile(
+            title: "TestGame",
+            svgSrc: "assets/icons/menu_setting.svg",
+            press: () => onNavButtonPressed(10),
+          ),
         ],
       ),
     );
