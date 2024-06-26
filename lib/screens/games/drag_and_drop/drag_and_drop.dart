@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 
 typedef void IndexCallback(int index);
@@ -42,7 +43,9 @@ class DragAndDropWidget extends StatefulWidget {
 }
 
 class _DragAndDropWidgetState extends State<DragAndDropWidget> {
-  final String imageUrl = 'https://microcosm-backend.gmichele.com/random/image';
+  final String imageUrl =
+      'https://microcosm-backend.gmichele.com/get/low/random';
+
   List<Uint8List> pieces = [];
   final Map<int, Uint8List?> _currentPositions = {
     0: null,
@@ -50,8 +53,14 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
     2: null,
     3: null
   };
-  String resultMessage = '';
 
+  String resultMessage = '';
+  List<String> labels = [
+    'Top Left',
+    'Top Right',
+    'Bottom Left',
+    'Bottom Right'
+  ];
   @override
   void initState() {
     super.initState();
@@ -59,46 +68,65 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
   }
 
   Future<void> _downloadAndSplitImage() async {
-    final response = await http.get(Uri.parse(imageUrl));
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> quizData = jsonDecode(response.body);
+    for (int i = 0; i < 4; i++) {
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> quizData = jsonDecode(response.body);
 
-      final img.Image? fullImage =
-          img.decodeImage(base64Decode(quizData['rows'][0][0]));
-      if (fullImage == null) {
-        throw Exception("Failed to create image from bytes.");
+        final img.Image? fullImage =
+            img.decodeImage(base64Decode(quizData['rows'][0][1]));
+
+        if (fullImage == null) {
+          throw Exception("Failed to create image from bytes.");
+        }
+
+        // pieces = [
+        //   Uint8List.fromList(img.encodeJpg(
+        //       img.copyCrop(fullImage, 0, 0, pieceWidth, pieceHeight))),
+        //   Uint8List.fromList(img.encodeJpg(
+        //       img.copyCrop(fullImage, pieceWidth, 0, pieceWidth, pieceHeight))),
+        //   Uint8List.fromList(img.encodeJpg(img.copyCrop(
+        //       fullImage, 0, pieceHeight, pieceWidth, pieceHeight))),
+        //   Uint8List.fromList(img.encodeJpg(img.copyCrop(
+        //       fullImage, pieceWidth, pieceHeight, pieceWidth, pieceHeight))),
+        // ];
+
+        print('hey');
+
+        Set<int> pixels = {};
+        for (int i = 0; i < fullImage.width; i++) {
+          for (int j = 0; j < fullImage.height; j++) {
+            pixels.add(fullImage.getPixel(i, j));
+          }
+        }
+
+        print(pixels);
+
+        for (int i = 0; i < pixels.length; i++) {
+          print(Color(pixels.elementAt(i)));
+          print(Color(pixels.elementAt(i)).red);
+        }
+
+        setState(() {});
+      } else {
+        throw Exception('Failed to download image');
       }
-      final int pieceWidth = 1024;
-      final int pieceHeight = 1024;
-
-      pieces = [
-        Uint8List.fromList(img
-            .encodeJpg(img.copyCrop(fullImage, 0, 0, pieceWidth, pieceHeight))),
-        Uint8List.fromList(img.encodeJpg(
-            img.copyCrop(fullImage, pieceWidth, 0, pieceWidth, pieceHeight))),
-        Uint8List.fromList(img.encodeJpg(
-            img.copyCrop(fullImage, 0, pieceHeight, pieceWidth, pieceHeight))),
-        Uint8List.fromList(img.encodeJpg(img.copyCrop(
-            fullImage, pieceWidth, pieceHeight, pieceWidth, pieceHeight))),
-      ];
-
-      setState(() {});
-    } else {
-      throw Exception('Failed to download image');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      Column(children: [
         Expanded(
             child: Container(
-          height: 500,
-          width: 500,
+          padding: EdgeInsets.all(20),
+          alignment: Alignment.center,
+          height: 400,
+          width: 400,
           child: GridView.builder(
             gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
             itemCount: pieces.length,
             itemBuilder: (context, index) {
               return DragTarget<Uint8List>(
@@ -133,28 +161,17 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                           color: Colors.grey[200],
                           width: 100,
                           height: 100,
-                        );
+                          child: Center(
+                            child: Text(
+                              labels[index],
+                              style: TextStyle(fontSize: 24),
+                            ),
+                          ));
                 },
               );
             },
           ),
         )),
-        SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: pieces.map((piece) {
-            return Draggable<Uint8List>(
-              data: piece,
-              child: !_currentPositions.containsValue(piece)
-                  ? Image.memory(piece, width: 100, height: 100)
-                  : Container(
-                      width: 100, height: 100), // Empty space once placed
-              feedback: Image.memory(piece, width: 100, height: 100),
-              childWhenDragging: Container(
-                  width: 100, height: 100), // Empty space while dragging
-            );
-          }).toList(),
-        ),
         SizedBox(height: 20),
         Row(children: [
           ElevatedButton(
@@ -173,8 +190,21 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
               ? TextStyle(fontSize: 24, color: Colors.red)
               : TextStyle(fontSize: 24, color: Colors.green),
         ),
-      ],
-    );
+      ]),
+      Column(
+        children: pieces.map((piece) {
+          return Draggable<Uint8List>(
+            data: piece,
+            child: !_currentPositions.containsValue(piece)
+                ? Image.memory(piece, width: 200, height: 200)
+                : Container(width: 200, height: 200), // Empty space once placed
+            feedback: Image.memory(piece, width: 200, height: 200),
+            childWhenDragging: Container(
+                width: 200, height: 200), // Empty space while dragging
+          );
+        }).toList(),
+      ),
+    ]);
   }
 
   void _checkPositions() {

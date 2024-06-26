@@ -45,14 +45,19 @@ class _MainScreenState extends State<MainScreen> {
         page = DragAndDropGame(onNavButtonPressed: upNavBarId);
         break;
       case 4:
-        page = SelectTheAreaGame();
+        page = MemoryGame();
         break;
       case 5:
         page = QuizGame();
         break;
-      case 10:
-        page = MemoryGame();
+      case 6:
+        page = SelectTheAreaGame();
         break;
+
+      case 10:
+        page = DragAndDropGame(onNavButtonPressed: upNavBarId);
+        break;
+
       default:
         // If you ever add a new destination to the navigation rail
         // and forget to update this code, the program crashes in development
