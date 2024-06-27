@@ -38,8 +38,8 @@ void main() {
     print(document);
     print("---");
     console.dir(document);
+    jwt_decode('we');
   }
-  f()
   runApp(MyApp());
 }
 
