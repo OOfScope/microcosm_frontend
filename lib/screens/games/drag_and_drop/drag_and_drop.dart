@@ -1,8 +1,8 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as img;
-import 'dart:typed_data';
-import 'package:flutter/services.dart';
 import 'dart:convert';
 
 typedef void IndexCallback(int index);
@@ -44,10 +44,10 @@ class DragAndDropWidget extends StatefulWidget {
 
 class _DragAndDropWidgetState extends State<DragAndDropWidget> {
   final String imageUrl =
-      'https://microcosm-backend.gmichele.com/get/low/random';
+      'https://microcosm-backend.gmichele.com/get/low/random/image';
 
-  List<Uint8List> pieces = [];
-  final Map<int, Uint8List?> _currentPositions = {
+  List<Image> pieces = [];
+  final Map<int, Image?> _currentPositions = {
     0: null,
     1: null,
     2: null,
@@ -55,12 +55,14 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
   };
 
   String resultMessage = '';
+
   List<String> labels = [
     'Top Left',
     'Top Right',
     'Bottom Left',
     'Bottom Right'
   ];
+
   @override
   void initState() {
     super.initState();
@@ -73,39 +75,27 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
       if (response.statusCode == 200) {
         final Map<String, dynamic> quizData = jsonDecode(response.body);
 
-        final img.Image? fullImage =
-            img.decodeImage(base64Decode(quizData['rows'][0][1]));
+        final Image? fullImage =
+            Image.memory(base64Decode(quizData['rows'][0][0]));
 
         if (fullImage == null) {
           throw Exception("Failed to create image from bytes.");
         }
+        pieces.add(fullImage);
 
-        // pieces = [
-        //   Uint8List.fromList(img.encodeJpg(
-        //       img.copyCrop(fullImage, 0, 0, pieceWidth, pieceHeight))),
-        //   Uint8List.fromList(img.encodeJpg(
-        //       img.copyCrop(fullImage, pieceWidth, 0, pieceWidth, pieceHeight))),
-        //   Uint8List.fromList(img.encodeJpg(img.copyCrop(
-        //       fullImage, 0, pieceHeight, pieceWidth, pieceHeight))),
-        //   Uint8List.fromList(img.encodeJpg(img.copyCrop(
-        //       fullImage, pieceWidth, pieceHeight, pieceWidth, pieceHeight))),
-        // ];
+        // Set<int> pixels = {};
+        // for (int i = 0; i < fullImage.width; i++) {
+        //   for (int j = 0; j < fullImage.height; j++) {
+        //     pixels.add(fullImage.getPixel(i, j));
+        //   }
+        // }
 
-        print('hey');
+        // print(pixels);
 
-        Set<int> pixels = {};
-        for (int i = 0; i < fullImage.width; i++) {
-          for (int j = 0; j < fullImage.height; j++) {
-            pixels.add(fullImage.getPixel(i, j));
-          }
-        }
-
-        print(pixels);
-
-        for (int i = 0; i < pixels.length; i++) {
-          print(Color(pixels.elementAt(i)));
-          print(Color(pixels.elementAt(i)).red);
-        }
+        // for (int i = 0; i < pixels.length; i++) {
+        //   print(Color(pixels.elementAt(i)));
+        //   print(Color(pixels.elementAt(i)).red);
+        // }
 
         setState(() {});
       } else {
@@ -116,95 +106,146 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      Column(children: [
-        Expanded(
-            child: Container(
-          padding: EdgeInsets.all(20),
-          alignment: Alignment.center,
-          height: 400,
-          width: 400,
-          child: GridView.builder(
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
-            itemCount: pieces.length,
-            itemBuilder: (context, index) {
-              return DragTarget<Uint8List>(
-                onAccept: (data) {
-                  setState(() {
-                    Uint8List? previousData = _currentPositions[index];
-                    int previousIndex = _currentPositions.keys.firstWhere(
-                        (key) => _currentPositions[key] == data,
-                        orElse: () => -1);
-                    if (previousIndex != -1) {
-                      _currentPositions[previousIndex] = previousData;
-                    }
-                    _currentPositions[index] = data;
-                    //print(_currentPositions[index]);
-                  });
-                },
-                builder: (context, candidateData, rejectedData) {
-                  return _currentPositions[index] != null
-                      ? Draggable(
-                          data: _currentPositions[index],
-                          child: Image.memory(
-                            _currentPositions[index]!,
-                            width: 100,
-                            height: 100,
-                          ),
-                          feedback: Image.memory(_currentPositions[index]!,
-                              width: 100, height: 100),
-                          childWhenDragging: Container(
-                              color: Colors.grey[200], width: 100, height: 100),
-                        )
-                      : Container(
-                          color: Colors.grey[200],
-                          width: 100,
-                          height: 100,
-                          child: Center(
-                            child: Text(
-                              labels[index],
-                              style: TextStyle(fontSize: 24),
-                            ),
-                          ));
-                },
-              );
-            },
-          ),
-        )),
-        SizedBox(height: 20),
-        Row(children: [
-          ElevatedButton(
-            onPressed: _checkPositions,
-            child: Text('Confirm Choices'),
-          ),
-          ElevatedButton(
-            onPressed: () => widget.onNavButtonPressed(0),
-            child: Text('Main Menu'),
-          )
-        ]),
-        SizedBox(height: 20),
-        Text(
-          resultMessage,
-          style: resultMessage != 'Well Done!'
-              ? TextStyle(fontSize: 24, color: Colors.red)
-              : TextStyle(fontSize: 24, color: Colors.green),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        SizedBox(
+          height: 20,
         ),
-      ]),
-      Column(
-        children: pieces.map((piece) {
-          return Draggable<Uint8List>(
-            data: piece,
-            child: !_currentPositions.containsValue(piece)
-                ? Image.memory(piece, width: 200, height: 200)
-                : Container(width: 200, height: 200), // Empty space once placed
-            feedback: Image.memory(piece, width: 200, height: 200),
-            childWhenDragging: Container(
-                width: 200, height: 200), // Empty space while dragging
-          );
-        }).toList(),
-      ),
-    ]);
+        Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+            Container(
+              transformAlignment: Alignment.center,
+              padding: EdgeInsets.all(20),
+              alignment: Alignment.center,
+              height: 500,
+              width: 500,
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisSpacing: 8, mainAxisSpacing: 8, crossAxisCount: 2),
+                itemCount: pieces.length,
+                itemBuilder: (context, index) {
+                  return DragTarget<Image>(
+                    onAccept: (data) {
+                      setState(() {
+                        Image? previousData = _currentPositions[index];
+                        int previousIndex = _currentPositions.keys.firstWhere(
+                            (key) => _currentPositions[key] == data,
+                            orElse: () => -1);
+
+                        if (previousIndex != -1) {
+                          //print('Previous index: $previousIndex');
+                          _currentPositions[previousIndex] = previousData;
+                        }
+                        _currentPositions[index] = data;
+                      });
+                    },
+                    builder: (context, candidateData, rejectedData) {
+                      return _currentPositions[index] != null
+                          ? Draggable(
+                              data: _currentPositions[index],
+                              child: Container(
+                                child: _currentPositions[index]!,
+                                width: 200,
+                                height: 200,
+                              ),
+                              feedback: Center(
+                                child: Container(
+                                  child: _currentPositions[index]!,
+                                  width: 200,
+                                  height: 200,
+                                ),
+                              ),
+                              childWhenDragging: Container(
+                                color: Colors.grey[200],
+                                width: 200,
+                                height: 200,
+                                child: Center(
+                                    child: Text(
+                                  labels[index],
+                                  style: TextStyle(fontSize: 24),
+                                )),
+                              ))
+                          : Container(
+                              color: Colors.grey[200],
+                              width: 200,
+                              height: 200,
+                              child: Center(
+                                child: Text(
+                                  labels[index],
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                              ));
+                    },
+                  );
+                },
+              ),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Center(
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 400,
+                    width: 400,
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio:
+                            1, // Aspect ratio for 1:1 (square) items
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                      ),
+                      itemCount: pieces.length,
+                      itemBuilder: (context, index) {
+                        return Draggable<Image>(
+                          data: pieces[index],
+                          child: !_currentPositions.containsValue(pieces[index])
+                              ? Container(
+                                  child: pieces[index], width: 200, height: 200)
+                              : Container(
+                                  width: 200,
+                                  height: 200), // Empty space once placed
+                          feedback: Container(
+                              child: pieces[index], width: 200, height: 200),
+                          childWhenDragging: Container(
+                              width: 200,
+                              height: 200), // Empty space while dragging
+                          onDragCompleted: () {},
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ]),
+          SizedBox(
+            height: 40,
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            ElevatedButton(
+              onPressed: _checkPositions,
+              child: Text('Confirm Choices'),
+            ),
+            ElevatedButton(
+              onPressed: () => widget.onNavButtonPressed(0),
+              child: Text('Main Menu'),
+            )
+          ]),
+        ]),
+        Center(
+          child: Text(
+            resultMessage,
+            style: resultMessage != 'Well Done!'
+                ? TextStyle(fontSize: 24, color: Colors.red)
+                : TextStyle(fontSize: 24, color: Colors.green),
+          ),
+        ),
+      ],
+    );
   }
 
   void _checkPositions() {

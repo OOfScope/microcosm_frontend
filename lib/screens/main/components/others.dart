@@ -34,7 +34,7 @@ class Other extends StatelessWidget {
           ),
           SizedBox(height: defaultPadding),
           Container(
-            height: 250,
+            height: 230,
             padding: EdgeInsets.only(
               left: defaultPadding,
               right: defaultPadding,

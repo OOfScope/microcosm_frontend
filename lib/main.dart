@@ -5,26 +5,23 @@ import 'package:admin/controllers/MenuAppController.dart';
 import 'package:admin/screens/main/main_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:web/web.dart';
 import 'package:http/http.dart' as http;
 
-
-
-Future<JSBoxedDartObject> jwt_decode(String token) async{
-  final String jwt_decode_url = 'https://microcosm-backend.gmichele.com/parse_jwt/' + token;
+Future<JSBoxedDartObject> jwt_decode(String token) async {
+  final String jwt_decode_url =
+      'https://microcosm-backend.gmichele.com/parse_jwt/' + token;
 
   final response = await http.get(Uri.parse(jwt_decode_url));
 
-      if (response.statusCode == 200) {
-        console.dir(response.toJSBox);
-      }
+  if (response.statusCode == 200) {
+    console.dir(response.toJSBox);
+  }
   return response.toJSBox;
-      
 }
-
-
 
 void main() {
   if (kReleaseMode) {
@@ -40,6 +37,7 @@ void main() {
     Future<JSBoxedDartObject> ret = jwt_decode(token);
     console.dir(ret.toJS);
   }
+  debugPaintSizeEnabled = false;
   runApp(MyApp());
 }
 
