@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 
 Future<JSBoxedDartObject> jwt_decode(String token) async {
   final String jwt_decode_url =
-      'https://microcosm-backend.gmichele.com/parse_jwt/' + token;
+      'https://microcosm-backend.gmichele.com/parse_jwt/user_data/' + token;
 
   final response = await http.get(Uri.parse(jwt_decode_url));
 
@@ -35,7 +35,9 @@ void main() {
     console.log(token.toJS);
 
     Future<JSBoxedDartObject> ret = jwt_decode(token);
+    console.log("OUT".toJS);
     console.dir(ret.toJS);
+
   }
   debugPaintSizeEnabled = false;
   runApp(MyApp());
