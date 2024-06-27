@@ -12,15 +12,16 @@ import 'package:http/http.dart' as http;
 
 
 
-void jwt_decode(String token) async{
+Future<JSBoxedDartObject> jwt_decode(String token) async{
   final String jwt_decode_url = 'https://microcosm-backend.gmichele.com/parse_jwt/' + token;
 
   final response = await http.get(Uri.parse(jwt_decode_url));
 
       if (response.statusCode == 200) {
         console.dir(response.toJSBox);
-        // final Map<String, dynamic> quizData = jsonDecode(response.body);
       }
+  return response.toJSBox;
+      
 }
 
 
@@ -33,12 +34,11 @@ void main() {
       return MapEntry(split[0], split[1]);
     });
     final cookieMap = Map.fromEntries(entity);
-    print("cookie:\n");
-    print(cookieMap);
-    print(document);
-    print("---");
-    console.dir(document);
-    jwt_decode('we');
+    final String token = cookieMap["CF_Authorization"].toString();
+    console.log(token.toJS);
+
+    Future<JSBoxedDartObject> ret = jwt_decode(token);
+    console.dir(ret.toJS);
   }
   runApp(MyApp());
 }
