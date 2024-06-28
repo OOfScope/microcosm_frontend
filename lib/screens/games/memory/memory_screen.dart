@@ -146,9 +146,9 @@ class CardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
+    return ColoredBox(
       color: Colors.grey,
-      child: Center(
+      child: const Center(
         child: Text(
           '?',
           style: TextStyle(fontSize: 24, color: Colors.white),

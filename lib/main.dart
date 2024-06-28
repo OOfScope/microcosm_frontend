@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:js_interop';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +9,70 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web/web.dart';
 
 import 'constants.dart';
 import 'controllers/menu_app_controller.dart';
+import 'models/user_data.dart';
 import 'screens/main/main_screen.dart';
+import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<User> checkIfUserOnDisk(String email, String country) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  final String? nickname = prefs.getString('nickname');
+  final int score = prefs.getInt('score') ?? 0;
+  final int level = prefs.getInt('level') ?? 0;
+
+  if (nickname != null && prefs.getString('email') == email && prefs.getString('country') == country) {
+    // User exists on disk
+    final String name = email.split('@').first;
+    final String laboratory = prefs.getString('laboratory') ?? 'Unknown Lab';
+
+    User user = User(
+      nickname: nickname,
+      name: name,
+      email: email,
+      laboratory: laboratory,
+      score: score,
+      level: level,
+      country: country,
+    );
+    print(user);
+    return user;
+
+  } else {
+    // User does not exist on disk, create one
+    final String name = email.split('@').first;
+    
+    // List of random names for the laboratory
+    final List<String> labNames = ['Physics Lab', 'Chemistry Lab', 'Biology Lab', 'Computer Lab'];
+    final String laboratory = labNames[Random().nextInt(labNames.length)];
+
+    // Set new user data in SharedPreferences
+    await prefs.setString('nickname', name);
+    await prefs.setString('name', name);
+    await prefs.setString('email', email);
+    await prefs.setString('laboratory', laboratory);
+    await prefs.setInt('score', score);
+    await prefs.setInt('level', level);
+    await prefs.setString('country', country);
+
+    User user = User(
+      nickname: name,
+      name: name,
+      email: email,
+      laboratory: laboratory,
+      score: score,
+      level: level,
+      country: country,
+    );
+    print(user);
+    return user;
+  }
+}
 
 Future<Map<String, dynamic>> jwtDecode(String token) async {
   final String jwtDecodeUrl =
@@ -33,6 +93,7 @@ Future<Map<String, dynamic>> jwtDecode(String token) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
 
   Map<String, dynamic>? decodedToken;
 
@@ -69,6 +130,12 @@ void main() async {
       print(decodedToken);
     }
   }
+  String email = decodedToken!['email'] as String;
+  String country = decodedToken['country'] as String;
+
+  final User user = await checkIfUserOnDisk(email, country);
+
+  print(user);
 
   debugPaintSizeEnabled = false;
   runApp(const MyApp());
