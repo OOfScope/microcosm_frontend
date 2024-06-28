@@ -29,7 +29,7 @@ class SearchButton extends StatelessWidget {
               height: 22,
               width: 22,
               child: IconButton(
-                  padding: const EdgeInsets.all(0.0),
+                  padding: EdgeInsets.zero,
                   onPressed: () {
                     print('Send button pressed');
                   },

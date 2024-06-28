@@ -49,9 +49,9 @@ class account_info_card extends StatelessWidget {
     required this.name,
     required this.score,
   });
-  final rank;
-  final name;
-  final score;
+  final String rank;
+  final String name;
+  final String score;
 
   @override
   Widget build(BuildContext context) {

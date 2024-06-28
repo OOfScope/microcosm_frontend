@@ -17,7 +17,7 @@ class CloudStorageInfo {
   final Color? color;
 }
 
-List demoMyFiles = <>[
+List demoMyFiles = <CloudStorageInfo>[
   CloudStorageInfo(
     title: 'Documents',
     numOfFiles: 1328,

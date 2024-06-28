@@ -50,7 +50,7 @@ class _CircleImageComparisonScreenState
     final http.Response response2 = await http
         .get(Uri.parse('https://microcosm-backend.gmichele.com/1/mask'));
 
-    final data1 = jsonDecode(response1.body);
+    final Map<String, dynamic> data1 = jsonDecode(response1.body) as Map<String, dynamic>;
     final data2 = jsonDecode(response2.body);
 
     setState(() {

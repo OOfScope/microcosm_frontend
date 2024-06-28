@@ -4,7 +4,7 @@ class RecentFile {
   final String? icon, title, date, size;
 }
 
-List demoRecentFiles = <>[
+List demoRecentFiles = <RecentFile>[
   RecentFile(
     icon: 'assets/icons/xd_file.svg',
     title: 'XD File',
