@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants.dart';
-import '../../controllers/MenuAppController.dart';
+import '../../controllers/menu_app_controller.dart';
 import '../../responsive.dart';
 import '../dashboard/roadmap_screen.dart';
 import '../games/drag_and_drop/drag_and_drop.dart';
@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
         break;
 
       case 10:
-        page = const ChatApp();
+        page = const MemoryGame();
         break;
 
       default:

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../constants.dart';
 
@@ -31,7 +32,9 @@ class SearchButton extends StatelessWidget {
               child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
-                    print('Send button pressed');
+                    if (kDebugMode) {
+                      print('Send button pressed');
+                    }
                   },
                   icon: const Icon(Icons.send, size: 22, color: Colors.white)),
             )),

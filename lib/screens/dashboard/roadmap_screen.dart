@@ -5,7 +5,6 @@ import 'package:game_levels_scrolling_map/model/point_model.dart';
 typedef IndexCallback = void Function(int index);
 
 class RoadmapScreen extends StatefulWidget {
-
   const RoadmapScreen({super.key, required this.onNavButtonPressed});
   final IndexCallback onNavButtonPressed;
 
@@ -17,8 +16,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-          child: GameLevelsScrollingMap.scrollable(
+      body: GameLevelsScrollingMap.scrollable(
         imageUrl: 'assets/images/map_vertical.png',
         direction: Axis.vertical,
         reverseScrolling: true,
@@ -26,7 +24,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
         pointsPositionDeltaY: 25,
         svgUrl: 'assets/images/map_vertical.svg',
         points: points,
-      )), // This trailing comma makes auto-formatting nicer for build methods.
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
