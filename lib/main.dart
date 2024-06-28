@@ -35,6 +35,7 @@ void main() {
 
 
   if (kReleaseMode) {
+    console.log('K-RELEASE'.toJS)
     final cookie = document.cookie;
     final entity = cookie.split("; ").map((item) {
       final split = item.split("=");
