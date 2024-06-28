@@ -25,6 +25,8 @@ Future<Map<String,dynamic>> jwt_decode(String token) async {
   }else{
       String body = response.body;
       var ret = jsonDecode(response.body) as Map<String, dynamic>;
+      console.dir(ret.jsify());
+
       return ret;
 
   }
