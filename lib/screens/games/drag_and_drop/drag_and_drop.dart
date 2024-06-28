@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -126,7 +123,7 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                 itemCount: pieces.length,
                 itemBuilder: (context, index) {
                   return DragTarget<Image>(
-                    onAccept: (data) {
+                    onAcceptWithDetails: (data) {
                       setState(() {
                         Image? previousData = _currentPositions[index];
                         int previousIndex = _currentPositions.keys.firstWhere(
@@ -137,7 +134,7 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                           //print('Previous index: $previousIndex');
                           _currentPositions[previousIndex] = previousData;
                         }
-                        _currentPositions[index] = data;
+                        _currentPositions[index] = data as Image?;
                       });
                     },
                     builder: (context, candidateData, rejectedData) {

@@ -27,7 +27,7 @@ class _CircleImageComparisonScreenState
   Offset? _startPoint;
   Offset? _endPoint;
   bool _isDrawing = false;
-  bool _isSecondClick = false;
+  // bool _isSecondClick = false;
   Uint8List _image1Bytes = Uint8List(0);
   Uint8List _image2Bytes = Uint8List(0);
   img.Image? _image1;

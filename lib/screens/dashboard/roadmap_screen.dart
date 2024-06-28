@@ -33,6 +33,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
 
   @override
   void initState() {
+    super.initState();
     fillTestData();
   }
 
