@@ -4,12 +4,10 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
-  runApp(const ChatApp());
+  runApp(ChatApp());
 }
 
 class ChatApp extends StatelessWidget {
-  const ChatApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,48 +23,44 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  final List<Widget> _messages = <Widget>[];
+  final List<Widget> _messages = [];
 
   Stream<String> _sendMessage(String message) async* {
-    if (message.isEmpty) {
-      return;
-    }
+    if (message.isEmpty) return;
 
     setState(() {
-      _messages.add(Text('You: $message'));
+      _messages.add(Text("You: $message"));
     });
 
     _controller.clear();
 
-    final http.Response response = await http.post(
+    final response = await http.post(
       Uri.parse('https://ollama.vinzlab.com/api/generate'),
-      headers: <String, String>{'Content-Type': 'application/json'},
-      body:
-          json.encode(<String, String>{'model': 'gemma:2b', 'prompt': message}),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'model': 'gemma:2b', 'prompt': message}),
     );
 
     if (response.statusCode == 200) {
-      final Iterable<String> lines = LineSplitter.split(response.body);
-      for (final String line in lines) {
-        final Map<String, String> decoded =
-            json.decode(line) as Map<String, String>;
-        final String token = decoded['response']!;
+      final lines = LineSplitter.split(response.body);
+      for (final line in lines) {
+        final decoded = json.decode(line);
+        final token = decoded['response'] as String;
         yield token;
       }
     } else {
-      yield 'Error ${response.statusCode}';
+      yield "Error ${response.statusCode}";
     }
   }
 
   void _handleSendMessage() {
-    final String message = _controller.text;
+    final message = _controller.text;
     if (message.isNotEmpty) {
-      final Stream<String> responseStream = _sendMessage(message);
+      final responseStream = _sendMessage(message);
       setState(() {
         _messages.add(
           StreamBuilder<String>(
             stream: responseStream,
-            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return CircularProgressIndicator();
               } else if (snapshot.hasError) {
@@ -88,18 +82,17 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('ChatGPT Chatbox')),
       body: Column(
-        children: <Widget>[
+        children: [
           Expanded(
             child: ListView.builder(
               itemCount: _messages.length,
-              itemBuilder: (BuildContext context, int index) =>
-                  _messages[index],
+              itemBuilder: (context, index) => _messages[index],
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              children: <Widget>[
+              children: [
                 Expanded(
                   child: TextField(
                     controller: _controller,
