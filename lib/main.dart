@@ -23,7 +23,6 @@ Future<Map<String, dynamic>> jwt_decode(String token) async {
   } else {
     String body = response.body;
     var ret = jsonDecode(body) as Map<String, dynamic>;
-    //console.dir(ret.jsify());
     return ret;
   }
 }
@@ -55,7 +54,7 @@ void main() async {
   if (decodedToken == null || decodedToken.isEmpty) {
     console.log('Error in token parsing or token is empty!'.toJS);
   } else {
-    print(decodedToken['email']);
+    print(decodedToken);
   }
 
   debugPaintSizeEnabled = false;
