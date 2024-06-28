@@ -3,37 +3,37 @@ import '../../../constants.dart';
 
 class SearchButton extends StatelessWidget {
   const SearchButton({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
         decoration: InputDecoration(
-      hintText: "Ask me anything...",
+      hintText: 'Ask me anything...',
       fillColor: secondaryColor,
       filled: true,
-      border: OutlineInputBorder(
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+      border: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       suffixIcon: InkWell(
         onTap: () {},
         child: Container(
-            padding: EdgeInsets.all(defaultPadding * 0.75),
-            margin: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-            decoration: BoxDecoration(
+            padding: const EdgeInsets.all(defaultPadding * 0.75),
+            margin: const EdgeInsets.symmetric(horizontal: defaultPadding / 2),
+            decoration: const BoxDecoration(
               color: primaryColor,
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              borderRadius: BorderRadius.all(Radius.circular(10)),
             ),
             child: SizedBox(
               height: 22,
               width: 22,
               child: IconButton(
-                  padding: EdgeInsets.all(0.0),
-                  onPressed: (() {
-                    print("Send button pressed");
-                  }),
-                  icon: Icon(Icons.send, size: 22, color: Colors.white)),
+                  padding: const EdgeInsets.all(0.0),
+                  onPressed: () {
+                    print('Send button pressed');
+                  },
+                  icon: const Icon(Icons.send, size: 22, color: Colors.white)),
             )),
       ),
     ));

@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-typedef void IndexCallback(int index);
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+typedef IndexCallback = void Function(int index);
 
 class DragAndDropGame extends StatelessWidget {
-  final IndexCallback onNavButtonPressed;
 
-  const DragAndDropGame({Key? key, required this.onNavButtonPressed})
-      : super(key: key);
+  const DragAndDropGame({super.key, required this.onNavButtonPressed});
+  final IndexCallback onNavButtonPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +19,10 @@ class DragAndDropGame extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Drag and Drop Game'),
+          title: const Text('Drag and Drop Game'),
         ),
         body: DragAndDropWidget(
-          onNavButtonPressed: this.onNavButtonPressed,
+          onNavButtonPressed: onNavButtonPressed,
         ),
       ),
     );
@@ -30,10 +30,9 @@ class DragAndDropGame extends StatelessWidget {
 }
 
 class DragAndDropWidget extends StatefulWidget {
-  final IndexCallback onNavButtonPressed;
 
-  const DragAndDropWidget({Key? key, required this.onNavButtonPressed})
-      : super(key: key);
+  const DragAndDropWidget({super.key, required this.onNavButtonPressed});
+  final IndexCallback onNavButtonPressed;
 
   @override
   _DragAndDropWidgetState createState() => _DragAndDropWidgetState();
@@ -43,8 +42,8 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
   final String imageUrl =
       'https://microcosm-backend.gmichele.com/get/low/random/image';
 
-  List<Image> pieces = [];
-  final Map<int, Image?> _currentPositions = {
+  List<Image> pieces = <Image>[];
+  final Map<int, Image?> _currentPositions = <int, Image?>{
     0: null,
     1: null,
     2: null,
@@ -53,7 +52,7 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
 
   String resultMessage = '';
 
-  List<String> labels = [
+  List<String> labels = <String>[
     'Top Left',
     'Top Right',
     'Bottom Left',
@@ -68,16 +67,12 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
 
   Future<void> _downloadAndSplitImage() async {
     for (int i = 0; i < 4; i++) {
-      final response = await http.get(Uri.parse(imageUrl));
+      final http.Response response = await http.get(Uri.parse(imageUrl));
       if (response.statusCode == 200) {
         final Map<String, dynamic> quizData = jsonDecode(response.body);
 
-        final Image? fullImage =
+        final Image fullImage =
             Image.memory(base64Decode(quizData['rows'][0][0]));
-
-        if (fullImage == null) {
-          throw Exception("Failed to create image from bytes.");
-        }
         pieces.add(fullImage);
 
         // Set<int> pixels = {};
@@ -105,29 +100,29 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        SizedBox(
+      children: <Widget>[
+        const SizedBox(
           height: 20,
         ),
-        Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+        Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
+          Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
             Container(
               transformAlignment: Alignment.center,
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               alignment: Alignment.center,
               height: 500,
               width: 500,
               child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisSpacing: 8, mainAxisSpacing: 8, crossAxisCount: 2),
                 itemCount: pieces.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (BuildContext context, int index) {
                   return DragTarget<Image>(
-                    onAcceptWithDetails: (data) {
+                    onAcceptWithDetails: (DragTargetDetails<Image> data) {
                       setState(() {
-                        Image? previousData = _currentPositions[index];
-                        int previousIndex = _currentPositions.keys.firstWhere(
-                            (key) => _currentPositions[key] == data,
+                        final Image? previousData = _currentPositions[index];
+                        final int previousIndex = _currentPositions.keys.firstWhere(
+                            (int key) => _currentPositions[key] == data,
                             orElse: () => -1);
 
                         if (previousIndex != -1) {
@@ -137,20 +132,15 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                         _currentPositions[index] = data as Image?;
                       });
                     },
-                    builder: (context, candidateData, rejectedData) {
+                    builder: (BuildContext context, List<Image?> candidateData, List rejectedData) {
                       return _currentPositions[index] != null
                           ? Draggable(
                               data: _currentPositions[index],
-                              child: Container(
-                                child: _currentPositions[index]!,
-                                width: 200,
-                                height: 200,
-                              ),
                               feedback: Center(
-                                child: Container(
-                                  child: _currentPositions[index]!,
+                                child: SizedBox(
                                   width: 200,
                                   height: 200,
+                                  child: _currentPositions[index],
                                 ),
                               ),
                               childWhenDragging: Container(
@@ -160,8 +150,13 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                                 child: Center(
                                     child: Text(
                                   labels[index],
-                                  style: TextStyle(fontSize: 24),
+                                  style: const TextStyle(fontSize: 24),
                                 )),
+                              ),
+                              child: SizedBox(
+                                width: 200,
+                                height: 200,
+                                child: _currentPositions[index],
                               ))
                           : Container(
                               color: Colors.grey[200],
@@ -170,7 +165,7 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                               child: Center(
                                 child: Text(
                                   labels[index],
-                                  style: TextStyle(fontSize: 24),
+                                  style: const TextStyle(fontSize: 24),
                                 ),
                               ));
                     },
@@ -178,39 +173,39 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                 },
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 40,
             ),
             Center(
               child: Row(
-                children: [
+                children: <Widget>[
                   SizedBox(
                     height: 400,
                     width: 400,
                     child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio:
-                            1, // Aspect ratio for 1:1 (square) items
                         crossAxisSpacing: 8,
                         mainAxisSpacing: 8,
                       ),
                       itemCount: pieces.length,
-                      itemBuilder: (context, index) {
+                      itemBuilder: (BuildContext context, int index) {
                         return Draggable<Image>(
-                          data: pieces[index],
-                          child: !_currentPositions.containsValue(pieces[index])
-                              ? Container(
-                                  child: pieces[index], width: 200, height: 200)
-                              : Container(
-                                  width: 200,
-                                  height: 200), // Empty space once placed
-                          feedback: Container(
-                              child: pieces[index], width: 200, height: 200),
-                          childWhenDragging: Container(
+                          data: pieces[index], // Empty space once placed
+                          feedback: SizedBox(
+                              width: 200, height: 200,
+                              child: pieces[index]),
+                          childWhenDragging: const SizedBox(
                               width: 200,
                               height: 200), // Empty space while dragging
                           onDragCompleted: () {},
+                          child: !_currentPositions.containsValue(pieces[index])
+                              ? SizedBox(
+                                  width: 200, height: 200,
+                                  child: pieces[index])
+                              : const SizedBox(
+                                  width: 200,
+                                  height: 200),
                         );
                       },
                     ),
@@ -219,17 +214,17 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
               ),
             ),
           ]),
-          SizedBox(
+          const SizedBox(
             height: 40,
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             ElevatedButton(
               onPressed: _checkPositions,
-              child: Text('Confirm Choices'),
+              child: const Text('Confirm Choices'),
             ),
             ElevatedButton(
               onPressed: () => widget.onNavButtonPressed(0),
-              child: Text('Main Menu'),
+              child: const Text('Main Menu'),
             )
           ]),
         ]),
@@ -237,8 +232,8 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
           child: Text(
             resultMessage,
             style: resultMessage != 'Well Done!'
-                ? TextStyle(fontSize: 24, color: Colors.red)
-                : TextStyle(fontSize: 24, color: Colors.green),
+                ? const TextStyle(fontSize: 24, color: Colors.red)
+                : const TextStyle(fontSize: 24, color: Colors.green),
           ),
         ),
       ],

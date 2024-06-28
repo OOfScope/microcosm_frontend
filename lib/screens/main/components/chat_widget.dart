@@ -1,6 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:admin/screens/main/components/text_widget.dart';
+import 'text_widget.dart';
 
 Color scaffoldBackgroundColor = const Color(0xFF343541);
 Color cardColor = const Color(0xFF444654);
@@ -18,18 +18,18 @@ class ChatWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
+      children: <Widget>[
         Material(
           color: chatIndex == 0 ? scaffoldBackgroundColor : cardColor,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 Image.asset(
                   chatIndex == 0
-                      ? "assets/images/person.png"
-                      : "assets/images/chat_logo.png",
+                      ? 'assets/images/person.png'
+                      : 'assets/images/chat_logo.png',
                   height: 30,
                   width: 30,
                 ),
@@ -49,10 +49,9 @@ class ChatWidget extends StatelessWidget {
                                   fontSize: 16),
                               child: AnimatedTextKit(
                                   isRepeatingAnimation: false,
-                                  repeatForever: false,
                                   displayFullTextOnTap: true,
                                   totalRepeatCount: 1,
-                                  animatedTexts: [
+                                  animatedTexts: <AnimatedText>[
                                     TyperAnimatedText(
                                       msg.trim(),
                                     ),
@@ -66,12 +65,10 @@ class ChatWidget extends StatelessWidget {
                                   fontSize: 16),
                             ),
                 ),
-                chatIndex == 0
-                    ? const SizedBox.shrink()
-                    : Row(
+                if (chatIndex == 0) const SizedBox.shrink() else const Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children: <Widget>[
                           Icon(
                             Icons.thumb_up_alt_outlined,
                             color: Colors.white,

@@ -1,30 +1,31 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:admin/screens/main/components/search_button.dart';
-import 'package:admin/screens/main/components/chat_widget.dart';
+
 import '../../../constants.dart';
+import 'chat_widget.dart';
+import 'search_button.dart';
 
 class Other extends StatelessWidget {
   const Other({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 270,
-      padding: EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
         color: secondaryColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text(
-            "Chat with AI",
+        children: <Widget>[
+          const Text(
+            'Chat with AI',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
@@ -32,23 +33,22 @@ class Other extends StatelessWidget {
             // Align in the center
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: defaultPadding),
+          const SizedBox(height: defaultPadding),
           Container(
             height: 230,
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: defaultPadding,
               right: defaultPadding,
             ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
+            child: const SingleChildScrollView(
               child: ChatWidget(
-                msg: "Hello, how can I help you?",
+                msg: 'Hello, how can I help you?',
                 chatIndex: 1,
               ),
             ),
           ),
-          SizedBox(height: defaultPadding),
-          SearchButton(),
+          const SizedBox(height: defaultPadding),
+          const SearchButton(),
         ],
       ),
     );

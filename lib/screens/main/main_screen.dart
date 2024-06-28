@@ -1,26 +1,29 @@
-import 'package:admin/constants.dart';
-import 'package:admin/controllers/MenuAppController.dart';
-import 'package:admin/responsive.dart';
-import 'package:admin/screens/dashboard/roadmap_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:admin/screens/settings/settings_screen.dart';
-import 'package:admin/screens/profile/profile_screen.dart';
-import 'package:admin/screens/main/components/leaderboard.dart';
-import 'package:admin/screens/main/components/others.dart';
-import 'package:admin/screens/games/drag_and_drop/drag_and_drop.dart';
-import 'package:admin/screens/games/select_the_area/select_the_area_screen.dart';
-import 'package:admin/screens/games/memory/memory_screen.dart';
-import 'package:admin/screens/games/quiz/quiz.dart';
+
+import '../../constants.dart';
+import '../../controllers/MenuAppController.dart';
+import '../../responsive.dart';
+import '../dashboard/roadmap_screen.dart';
+import '../games/drag_and_drop/drag_and_drop.dart';
+import '../games/memory/memory_screen.dart';
+import '../games/quiz/quiz.dart';
+import '../games/select_the_area/select_the_area_screen.dart';
+import '../profile/profile_screen.dart';
+import '../settings/settings_screen.dart';
+import 'components/leaderboard.dart';
+import 'components/others.dart';
 import 'components/side_menu.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  var _selectedPage = 0;
+  int _selectedPage = 0;
 
   void upNavBarId(int index) {
     setState(() {
@@ -36,22 +39,22 @@ class _MainScreenState extends State<MainScreen> {
         page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
-        page = ProfileScreen();
+        page = const ProfileScreen();
         break;
       case 2:
-        page = SettingsScreen();
+        page = const SettingsScreen();
         break;
       case 3:
         page = DragAndDropGame(onNavButtonPressed: upNavBarId);
         break;
       case 4:
-        page = MemoryGame();
+        page = const MemoryGame();
         break;
       case 5:
-        page = QuizGame();
+        page = const QuizGame();
         break;
       case 6:
-        page = SelectTheAreaGame();
+        page = const SelectTheAreaGame();
         break;
 
       case 10:
@@ -70,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
       body: SafeArea(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: <Widget>[
             // We want this side menu only for large screen
             if (Responsive.isDesktop(context))
               Expanded(
@@ -83,11 +86,9 @@ class _MainScreenState extends State<MainScreen> {
               flex: 4,
               child: page,
             ),
-            Expanded(
-              // It takes 1/6 part of the screen
-              flex: 1,
+            const Expanded(
               child: Column(
-                children: [
+                children: <Widget>[
                   SizedBox(height: 2 * defaultPadding),
                   Leaderboard(),
                   SizedBox(height: defaultPadding),

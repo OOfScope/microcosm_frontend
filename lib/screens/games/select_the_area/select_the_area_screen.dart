@@ -1,22 +1,27 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:image/image.dart' as img;
-import 'dart:convert';
 
-void main() => runApp(SelectTheAreaGame());
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as img;
+
+void main() => runApp(const SelectTheAreaGame());
 
 class SelectTheAreaGame extends StatelessWidget {
+  const SelectTheAreaGame({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: CircleImageComparisonScreen(),
     );
   }
 }
 
 class CircleImageComparisonScreen extends StatefulWidget {
+  const CircleImageComparisonScreen({super.key});
+
   @override
   _CircleImageComparisonScreenState createState() =>
       _CircleImageComparisonScreenState();
@@ -40,9 +45,9 @@ class _CircleImageComparisonScreenState
   }
 
   Future<void> _loadImages() async {
-    final response1 = await http
+    final http.Response response1 = await http
         .get(Uri.parse('https://microcosm-backend.gmichele.com/1/image'));
-    final response2 = await http
+    final http.Response response2 = await http
         .get(Uri.parse('https://microcosm-backend.gmichele.com/1/mask'));
 
     final data1 = jsonDecode(response1.body);
@@ -81,13 +86,13 @@ class _CircleImageComparisonScreenState
   void _comparePixels() {
     if (_startPoint == null || _endPoint == null) return;
 
-    double centerX = (_startPoint!.dx + _endPoint!.dx) / 2;
-    double centerY = (_startPoint!.dy + _endPoint!.dy) / 2;
-    double radius = sqrt(pow(_endPoint!.dx - _startPoint!.dx, 2) +
+    final double centerX = (_startPoint!.dx + _endPoint!.dx) / 2;
+    final double centerY = (_startPoint!.dy + _endPoint!.dy) / 2;
+    final double radius = sqrt(pow(_endPoint!.dx - _startPoint!.dx, 2) +
             pow(_endPoint!.dy - _startPoint!.dy, 2)) /
         2;
 
-    Set<int> uniquePixelValues = {};
+    final Set<int> uniquePixelValues = <int>{};
 
     for (int x = (centerX - radius).toInt();
         x <= (centerX + radius).toInt();
@@ -96,10 +101,10 @@ class _CircleImageComparisonScreenState
           y <= (centerY + radius).toInt();
           y++) {
         if (x >= 0 && x < _image1!.width && y >= 0 && y < _image1!.height) {
-          double dx = x - centerX;
-          double dy = y - centerY;
+          final double dx = x - centerX;
+          final double dy = y - centerY;
           if (dx * dx + dy * dy <= radius * radius) {
-            int pixelValue = _image2!.getPixel(x, y);
+            final int pixelValue = _image2!.getPixel(x, y);
             uniquePixelValues.add(pixelValue);
           }
         }
@@ -107,9 +112,9 @@ class _CircleImageComparisonScreenState
     }
 
     // Print each unique pixel value
-    uniquePixelValues.forEach((pixelValue) {
+    for (final int pixelValue in uniquePixelValues) {
       print('Pixel Value: $pixelValue');
-    });
+    }
 
     // Reset the points after calculation
   }
@@ -118,10 +123,10 @@ class _CircleImageComparisonScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Circle Area Comparison'),
+        title: const Text('Circle Area Comparison'),
       ),
       body: _image1Bytes.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Center(
               child: ClipRect(
                 child: FittedBox(
@@ -131,7 +136,7 @@ class _CircleImageComparisonScreenState
                       onPanUpdate: _onPanUpdate,
                       onPanEnd: _onPanEnd,
                       child: Stack(
-                        children: [
+                        children: <Widget>[
                           Image.memory(
                             _image1Bytes,
                             fit: BoxFit.cover,
@@ -156,20 +161,20 @@ class _CircleImageComparisonScreenState
 }
 
 class CirclePainter extends CustomPainter {
+
+  CirclePainter(this.startPoint, this.endPoint);
   final Offset startPoint;
   final Offset endPoint;
 
-  CirclePainter(this.startPoint, this.endPoint);
-
   @override
   void paint(Canvas canvas, Size size) {
-    double centerX = (startPoint.dx + endPoint.dx) / 2;
-    double centerY = (startPoint.dy + endPoint.dy) / 2;
-    double radius = sqrt(pow(endPoint.dx - startPoint.dx, 2) +
+    final double centerX = (startPoint.dx + endPoint.dx) / 2;
+    final double centerY = (startPoint.dy + endPoint.dy) / 2;
+    final double radius = sqrt(pow(endPoint.dx - startPoint.dx, 2) +
             pow(endPoint.dy - startPoint.dy, 2)) /
         2;
 
-    Paint paint = Paint()
+    final Paint paint = Paint()
       ..color = Colors.blue.withOpacity(0.5)
       ..style = PaintingStyle.fill;
 

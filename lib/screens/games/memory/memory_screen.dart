@@ -1,28 +1,33 @@
 // lib/memory_game.dart
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'dart:math';
-import 'package:admin/screens/games/memory/components/game_state.dart';
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:provider/provider.dart';
+
+import 'components/game_state.dart';
 
 class MemoryGame extends StatelessWidget {
+  const MemoryGame({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => GameState()..initialize(),
+      create: (BuildContext context) => GameState()..initialize(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Memory Game'),
+          title: const Text('Memory Game'),
         ),
         body: Column(
-          children: [
-            Expanded(child: MyHomePage()),
+          children: <Widget>[
+            const Expanded(child: MyHomePage()),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Consumer<GameState>(
-                builder: (context, gameState, child) {
+                builder: (BuildContext context, GameState gameState, Widget? child) {
                   if (gameState.allMatched) {
-                    return Text(
+                    return const Text(
                       'Well Done',
                       style: TextStyle(fontSize: 24, color: Colors.green),
                     );
@@ -40,18 +45,20 @@ class MemoryGame extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
+    final GameState gameState = Provider.of<GameState>(context);
     return GridView.builder(
       padding: const EdgeInsets.all(16.0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         mainAxisSpacing: 16.0,
         crossAxisSpacing: 16.0,
       ),
       itemCount: gameState.cards.length,
-      itemBuilder: (context, index) {
+      itemBuilder: (BuildContext context, int index) {
         return CardTile(index: index);
       },
     );
@@ -59,14 +66,14 @@ class MyHomePage extends StatelessWidget {
 }
 
 class CardTile extends HookWidget {
-  final int index;
 
-  CardTile({required this.index});
+  const CardTile({super.key, required this.index});
+  final int index;
 
   @override
   Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
-    final isFlipped = gameState.cardFlipped[index];
+    final GameState gameState = Provider.of<GameState>(context);
+    final bool isFlipped = gameState.cardFlipped[index];
 
     return GestureDetector(
       onTap: () {
@@ -83,17 +90,17 @@ class CardTile extends HookWidget {
         }
       },
       child: AnimatedSwitcher(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          final rotateAnim = Tween(begin: pi, end: 0.0).animate(animation);
+          final Animation<double> rotateAnim = Tween(begin: pi, end: 0.0).animate(animation);
           return AnimatedBuilder(
             animation: rotateAnim,
             child: child,
-            builder: (context, child) {
-              final isUnder = (ValueKey(isFlipped) != child!.key);
-              var tilt = ((animation.value - 0.5).abs() - 0.5) * 0.002;
+            builder: (BuildContext context, Widget? child) {
+              final bool isUnder = (ValueKey(isFlipped) != child!.key);
+              double tilt = ((animation.value - 0.5).abs() - 0.5) * 0.002;
               tilt *= isUnder ? -1.0 : 1.0;
-              final value = isUnder
+              final double value = isUnder
                   ? (rotateAnim.value < pi / 2 ? rotateAnim.value : pi / 2)
                   : rotateAnim.value;
               return Transform(
@@ -107,10 +114,10 @@ class CardTile extends HookWidget {
         // matched card must not be flipped
         child: isFlipped
             ? CardFace(
-                key: ValueKey(true),
+                key: const ValueKey(true),
                 index: gameState.cards[index],
               )
-            : CardBack(
+            : const CardBack(
                 key: ValueKey(false),
               ),
       ),
@@ -119,29 +126,29 @@ class CardTile extends HookWidget {
 }
 
 class CardFace extends StatelessWidget {
+  const CardFace({required Key key, required this.index}) : super(key: key);
   final int index;
-  CardFace({required Key key, required this.index}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final gameState = Provider.of<GameState>(context);
-    final pieces = gameState.pieces;
+    final GameState gameState = Provider.of<GameState>(context);
+    final List<Uint8List> pieces = gameState.pieces;
 
     return Container(
         child: pieces.isNotEmpty
             ? Image.memory(pieces[gameState.cards[index]])
-            : CircularProgressIndicator());
+            : const CircularProgressIndicator());
   }
 }
 
 class CardBack extends StatelessWidget {
-  CardBack({required Key key}) : super(key: key);
+  const CardBack({required Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.grey,
-      child: Center(
+      child: const Center(
         child: Text(
           '?',
           style: TextStyle(fontSize: 24, color: Colors.white),

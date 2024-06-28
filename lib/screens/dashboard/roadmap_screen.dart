@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:game_levels_scrolling_map/game_levels_scrolling_map.dart';
 import 'package:game_levels_scrolling_map/model/point_model.dart';
 
-typedef void IndexCallback(int index);
+typedef IndexCallback = void Function(int index);
 
 class RoadmapScreen extends StatefulWidget {
-  final IndexCallback onNavButtonPressed;
 
-  const RoadmapScreen({Key? key, required this.onNavButtonPressed})
-      : super(key: key);
+  const RoadmapScreen({super.key, required this.onNavButtonPressed});
+  final IndexCallback onNavButtonPressed;
 
   @override
   State<RoadmapScreen> createState() => _RoadmapScreenState();
@@ -20,7 +19,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     return Scaffold(
       body: Container(
           child: GameLevelsScrollingMap.scrollable(
-        imageUrl: "assets/images/map_vertical.png",
+        imageUrl: 'assets/images/map_vertical.png',
         direction: Axis.vertical,
         reverseScrolling: true,
         pointsPositionDeltaX: 25,
@@ -37,7 +36,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     fillTestData();
   }
 
-  List<PointModel> points = [];
+  List<PointModel> points = <PointModel>[];
 
   void fillTestData() {
     for (int i = 0; i < 100; i++) {
@@ -49,13 +48,13 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     return InkWell(
       child: Stack(
         alignment: Alignment.center,
-        children: [
+        children: <Widget>[
           Image.asset(
-            "assets/images/map_vertical_point.png",
+            'assets/images/map_vertical_point.png',
             fit: BoxFit.fitWidth,
             width: 50,
           ),
-          Text("$order",
+          Text('$order',
               style: const TextStyle(color: Colors.black, fontSize: 15))
         ],
       ),

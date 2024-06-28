@@ -5,15 +5,15 @@ import '../../../constants.dart';
 
 class Chart extends StatelessWidget {
   const Chart({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 200,
       child: Stack(
-        children: [
+        children: <Widget>[
           PieChart(
             PieChartData(
               sectionsSpace: 0,
@@ -25,17 +25,17 @@ class Chart extends StatelessWidget {
           Positioned.fill(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: defaultPadding),
+              children: <Widget>[
+                const SizedBox(height: defaultPadding),
                 Text(
-                  "29.1",
+                  '29.1',
                   style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                         height: 0.5,
                       ),
                 ),
-                Text("of 128GB")
+                const Text('of 128GB')
               ],
             ),
           ),
@@ -45,7 +45,7 @@ class Chart extends StatelessWidget {
   }
 }
 
-List<PieChartSectionData> paiChartSelectionData = [
+List<PieChartSectionData> paiChartSelectionData = <PieChartSectionData>[
   PieChartSectionData(
     color: primaryColor,
     value: 25,
@@ -53,19 +53,19 @@ List<PieChartSectionData> paiChartSelectionData = [
     radius: 25,
   ),
   PieChartSectionData(
-    color: Color(0xFF26E5FF),
+    color: const Color(0xFF26E5FF),
     value: 20,
     showTitle: false,
     radius: 22,
   ),
   PieChartSectionData(
-    color: Color(0xFFFFCF26),
+    color: const Color(0xFFFFCF26),
     value: 10,
     showTitle: false,
     radius: 19,
   ),
   PieChartSectionData(
-    color: Color(0xFFEE2727),
+    color: const Color(0xFFEE2727),
     value: 15,
     showTitle: false,
     radius: 16,

@@ -1,27 +1,27 @@
-import 'package:admin/screens/main/components/account_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../constants.dart';
+import 'account_details.dart';
 
 class Leaderboard extends StatelessWidget {
   const Leaderboard({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 270,
-      padding: EdgeInsets.all(defaultPadding),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: const BoxDecoration(
         color: secondaryColor,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
       ),
-      child: Column(
-        children: [
+      child: const Column(
+        children: <Widget>[
           Text(
-            "Leaderboard",
+            'Leaderboard',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
@@ -43,21 +43,21 @@ class Leaderboard extends StatelessWidget {
 }
 
 class account_info_card extends StatelessWidget {
-  final rank;
-  final name;
-  final score;
   const account_info_card({
-    Key? key,
+    super.key,
     required this.rank,
     required this.name,
     required this.score,
-  }) : super(key: key);
+  });
+  final rank;
+  final name;
+  final score;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: defaultPadding),
-      padding: EdgeInsets.only(
+      margin: const EdgeInsets.only(top: defaultPadding),
+      padding: const EdgeInsets.only(
           top: defaultPadding / 2,
           left: defaultPadding,
           right: defaultPadding,
@@ -71,7 +71,7 @@ class account_info_card extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+        children: <Widget>[
           Text(rank),
           AccountDetails(name: name),
           Text(score),

@@ -1,42 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-typedef void IndexCallback(int index);
+typedef IndexCallback = void Function(int index);
 
 class SideMenu extends StatelessWidget {
-  final IndexCallback onNavButtonPressed;
 
   const SideMenu({
-    Key? key,
+    super.key,
     required this.onNavButtonPressed,
-  }) : super(key: key);
+  });
+  final IndexCallback onNavButtonPressed;
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
-        children: [
+        children: <Widget>[
           DrawerHeader(
-            child: Image.asset("assets/images/microcosm.png"),
+            child: Image.asset('assets/images/microcosm.png'),
           ),
           DrawerListTile(
-            title: "Dashboard",
-            svgSrc: "assets/icons/menu_dashboard.svg",
+            title: 'Dashboard',
+            svgSrc: 'assets/icons/menu_dashboard.svg',
             press: () => onNavButtonPressed(0),
           ),
           DrawerListTile(
-            title: "Profile",
-            svgSrc: "assets/icons/menu_profile.svg",
+            title: 'Profile',
+            svgSrc: 'assets/icons/menu_profile.svg',
             press: () => onNavButtonPressed(1),
           ),
           DrawerListTile(
-            title: "Settings",
-            svgSrc: "assets/icons/menu_setting.svg",
+            title: 'Settings',
+            svgSrc: 'assets/icons/menu_setting.svg',
             press: () => onNavButtonPressed(2),
           ),
           DrawerListTile(
-            title: "TestGame",
-            svgSrc: "assets/icons/menu_setting.svg",
+            title: 'TestGame',
+            svgSrc: 'assets/icons/menu_setting.svg',
             press: () => onNavButtonPressed(10),
           ),
         ],
@@ -47,12 +47,12 @@ class SideMenu extends StatelessWidget {
 
 class DrawerListTile extends StatelessWidget {
   const DrawerListTile({
-    Key? key,
+    super.key,
     // For selecting those three line once press "Command+D"
     required this.title,
     required this.svgSrc,
     required this.press,
-  }) : super(key: key);
+  });
 
   final String title, svgSrc;
   final VoidCallback press;
@@ -68,7 +68,7 @@ class DrawerListTile extends StatelessWidget {
       ),
       title: Text(
         title,
-        style: TextStyle(color: Colors.white54),
+        style: const TextStyle(color: Colors.white54),
       ),
     );
   }

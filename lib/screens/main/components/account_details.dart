@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../constants.dart';
 
 class AccountDetails extends StatelessWidget {
+  const AccountDetails({super.key, required this.name});
   final name;
-  const AccountDetails({Key? key, required this.name}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Flexible(
       child: Container(
-        padding: EdgeInsets.only(
+        padding: const EdgeInsets.only(
           left: defaultPadding,
           right: defaultPadding,
         ),
