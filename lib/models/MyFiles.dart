@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class CloudStorageInfo {
-
   CloudStorageInfo({
     this.svgSrc,
     this.title,
@@ -17,7 +16,7 @@ class CloudStorageInfo {
   final Color? color;
 }
 
-List demoMyFiles = <CloudStorageInfo>[
+List<CloudStorageInfo> demoMyFiles = <CloudStorageInfo>[
   CloudStorageInfo(
     title: 'Documents',
     numOfFiles: 1328,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -67,11 +68,14 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
     for (int i = 0; i < 4; i++) {
       final http.Response response = await http.get(Uri.parse(imageUrl));
       if (response.statusCode == 200) {
-        final Map<String, String> quizData =
-            jsonDecode(response.body) as Map<String, String>;
+        final Map<String, dynamic> jsonImageResponse =
+            jsonDecode(response.body) as Map<String, dynamic>;
 
-        final Image fullImage =
-            Image.memory(base64Decode(quizData['rows']![0][0]));
+        final String base64Image = jsonImageResponse['rows'][0][0] as String;
+
+        final Uint8List rawImage = base64Decode(base64Image);
+
+        final Image fullImage = Image.memory(rawImage);
         pieces.add(fullImage);
 
         // Set<int> pixels = {};
@@ -125,14 +129,15 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                         itemBuilder: (BuildContext context, int index) {
                           return DragTarget<Image>(
                             onAcceptWithDetails:
-                                (DragTargetDetails<Image> data) {
+                                (DragTargetDetails<Image?> draggableImage) {
                               setState(() {
                                 final Image? previousData =
                                     _currentPositions[index];
                                 final int previousIndex = _currentPositions.keys
                                     .firstWhere(
                                         (int key) =>
-                                            _currentPositions[key] == data,
+                                            _currentPositions[key] ==
+                                            draggableImage.data,
                                         orElse: () => -1);
 
                                 if (previousIndex != -1) {
@@ -140,7 +145,7 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
                                   _currentPositions[previousIndex] =
                                       previousData;
                                 }
-                                _currentPositions[index] = data as Image?;
+                                _currentPositions[index] = draggableImage.data;
                               });
                             },
                             builder: (BuildContext context,

@@ -1,10 +1,9 @@
 class RecentFile {
-
   RecentFile({this.icon, this.title, this.date, this.size});
   final String? icon, title, date, size;
 }
 
-List demoRecentFiles = <RecentFile>[
+List<RecentFile> demoRecentFiles = <RecentFile>[
   RecentFile(
     icon: 'assets/icons/xd_file.svg',
     title: 'XD File',

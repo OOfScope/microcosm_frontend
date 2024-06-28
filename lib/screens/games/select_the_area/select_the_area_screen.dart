@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
@@ -50,7 +50,8 @@ class _CircleImageComparisonScreenState
     final http.Response response2 = await http
         .get(Uri.parse('https://microcosm-backend.gmichele.com/1/mask'));
 
-    final data1 = jsonDecode(response1.body) as Map<String, String>;
+    final Map<String, String> data1 =
+        jsonDecode(response1.body) as Map<String, String>;
     final Map<String, String> data2 =
         jsonDecode(response2.body) as Map<String, String>;
 
@@ -85,7 +86,9 @@ class _CircleImageComparisonScreenState
   }
 
   void _comparePixels() {
-    if (_startPoint == null || _endPoint == null) return;
+    if (_startPoint == null || _endPoint == null) {
+      return;
+    }
 
     final double centerX = (_startPoint!.dx + _endPoint!.dx) / 2;
     final double centerY = (_startPoint!.dy + _endPoint!.dy) / 2;
@@ -114,7 +117,9 @@ class _CircleImageComparisonScreenState
 
     // Print each unique pixel value
     for (final int pixelValue in uniquePixelValues) {
-      print('Pixel Value: $pixelValue');
+      if (kDebugMode) {
+        print('Pixel Value: $pixelValue');
+      }
     }
 
     // Reset the points after calculation
@@ -131,27 +136,25 @@ class _CircleImageComparisonScreenState
           : Center(
               child: ClipRect(
                 child: FittedBox(
-                  child: Container(
-                    child: GestureDetector(
-                      onPanStart: _onPanStart,
-                      onPanUpdate: _onPanUpdate,
-                      onPanEnd: _onPanEnd,
-                      child: Stack(
-                        children: <Widget>[
-                          Image.memory(
-                            _image1Bytes,
-                            fit: BoxFit.cover,
-                            width: 750,
-                            height: 750,
+                  child: GestureDetector(
+                    onPanStart: _onPanStart,
+                    onPanUpdate: _onPanUpdate,
+                    onPanEnd: _onPanEnd,
+                    child: Stack(
+                      children: <Widget>[
+                        Image.memory(
+                          _image1Bytes,
+                          fit: BoxFit.cover,
+                          width: 750,
+                          height: 750,
+                        ),
+                        if (_isDrawing &&
+                            _startPoint != null &&
+                            _endPoint != null)
+                          CustomPaint(
+                            painter: CirclePainter(_startPoint!, _endPoint!),
                           ),
-                          if (_isDrawing &&
-                              _startPoint != null &&
-                              _endPoint != null)
-                            CustomPaint(
-                              painter: CirclePainter(_startPoint!, _endPoint!),
-                            ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
