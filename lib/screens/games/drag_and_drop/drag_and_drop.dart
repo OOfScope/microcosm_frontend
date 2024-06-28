@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 typedef IndexCallback = void Function(int index);
 
 class DragAndDropGame extends StatelessWidget {
-
   const DragAndDropGame({super.key, required this.onNavButtonPressed});
   final IndexCallback onNavButtonPressed;
 
@@ -30,7 +29,6 @@ class DragAndDropGame extends StatelessWidget {
 }
 
 class DragAndDropWidget extends StatefulWidget {
-
   const DragAndDropWidget({super.key, required this.onNavButtonPressed});
   final IndexCallback onNavButtonPressed;
 
@@ -69,10 +67,11 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
     for (int i = 0; i < 4; i++) {
       final http.Response response = await http.get(Uri.parse(imageUrl));
       if (response.statusCode == 200) {
-        final Map<String, dynamic> quizData = jsonDecode(response.body);
+        final Map<String, String> quizData =
+            jsonDecode(response.body) as Map<String, String>;
 
         final Image fullImage =
-            Image.memory(base64Decode(quizData['rows'][0][0]));
+            Image.memory(base64Decode(quizData['rows']![0][0]));
         pieces.add(fullImage);
 
         // Set<int> pixels = {};
@@ -104,130 +103,149 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
         const SizedBox(
           height: 20,
         ),
-        Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
-          Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
-            Container(
-              transformAlignment: Alignment.center,
-              padding: const EdgeInsets.all(20),
-              alignment: Alignment.center,
-              height: 500,
-              width: 500,
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisSpacing: 8, mainAxisSpacing: 8, crossAxisCount: 2),
-                itemCount: pieces.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return DragTarget<Image>(
-                    onAcceptWithDetails: (DragTargetDetails<Image> data) {
-                      setState(() {
-                        final Image? previousData = _currentPositions[index];
-                        final int previousIndex = _currentPositions.keys.firstWhere(
-                            (int key) => _currentPositions[key] == data,
-                            orElse: () => -1);
+        Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Container(
+                      transformAlignment: Alignment.center,
+                      padding: const EdgeInsets.all(20),
+                      alignment: Alignment.center,
+                      height: 500,
+                      width: 500,
+                      child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
+                                crossAxisCount: 2),
+                        itemCount: pieces.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return DragTarget<Image>(
+                            onAcceptWithDetails:
+                                (DragTargetDetails<Image> data) {
+                              setState(() {
+                                final Image? previousData =
+                                    _currentPositions[index];
+                                final int previousIndex = _currentPositions.keys
+                                    .firstWhere(
+                                        (int key) =>
+                                            _currentPositions[key] == data,
+                                        orElse: () => -1);
 
-                        if (previousIndex != -1) {
-                          //print('Previous index: $previousIndex');
-                          _currentPositions[previousIndex] = previousData;
-                        }
-                        _currentPositions[index] = data as Image?;
-                      });
-                    },
-                    builder: (BuildContext context, List<Image?> candidateData, List rejectedData) {
-                      return _currentPositions[index] != null
-                          ? Draggable(
-                              data: _currentPositions[index],
-                              feedback: Center(
-                                child: SizedBox(
-                                  width: 200,
-                                  height: 200,
-                                  child: _currentPositions[index],
-                                ),
-                              ),
-                              childWhenDragging: Container(
-                                color: Colors.grey[200],
-                                width: 200,
-                                height: 200,
-                                child: Center(
-                                    child: Text(
-                                  labels[index],
-                                  style: const TextStyle(fontSize: 24),
-                                )),
-                              ),
-                              child: SizedBox(
-                                width: 200,
-                                height: 200,
-                                child: _currentPositions[index],
-                              ))
-                          : Container(
-                              color: Colors.grey[200],
-                              width: 200,
-                              height: 200,
-                              child: Center(
-                                child: Text(
-                                  labels[index],
-                                  style: const TextStyle(fontSize: 24),
-                                ),
-                              ));
-                    },
-                  );
-                },
-              ),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Center(
-              child: Row(
-                children: <Widget>[
-                  SizedBox(
-                    height: 400,
-                    width: 400,
-                    child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
+                                if (previousIndex != -1) {
+                                  //print('Previous index: $previousIndex');
+                                  _currentPositions[previousIndex] =
+                                      previousData;
+                                }
+                                _currentPositions[index] = data as Image?;
+                              });
+                            },
+                            builder: (BuildContext context,
+                                List<Image?> candidateData, List rejectedData) {
+                              return _currentPositions[index] != null
+                                  ? Draggable(
+                                      data: _currentPositions[index],
+                                      feedback: Center(
+                                        child: SizedBox(
+                                          width: 200,
+                                          height: 200,
+                                          child: _currentPositions[index],
+                                        ),
+                                      ),
+                                      childWhenDragging: Container(
+                                        color: Colors.grey[200],
+                                        width: 200,
+                                        height: 200,
+                                        child: Center(
+                                            child: Text(
+                                          labels[index],
+                                          style: const TextStyle(fontSize: 24),
+                                        )),
+                                      ),
+                                      child: SizedBox(
+                                        width: 200,
+                                        height: 200,
+                                        child: _currentPositions[index],
+                                      ))
+                                  : Container(
+                                      color: Colors.grey[200],
+                                      width: 200,
+                                      height: 200,
+                                      child: Center(
+                                        child: Text(
+                                          labels[index],
+                                          style: const TextStyle(fontSize: 24),
+                                        ),
+                                      ));
+                            },
+                          );
+                        },
                       ),
-                      itemCount: pieces.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Draggable<Image>(
-                          data: pieces[index], // Empty space once placed
-                          feedback: SizedBox(
-                              width: 200, height: 200,
-                              child: pieces[index]),
-                          childWhenDragging: const SizedBox(
-                              width: 200,
-                              height: 200), // Empty space while dragging
-                          onDragCompleted: () {},
-                          child: !_currentPositions.containsValue(pieces[index])
-                              ? SizedBox(
-                                  width: 200, height: 200,
-                                  child: pieces[index])
-                              : const SizedBox(
-                                  width: 200,
-                                  height: 200),
-                        );
-                      },
                     ),
-                  ),
-                ],
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    Center(
+                      child: Row(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 400,
+                            width: 400,
+                            child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
+                              ),
+                              itemCount: pieces.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Draggable<Image>(
+                                  data:
+                                      pieces[index], // Empty space once placed
+                                  feedback: SizedBox(
+                                      width: 200,
+                                      height: 200,
+                                      child: pieces[index]),
+                                  childWhenDragging: const SizedBox(
+                                      width: 200,
+                                      height:
+                                          200), // Empty space while dragging
+                                  onDragCompleted: () {},
+                                  child: !_currentPositions
+                                          .containsValue(pieces[index])
+                                      ? SizedBox(
+                                          width: 200,
+                                          height: 200,
+                                          child: pieces[index])
+                                      : const SizedBox(width: 200, height: 200),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]),
+              const SizedBox(
+                height: 40,
               ),
-            ),
-          ]),
-          const SizedBox(
-            height: 40,
-          ),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            ElevatedButton(
-              onPressed: _checkPositions,
-              child: const Text('Confirm Choices'),
-            ),
-            ElevatedButton(
-              onPressed: () => widget.onNavButtonPressed(0),
-              child: const Text('Main Menu'),
-            )
-          ]),
-        ]),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: _checkPositions,
+                      child: const Text('Confirm Choices'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => widget.onNavButtonPressed(0),
+                      child: const Text('Main Menu'),
+                    )
+                  ]),
+            ]),
         Center(
           child: Text(
             resultMessage,

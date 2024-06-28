@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
         break;
 
       case 10:
-        page = DragAndDropGame(onNavButtonPressed: upNavBarId);
+        page = const ChatApp();
         break;
 
       default:
@@ -92,7 +92,7 @@ class _MainScreenState extends State<MainScreen> {
                   SizedBox(height: 2 * defaultPadding),
                   Leaderboard(),
                   SizedBox(height: defaultPadding),
-                  Flexible(child: Other()),
+                  Flexible(child: Leaderboard()),
                 ],
               ),
             ),

@@ -7,7 +7,6 @@ import '../../../controllers/MenuAppController.dart';
 import '../../../responsive.dart';
 
 class Header extends StatelessWidget {
-
   const Header({super.key, this.title});
   final title;
 
@@ -22,7 +21,7 @@ class Header extends StatelessWidget {
           ),
         if (!Responsive.isMobile(context))
           Text(
-            headline6,
+            'headline',
             style: Theme.of(context).textTheme.titleLarge,
           ),
         if (!Responsive.isMobile(context))

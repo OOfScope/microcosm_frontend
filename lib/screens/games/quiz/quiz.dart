@@ -51,8 +51,9 @@ class _QuizWidgetState extends State<QuizWidget> {
   Future<void> _fetchImage() async {
     final http.Response response = await http.get(Uri.parse(imageUrl));
     if (response.statusCode == 200) {
-      final dynamic jsonResponse = json.decode(response.body);
-      final String base64Image = jsonResponse['rows'][0][0];
+      final Map<String, String> jsonResponse =
+          json.decode(response.body) as Map<String, String>;
+      final String base64Image = jsonResponse['rows']![0][0];
       setState(() {
         imageBytes = base64.decode(base64Image);
       });

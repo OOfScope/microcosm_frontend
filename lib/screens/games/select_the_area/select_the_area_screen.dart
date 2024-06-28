@@ -50,12 +50,13 @@ class _CircleImageComparisonScreenState
     final http.Response response2 = await http
         .get(Uri.parse('https://microcosm-backend.gmichele.com/1/mask'));
 
-    final Map<String, dynamic> data1 = jsonDecode(response1.body) as Map<String, dynamic>;
-    final data2 = jsonDecode(response2.body);
+    final data1 = jsonDecode(response1.body) as Map<String, String>;
+    final Map<String, String> data2 =
+        jsonDecode(response2.body) as Map<String, String>;
 
     setState(() {
-      _image1Bytes = base64Decode(data1['rows'][0][0]);
-      _image2Bytes = base64Decode(data2['rows'][0][0]);
+      _image1Bytes = base64Decode(data1['rows']![0][0]);
+      _image2Bytes = base64Decode(data2['rows']![0][0]);
       _image1 = img.decodeImage(_image1Bytes);
       _image2 = img.decodeImage(_image2Bytes);
     });
@@ -161,7 +162,6 @@ class _CircleImageComparisonScreenState
 }
 
 class CirclePainter extends CustomPainter {
-
   CirclePainter(this.startPoint, this.endPoint);
   final Offset startPoint;
   final Offset endPoint;

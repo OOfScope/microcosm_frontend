@@ -3,7 +3,7 @@ import '../../../constants.dart';
 
 class AccountDetails extends StatelessWidget {
   const AccountDetails({super.key, required this.name});
-  final name;
+  final String name;
 
   @override
   Widget build(BuildContext context) {

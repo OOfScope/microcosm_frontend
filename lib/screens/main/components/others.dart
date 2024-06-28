@@ -1,54 +1,120 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:http/http.dart' as http;
 
-import '../../../constants.dart';
-import 'chat_widget.dart';
-import 'search_button.dart';
+void main() {
+  runApp(const ChatApp());
+}
 
-class Other extends StatelessWidget {
-  const Other({
-    super.key,
-  });
+class ChatApp extends StatelessWidget {
+  const ChatApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 270,
-      padding: const EdgeInsets.all(defaultPadding),
-      decoration: const BoxDecoration(
-        color: secondaryColor,
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return MaterialApp(
+      home: ChatScreen(),
+    );
+  }
+}
+
+class ChatScreen extends StatefulWidget {
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _controller = TextEditingController();
+  final List<Widget> _messages = <Widget>[];
+
+  Stream<String> _sendMessage(String message) async* {
+    if (message.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _messages.add(Text('You: $message'));
+    });
+
+    _controller.clear();
+
+    final http.Response response = await http.post(
+      Uri.parse('https://ollama.vinzlab.com/api/generate'),
+      headers: <String, String>{'Content-Type': 'application/json'},
+      body:
+          json.encode(<String, String>{'model': 'gemma:2b', 'prompt': message}),
+    );
+
+    if (response.statusCode == 200) {
+      final Iterable<String> lines = LineSplitter.split(response.body);
+      for (final String line in lines) {
+        final Map<String, String> decoded =
+            json.decode(line) as Map<String, String>;
+        final String token = decoded['response']!;
+        yield token;
+      }
+    } else {
+      yield 'Error ${response.statusCode}';
+    }
+  }
+
+  void _handleSendMessage() {
+    final String message = _controller.text;
+    if (message.isNotEmpty) {
+      final Stream<String> responseStream = _sendMessage(message);
+      setState(() {
+        _messages.add(
+          StreamBuilder<String>(
+            stream: responseStream,
+            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text("Error: ${snapshot.error}");
+              } else if (snapshot.hasData) {
+                return MarkdownBody(data: snapshot.data!);
+              } else {
+                return Container();
+              }
+            },
+          ),
+        );
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('ChatGPT Chatbox')),
+      body: Column(
         children: <Widget>[
-          const Text(
-            'Chat with AI',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
-            // Align in the center
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: defaultPadding),
-          Container(
-            height: 230,
-            padding: const EdgeInsets.only(
-              left: defaultPadding,
-              right: defaultPadding,
-            ),
-            child: const SingleChildScrollView(
-              child: ChatWidget(
-                msg: 'Hello, how can I help you?',
-                chatIndex: 1,
-              ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _messages.length,
+              itemBuilder: (BuildContext context, int index) =>
+                  _messages[index],
             ),
           ),
-          const SizedBox(height: defaultPadding),
-          const SearchButton(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: InputDecoration(
+                      labelText: 'Send a message',
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: _handleSendMessage,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

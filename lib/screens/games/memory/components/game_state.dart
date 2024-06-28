@@ -57,10 +57,11 @@ class GameState extends ChangeNotifier {
         'https://microcosm-backend.gmichele.com/random/image';
     final http.Response response = await http.get(Uri.parse(imageUrl));
     if (response.statusCode == 200) {
-      final Map<String, dynamic> quizData = jsonDecode(response.body);
+      final Map<String, String> quizData =
+          jsonDecode(response.body) as Map<String, String>;
 
       final img.Image? fullImage =
-          img.decodeImage(base64Decode(quizData['rows'][0][0]));
+          img.decodeImage(base64Decode(quizData['rows']![0][0]));
 
       if (fullImage == null) {
         throw Exception('Failed to create image from bytes.');
@@ -80,7 +81,10 @@ class GameState extends ChangeNotifier {
             fullImage, pieceWidth, pieceHeight, pieceWidth, pieceHeight))),
       ];
 
-      pieces = <Uint8List>[...originalPieces, ...originalPieces]; // Duplicate the pieces
+      pieces = <Uint8List>[
+        ...originalPieces,
+        ...originalPieces
+      ]; // Duplicate the pieces
     } else {
       throw Exception('Failed to download image');
     }
