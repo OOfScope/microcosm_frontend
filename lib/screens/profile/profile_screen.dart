@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../constants.dart';
 import '../../models/user_data.dart';
+
 import '../../utils.dart';
+import '../main/components/progress_levels.dart' as pl;
+
 
 class ProfileScreen extends StatelessWidget {
    
@@ -10,35 +13,88 @@ class ProfileScreen extends StatelessWidget {
   final UserManager userManager = UserManager.instance;
   
   final User user = UserManager.instance.user;
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(defaultPadding),
-        child: Column(
-          children: <Widget>[
-            const SizedBox(height: defaultPadding),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                  flex: 5,
-                  child: Column(
-                    children: <Widget>[
-                      _buildProfileHeader(context),
-                      const SizedBox(height: defaultPadding),
-                      _buildProfileDetails(context),
-                    ],
-                  ),
+@override
+Widget build(BuildContext context) {
+  return SafeArea(
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.all(pl.defaultPadding),
+      child: Column(
+        children: <Widget>[
+          const SizedBox(height: pl.defaultPadding),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                flex: 5,
+                child: Column(
+                  children: <Widget>[
+                    _buildProfileHeader(context),
+                    const SizedBox(height: pl.defaultPadding),
+                    _buildProfileDetails(context),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 30),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                flex: 5,
+                child: Column(
+                  children: <Widget>[
+                    _buildLevelingHeader(context),
+                    const SizedBox(height: pl.defaultPadding),
+                    pl.LevelProgressBar(user: user),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+
+
+Widget _buildLevelingHeader(BuildContext context) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+    decoration: BoxDecoration(
+      color: Colors.blue[900], // Dark blue background
+      borderRadius: BorderRadius.circular(10.0),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          spreadRadius: 2,
+          blurRadius: 4,
+          offset: const Offset(0, 2), // changes position of shadow
+        ),
+      ],
+    ),
+    child: const Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Text(
+          'Check your progress!',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Icon(
+          Icons.stars,
+          color: Colors.white,
+          size: 28,
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildProfileHeader(BuildContext context) {
     return Row(
@@ -50,8 +106,9 @@ class ProfileScreen extends StatelessWidget {
           children: <Widget>[
             Text(
               user.name,
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: const TextStyle(color: Colors.white, fontSize: 30)
             ),
+            Text(user.levelName, style: const TextStyle(color: Colors.white)),
             Text(
               user.email,
               style: Theme.of(context).textTheme.titleSmall,

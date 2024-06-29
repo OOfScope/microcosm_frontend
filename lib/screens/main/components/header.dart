@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 
@@ -72,14 +71,14 @@ class AccountEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    User user = UserManager.instance.user;
+    final User user = UserManager.instance.user;
 
     return Row(
       children: <Widget>[
         user.smallCircleAvatar,
         if (!Responsive.isMobile(context))
         Padding(
-            padding: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
+            padding: const EdgeInsets.symmetric(horizontal: defaultPadding / 2),
             child: Text(user.nickname),
           ),
       ],

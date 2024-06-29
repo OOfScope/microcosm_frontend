@@ -62,8 +62,7 @@ class _MainScreenState extends State<MainScreen> {
         break;
 
       default:
-        // If you ever add a new destination to the navigation rail
-        // and forget to update this code, the program crashes in development
+
         throw UnimplementedError('no widget for $_selectedPage');
     }
 
@@ -74,15 +73,11 @@ class _MainScreenState extends State<MainScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            // We want this side menu only for large screen
             if (Responsive.isDesktop(context))
               Expanded(
-                // default flex = 1
-                // and it takes 1/6 part of the screen
                 child: SideMenu(onNavButtonPressed: upNavBarId),
               ),
             Expanded(
-              // It takes 5/6 part of the screen
               flex: 4,
               child: page,
             ),

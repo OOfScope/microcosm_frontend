@@ -40,7 +40,11 @@ class User {
               fontSize: 15,
             ),
           ),
-        );
+        ){
+        _levelName = levels.firstWhere((Map<String, dynamic> level) => level['score'] == score)['name'] as String;
+        _nextLevelName = levels.firstWhere((Map<String, dynamic> level) => (level['score'] as int) > score)['name'] as String;
+
+        }
         
   final String _nickname;
   final String _name;
@@ -51,6 +55,45 @@ class User {
   final String _country;
   final CircleAvatar _circleAvatar;
   final CircleAvatar _smallCircleAvatar;
+  late final String _levelName;
+  late final String _nextLevelName;
+
+
+  static const String assetPath = 'assets/icons/doctors';
+
+   
+  static final List<Map<String, dynamic>> _levels = <Map<String, dynamic>>[
+    <String, dynamic>{
+      'name': 'Resident Doctor',
+      'score': 0,
+      'image': '$assetPath/1_level.svg'
+    },
+    <String, dynamic>{
+      'name': 'Junior Doctor',
+      'score': 20,
+      'image': '$assetPath/2_level.svg'
+    },
+    <String, dynamic>{
+      'name': 'Senior Doctor',
+      'score': 40,
+      'image': '$assetPath/3_level.svg'
+    },
+    <String, dynamic>{
+      'name': 'Attending Physician',
+      'score': 60,
+      'image': '$assetPath/4_level.svg'
+    },
+    <String, dynamic>{
+      'name': 'Chief Physician',
+      'score': 80,
+      'image': '$assetPath/5_level.svg'
+    },
+    <String, dynamic>{
+      'name': 'Pathology Expert',
+      'score': 100,
+      'image': '$assetPath/6_level.svg'
+    },
+  ];
 
 
   String get nickname => _nickname;
@@ -71,8 +114,15 @@ class User {
     _level = newLevel;
   }
 
+  String get levelName => _levelName;
+  String get nextLevelName => _nextLevelName;
+
+  List<Map<String, dynamic>> get levels => _levels;
+
+
   @override
   String toString() {
     return 'User(nickname: $_nickname, name: $_name, email: $_email, laboratory: $_laboratory, score: $_score, level: $_level, country: $_country)';
   }
+
 }
