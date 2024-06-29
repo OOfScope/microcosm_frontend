@@ -43,7 +43,9 @@ class User {
         ){
         _levelName = levels.firstWhere((Map<String, dynamic> level) => level['score'] == score)['name'] as String;
         _nextLevelName = levels.firstWhere((Map<String, dynamic> level) => (level['score'] as int) > score)['name'] as String;
-
+        _level = levels.indexWhere((Map<String, dynamic> level) => (level['score'] as int) > score) + 1; // levels are zero indexed
+        
+        this.addScore(60);
         }
         
   final String _nickname;
@@ -100,11 +102,12 @@ class User {
   String get name => _name;
   String get email => _email;
   String get laboratory => _laboratory;
-  int get score => _score;
-  int get level => _level;
   String get country => _country;
   CircleAvatar get circleAvatar => _circleAvatar;
   CircleAvatar get smallCircleAvatar => _smallCircleAvatar;
+  int get score => _score;
+  int get level => _level;
+
 
   set score(int newScore) {
     _score = newScore;
@@ -119,6 +122,11 @@ class User {
 
   List<Map<String, dynamic>> get levels => _levels;
 
+  int addScore(int scoreToAdd){
+    _score += scoreToAdd;
+
+    return _score; 
+  }
 
   @override
   String toString() {

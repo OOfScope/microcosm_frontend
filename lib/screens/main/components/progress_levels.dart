@@ -36,9 +36,9 @@ class LevelProgressBar extends StatelessWidget {
               FractionallySizedBox(
                 widthFactor: user.score / 100,
                 child: Container(
-                  height: 50, // Adjusted height for a thinner progress bar
+                  height: 90, // Adjusted height for a thinner progress bar
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: Colors.blue.shade200,
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
@@ -54,8 +54,8 @@ class LevelProgressBar extends StatelessWidget {
                         children: <Widget>[
                           SvgPicture.asset(
                             level['image'] as String,
-                            height: 30,
-                            width: 30,
+                            height: 50,
+                            width: 50,
                           ),
                           const SizedBox(height: 4),
                           Text(

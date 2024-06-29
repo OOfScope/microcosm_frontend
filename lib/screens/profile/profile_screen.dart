@@ -64,7 +64,7 @@ Widget _buildLevelingHeader(BuildContext context) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
     decoration: BoxDecoration(
-      color: Colors.blue[900], // Dark blue background
+      color: Colors.blue.shade700, // Dark blue background
       borderRadius: BorderRadius.circular(10.0),
       boxShadow: [
         BoxShadow(
@@ -133,7 +133,7 @@ Widget _buildLevelingHeader(BuildContext context) {
             _buildDetailRow('Email', user.email),
             _buildDetailRow('Laboratory', user.laboratory),
             _buildDetailRow('Score', user.score.toString()),
-            _buildDetailRow('Level', user.level.toString()),
+            _buildDetailRow('Level', '${user.level.toString()}/${user.levels.length}'),
             _buildDetailRow('Country', user.country),
           ],
         ),
@@ -161,9 +161,9 @@ Widget _buildLevelingHeader(BuildContext context) {
 }
 
 class Header extends StatelessWidget {
-  final String title;
 
   const Header({super.key, required this.title});
+  final String title;
 
   @override
   Widget build(BuildContext context) {
