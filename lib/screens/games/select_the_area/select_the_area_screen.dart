@@ -1,11 +1,10 @@
 import 'dart:convert';
-import 'dart:ui';
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as I;
+import 'package:image/image.dart' as img;
 
 void main() => runApp(const SelectTheAreaGame());
 
@@ -39,9 +38,13 @@ class _CircleImageComparisonScreenState
   Uint8List imageBytes = Uint8List(0);
   Uint8List maskImageBytes = Uint8List(0);
   Uint8List cmappedMaskImageBytes = Uint8List(0);
-  late I.Image fullImage;
-  late I.Image maskImage;
-  late I.Image cmappedMaskImage;
+
+  late img.Image fullImage;
+  late img.Image maskImage;
+  late img.Image cmappedMaskImage;
+
+  late Image renderedFullImage;
+  late Image renderedCmappedMaskImage;
 
   @override
   void initState() {
@@ -65,10 +68,24 @@ class _CircleImageComparisonScreenState
       cmappedMaskImageBytes =
           base64Decode(jsonImageResponse['rows']![0][3] as String);
 
-      fullImage = I.Image.fromBytes(imageLenght, imageLenght, imageBytes);
-      maskImage = I.Image.fromBytes(imageLenght, imageLenght, maskImageBytes);
+      fullImage = img.Image.fromBytes(imageLenght, imageLenght, imageBytes);
+      maskImage = img.Image.fromBytes(imageLenght, imageLenght, maskImageBytes);
       cmappedMaskImage =
-          I.Image.fromBytes(imageLenght, imageLenght, cmappedMaskImageBytes);
+          img.Image.fromBytes(imageLenght, imageLenght, cmappedMaskImageBytes);
+
+      renderedFullImage = Image.memory(
+        imageBytes,
+        fit: BoxFit.cover,
+        width: 600,
+        height: 600,
+      );
+
+      renderedCmappedMaskImage = Image.memory(
+        cmappedMaskImageBytes,
+        fit: BoxFit.cover,
+        width: 600,
+        height: 600,
+      );
 
       // print all lenghts
       if (kDebugMode) {
@@ -84,9 +101,9 @@ class _CircleImageComparisonScreenState
 
   void _onPanStart(DragStartDetails details) {
     setState(() {
-      _isDrawing = true;
       _startPoint = details.localPosition;
       _endPoint = details.localPosition;
+      _isDrawing = true;
     });
   }
 
@@ -109,7 +126,6 @@ class _CircleImageComparisonScreenState
   }
 
   void _comparePixels() {
-    _isVisible = true;
     if (_startPoint == null || _endPoint == null) {
       return;
     }
@@ -120,8 +136,8 @@ class _CircleImageComparisonScreenState
         600; // Adjust based on your displayed image size
 
     // Calculate the scale factor
-    final double scaleX = maskImage.width / displayedImageWidth;
-    final double scaleY = maskImage.height / displayedImageHeight;
+    final double scaleX = maskImage.length / displayedImageWidth;
+    final double scaleY = maskImage.length / displayedImageHeight;
 
     // Convert screen coordinates to image coordinates
     final double centerX = ((_startPoint!.dx + _endPoint!.dx) / 2) * scaleX;
@@ -164,7 +180,13 @@ class _CircleImageComparisonScreenState
       }
     }
 
+    setState(() {
+      _isVisible = true;
+    });
+
     // Reset the points after calculation
+    _startPoint = null;
+    _endPoint = null;
   }
 
   @override
@@ -177,14 +199,16 @@ class _CircleImageComparisonScreenState
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: <Widget>[
-                Slider(
-                  value: imageVisibility,
-                  onChanged: (double value) {
-                    setState(() {
-                      imageVisibility = value;
-                    });
-                  },
-                ),
+                if (_isVisible)
+                  Slider(
+                    value: imageVisibility,
+                    onChanged: (double value) {
+                      setState(() {
+                        imageVisibility = value;
+                      });
+                    },
+                  ),
+                const SizedBox(height: 30),
                 Center(
                   child: ClipRect(
                     child: FittedBox(
@@ -194,26 +218,11 @@ class _CircleImageComparisonScreenState
                         onPanEnd: _onPanEnd,
                         child: Stack(
                           children: <Widget>[
-                            Image.memory(
-                              imageBytes,
-                              fit: BoxFit.cover,
-                              width:
-                                  600, // Match this to the displayedImageWidth
-                              height:
-                                  600, // Match this to the displayedImageHeight
-                            ),
+                            renderedFullImage,
                             AnimatedOpacity(
-                              opacity: _isVisible ? imageVisibility : 0.0,
-                              duration: const Duration(milliseconds: 100),
-                              child: Image.memory(
-                                cmappedMaskImageBytes,
-                                fit: BoxFit.cover,
-                                width:
-                                    600, // Match this to the displayedImageWidth
-                                height:
-                                    600, // Match this to the displayedImageHeight
-                              ),
-                            ),
+                                opacity: _isVisible ? imageVisibility : 0.0,
+                                duration: const Duration(milliseconds: 100),
+                                child: renderedCmappedMaskImage),
                             if (_isDrawing &&
                                 _startPoint != null &&
                                 _endPoint != null)
@@ -226,6 +235,23 @@ class _CircleImageComparisonScreenState
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(height: 30),
+                // Display bottom left button to confirm the selection
+
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      // TO DO: Implement the logic to check if the selected area is correct
+                      if (!_isVisible &&
+                          _startPoint != null &&
+                          _endPoint != null &&
+                          _isDrawing) {
+                        _isVisible = true;
+                      }
+                    });
+                  },
+                  child: const Text('Confirm Selection'),
                 ),
               ],
             ),
