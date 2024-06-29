@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:admin/models/user_data.dart';
+import 'package:admin/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -32,6 +34,8 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   late Image renderedFullImage;
   late Image renderedCmappedMaskImage;
 
+  User myuser = UserManager.instance.user;
+
 //   color_map = {
 //     0: (0, 0, 0),      # Unknown
 //     1: (0, 0, 255),    # Carcinoma
@@ -55,8 +59,6 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
         jsonDecode(response.body) as Map<String, dynamic>;
 
     setState(() {
-      const int imageLenght = 1024;
-
       imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
       maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
       cmappedMaskImageBytes =
@@ -123,18 +125,31 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       return;
     }
 
-    // Convert screen coordinates to image coordinates
-    final double centerX = (_startPoint!.dx + _endPoint!.dx) / 2;
-    final double centerY = (_startPoint!.dy + _endPoint!.dy) / 2;
-    final double radius = sqrt(pow(_endPoint!.dx - _startPoint!.dx, 2) +
-            pow(_endPoint!.dy - _startPoint!.dy, 2)) /
-        2; // Assuming uniform scaling
+    // Since image and mask has different size we need of a scaling factor
+    final double scalingFactorX =
+        maskImage!.width / renderedCmappedMaskImage.width!;
+    final double scalingFactorY =
+        maskImage!.height / renderedCmappedMaskImage.height!;
 
-    // if (kDebugMode) {
-    //   print('Center: ($centerX, $centerY), Radius: $radius');
-    //   print('Image Size: ${fullImage.width} x ${fullImage.height}');
-    //   print('Mask Size: ${maskImage.width} x ${maskImage.height}');
-    // }
+    // Convert screen coordinates to image coordinates
+    final double centerX =
+        ((_startPoint!.dx + _endPoint!.dx) / 2) * scalingFactorX;
+    final double centerY =
+        ((_startPoint!.dy + _endPoint!.dy) / 2) * scalingFactorY;
+    final double radius = (sqrt(pow(_endPoint!.dx - _startPoint!.dx, 2) +
+                pow(_endPoint!.dy - _startPoint!.dy, 2)) /
+            2) *
+        scalingFactorX; // Assuming uniform scaling
+
+    if (kDebugMode) {
+      print('Center: ($centerX, $centerY), Radius: $radius');
+      print('Image Size: ${fullImage!.width} x ${fullImage!.height}');
+      print('Mask Size: ${maskImage!.width} x ${maskImage!.height}');
+      print(
+          'Rendered cmapped Mask Size: ${renderedCmappedMaskImage.width} x ${renderedCmappedMaskImage.height}');
+      print(
+          'Rendered Image Size: ${renderedFullImage.width} x ${renderedFullImage.height}');
+    }
 
     final Set<int> uniquePixelValues = <int>{};
 
