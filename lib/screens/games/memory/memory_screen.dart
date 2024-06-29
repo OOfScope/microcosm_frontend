@@ -1,6 +1,5 @@
 // lib/memory_game.dart
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -25,7 +24,8 @@ class MemoryGame extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Consumer<GameState>(
-                builder: (BuildContext context, GameState gameState, Widget? child) {
+                builder:
+                    (BuildContext context, GameState gameState, Widget? child) {
                   if (gameState.allMatched) {
                     return const Text(
                       'Well Done',
@@ -66,7 +66,6 @@ class MyHomePage extends StatelessWidget {
 }
 
 class CardTile extends HookWidget {
-
   const CardTile({super.key, required this.index});
   final int index;
 
@@ -92,7 +91,8 @@ class CardTile extends HookWidget {
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         transitionBuilder: (Widget child, Animation<double> animation) {
-          final Animation<double> rotateAnim = Tween(begin: pi, end: 0.0).animate(animation);
+          final Animation<double> rotateAnim =
+              Tween(begin: pi, end: 0.0).animate(animation);
           return AnimatedBuilder(
             animation: rotateAnim,
             child: child,
@@ -132,11 +132,11 @@ class CardFace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GameState gameState = Provider.of<GameState>(context);
-    final List<Uint8List> pieces = gameState.pieces;
+    final List<Image> pieces = gameState.pieces;
 
     return Container(
         child: pieces.isNotEmpty
-            ? Image.memory(pieces[gameState.cards[index]])
+            ? pieces[gameState.cards[index]]
             : const CircularProgressIndicator());
   }
 }
@@ -146,9 +146,9 @@ class CardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
+    return const ColoredBox(
       color: Colors.grey,
-      child: const Center(
+      child: Center(
         child: Text(
           '?',
           style: TextStyle(fontSize: 24, color: Colors.white),

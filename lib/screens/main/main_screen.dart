@@ -92,6 +92,7 @@ class _MainScreenState extends State<MainScreen> {
                   SizedBox(height: 2 * defaultPadding),
                   Leaderboard(),
                   SizedBox(height: defaultPadding),
+                  //TO BE CHANGED WITH ChatApp
                   Flexible(child: Leaderboard()),
                 ],
               ),

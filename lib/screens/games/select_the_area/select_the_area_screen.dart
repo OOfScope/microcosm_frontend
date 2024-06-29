@@ -33,10 +33,12 @@ class _CircleImageComparisonScreenState
   Offset? _endPoint;
   bool _isDrawing = false;
   // bool _isSecondClick = false;
-  Uint8List _image1Bytes = Uint8List(0);
-  Uint8List _image2Bytes = Uint8List(0);
-  img.Image? _image1;
-  img.Image? _image2;
+  Uint8List imageBytes = Uint8List(0);
+  Uint8List maskImageBytes = Uint8List(0);
+  Uint8List cmappedMaskImageBytes = Uint8List(0);
+  Image? fullImage;
+  Image? maskImage;
+  Image? cmappedMaskImage;
 
   @override
   void initState() {
@@ -45,21 +47,25 @@ class _CircleImageComparisonScreenState
   }
 
   Future<void> _loadImages() async {
-    final http.Response response1 = await http
-        .get(Uri.parse('https://microcosm-backend.gmichele.com/1/image'));
-    final http.Response response2 = await http
-        .get(Uri.parse('https://microcosm-backend.gmichele.com/1/mask'));
+    final http.Response response = await http.get(
+        Uri.parse('https://microcosm-backend.gmichele.com/get/high/random/'));
 
-    final Map<String, String> data1 =
-        jsonDecode(response1.body) as Map<String, String>;
-    final Map<String, String> data2 =
-        jsonDecode(response2.body) as Map<String, String>;
+    final Map<String, dynamic> jsonImageResponse =
+        jsonDecode(response.body) as Map<String, dynamic>;
 
     setState(() {
-      _image1Bytes = base64Decode(data1['rows']![0][0]);
-      _image2Bytes = base64Decode(data2['rows']![0][0]);
-      _image1 = img.decodeImage(_image1Bytes);
-      _image2 = img.decodeImage(_image2Bytes);
+      imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
+      maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
+      cmappedMaskImageBytes =
+          base64Decode(jsonImageResponse['rows']![0][3] as String);
+      fullImage = Image.memory(
+        imageBytes,
+        height: 4096,
+        width: 4096,
+      );
+      maskImage = Image.memory(maskImageBytes, height: 4096, width: 4096);
+      cmappedMaskImage =
+          Image.memory(cmappedMaskImageBytes, height: 4096, width: 4096);
     });
   }
 
@@ -79,8 +85,14 @@ class _CircleImageComparisonScreenState
 
   void _onPanEnd(DragEndDetails details) {
     setState(() {
-      if (_image1 != null && _image2 != null) {
-        _comparePixels();
+      if (fullImage != null && maskImage != null) {
+        try {
+          _comparePixels();
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error: $e');
+          }
+        }
       }
     });
   }
@@ -96,6 +108,12 @@ class _CircleImageComparisonScreenState
             pow(_endPoint!.dy - _startPoint!.dy, 2)) /
         2;
 
+    if (kDebugMode) {
+      print('Center: ($centerX, $centerY), Radius: $radius');
+      print('Image Size: ${fullImage!.width} x ${fullImage!.height}');
+      print('Mask Size: ${maskImage!.width} x ${maskImage!.height}');
+    }
+
     final Set<int> uniquePixelValues = <int>{};
 
     for (int x = (centerX - radius).toInt();
@@ -104,12 +122,16 @@ class _CircleImageComparisonScreenState
       for (int y = (centerY - radius).toInt();
           y <= (centerY + radius).toInt();
           y++) {
-        if (x >= 0 && x < _image1!.width && y >= 0 && y < _image1!.height) {
+        if (x >= 0 &&
+            x < fullImage!.width! &&
+            y >= 0 &&
+            y < fullImage!.height!) {
           final double dx = x - centerX;
           final double dy = y - centerY;
+
           if (dx * dx + dy * dy <= radius * radius) {
-            final int pixelValue = _image2!.getPixel(x, y);
-            uniquePixelValues.add(pixelValue);
+            //final int pixelValue =maskImage?[y * fullImage!.width!.toInt() + x];
+            //uniquePixelValues.add(pixelValue);
           }
         }
       }
@@ -131,7 +153,7 @@ class _CircleImageComparisonScreenState
       appBar: AppBar(
         title: const Text('Circle Area Comparison'),
       ),
-      body: _image1Bytes.isEmpty
+      body: imageBytes.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : Center(
               child: ClipRect(
@@ -143,10 +165,10 @@ class _CircleImageComparisonScreenState
                     child: Stack(
                       children: <Widget>[
                         Image.memory(
-                          _image1Bytes,
+                          imageBytes,
                           fit: BoxFit.cover,
-                          width: 750,
-                          height: 750,
+                          width: 600,
+                          height: 600,
                         ),
                         if (_isDrawing &&
                             _startPoint != null &&

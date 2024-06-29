@@ -2,15 +2,14 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as img;
 
 class GameState extends ChangeNotifier {
   List<int> cards = <int>[];
   List<bool> cardFlipped = List<bool>.generate(8, (int index) => false);
   List<bool> cardMatched = List<bool>.generate(8, (int index) => false);
-  List<Uint8List> pieces = <Uint8List>[];
+  List<Image> pieces = <Image>[];
   List<int> flippedCards = <int>[];
   bool isCardFlipping = false;
 
@@ -53,41 +52,28 @@ class GameState extends ChangeNotifier {
   }
 
   Future<void> _downloadAndSplitImage() async {
+    final List<Image> originalPieces = [];
     const String imageUrl =
-        'https://microcosm-backend.gmichele.com/random/image';
-    final http.Response response = await http.get(Uri.parse(imageUrl));
-    if (response.statusCode == 200) {
-      final Map<String, String> quizData =
-          jsonDecode(response.body) as Map<String, String>;
+        'https://microcosm-backend.gmichele.com/get/low/random/image';
 
-      final img.Image? fullImage =
-          img.decodeImage(base64Decode(quizData['rows']![0][0]));
+    for (int i = 0; i < 4; i++) {
+      final http.Response response = await http.get(Uri.parse(imageUrl));
 
-      if (fullImage == null) {
-        throw Exception('Failed to create image from bytes.');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonImageResponse =
+            jsonDecode(response.body) as Map<String, dynamic>;
+
+        final Image fullImage = Image.memory(
+            base64Decode(jsonImageResponse['rows'][0][0] as String));
+
+        originalPieces.add(fullImage);
+
+        // Duplicate the pieces
+      } else {
+        throw Exception('Failed to download image');
       }
-
-      const int pieceWidth = 1024;
-      const int pieceHeight = 1024;
-
-      final List<Uint8List> originalPieces = <Uint8List>[
-        Uint8List.fromList(img
-            .encodeJpg(img.copyCrop(fullImage, 0, 0, pieceWidth, pieceHeight))),
-        Uint8List.fromList(img.encodeJpg(
-            img.copyCrop(fullImage, pieceWidth, 0, pieceWidth, pieceHeight))),
-        Uint8List.fromList(img.encodeJpg(
-            img.copyCrop(fullImage, 0, pieceHeight, pieceWidth, pieceHeight))),
-        Uint8List.fromList(img.encodeJpg(img.copyCrop(
-            fullImage, pieceWidth, pieceHeight, pieceWidth, pieceHeight))),
-      ];
-
-      pieces = <Uint8List>[
-        ...originalPieces,
-        ...originalPieces
-      ]; // Duplicate the pieces
-    } else {
-      throw Exception('Failed to download image');
     }
+    pieces = <Image>[...originalPieces, ...originalPieces];
   }
 
   void _shuffleCards() {
