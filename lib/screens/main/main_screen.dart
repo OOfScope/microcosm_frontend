@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
         break;
 
       case 10:
-        page = const MemoryGame();
+        page = const SelectTheAreaGame();
         break;
 
       default:
