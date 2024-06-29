@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'dart:math';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:image/image.dart' as img;
+import 'package:image/image.dart' as I;
 
 void main() => runApp(const SelectTheAreaGame());
 
@@ -32,40 +33,51 @@ class _CircleImageComparisonScreenState
   Offset? _startPoint;
   Offset? _endPoint;
   bool _isDrawing = false;
-  // bool _isSecondClick = false;
+  bool _isVisible = false;
+
   Uint8List imageBytes = Uint8List(0);
   Uint8List maskImageBytes = Uint8List(0);
   Uint8List cmappedMaskImageBytes = Uint8List(0);
-  Image? fullImage;
-  Image? maskImage;
-  Image? cmappedMaskImage;
+  late I.Image fullImage;
+  late I.Image maskImage;
+  late I.Image cmappedMaskImage;
 
   @override
   void initState() {
     super.initState();
+
     _loadImages();
   }
 
   Future<void> _loadImages() async {
     final http.Response response = await http.get(
-        Uri.parse('https://microcosm-backend.gmichele.com/get/high/random/'));
+        Uri.parse('https://microcosm-backend.gmichele.com/get/low/random/'));
 
     final Map<String, dynamic> jsonImageResponse =
         jsonDecode(response.body) as Map<String, dynamic>;
 
     setState(() {
+      const int imageLenght = 600;
+
       imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
       maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
       cmappedMaskImageBytes =
           base64Decode(jsonImageResponse['rows']![0][3] as String);
-      fullImage = Image.memory(
-        imageBytes,
-        height: 4096,
-        width: 4096,
-      );
-      maskImage = Image.memory(maskImageBytes, height: 4096, width: 4096);
+
+      fullImage = I.Image.fromBytes(imageLenght, imageLenght, imageBytes);
+      maskImage = I.Image.fromBytes(imageLenght, imageLenght, maskImageBytes);
       cmappedMaskImage =
-          Image.memory(cmappedMaskImageBytes, height: 4096, width: 4096);
+          I.Image.fromBytes(imageLenght, imageLenght, cmappedMaskImageBytes);
+
+      // print all lenghts
+      if (kDebugMode) {
+        print('imageBytes: ${imageBytes.length}');
+        print('maskImageBytes: ${maskImageBytes.length}');
+        print('cmappedMaskImageBytes: ${cmappedMaskImageBytes.length}');
+        print('fullImage: ${fullImage.length}');
+        print('maskImage: ${maskImage.length}');
+        print('cmappedMaskImage: ${cmappedMaskImage.length}');
+      }
     });
   }
 
@@ -85,33 +97,43 @@ class _CircleImageComparisonScreenState
 
   void _onPanEnd(DragEndDetails details) {
     setState(() {
-      if (fullImage != null && maskImage != null) {
-        try {
-          _comparePixels();
-        } catch (e) {
-          if (kDebugMode) {
-            print('Error: $e');
-          }
+      try {
+        _comparePixels();
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error: $e');
         }
       }
     });
   }
 
   void _comparePixels() {
+    _isVisible = true;
     if (_startPoint == null || _endPoint == null) {
       return;
     }
 
-    final double centerX = (_startPoint!.dx + _endPoint!.dx) / 2;
-    final double centerY = (_startPoint!.dy + _endPoint!.dy) / 2;
-    final double radius = sqrt(pow(_endPoint!.dx - _startPoint!.dx, 2) +
-            pow(_endPoint!.dy - _startPoint!.dy, 2)) /
-        2;
+    const double displayedImageWidth =
+        600; // Adjust based on your displayed image size
+    const double displayedImageHeight =
+        600; // Adjust based on your displayed image size
+
+    // Calculate the scale factor
+    final double scaleX = maskImage.width / displayedImageWidth;
+    final double scaleY = maskImage.height / displayedImageHeight;
+
+    // Convert screen coordinates to image coordinates
+    final double centerX = ((_startPoint!.dx + _endPoint!.dx) / 2) * scaleX;
+    final double centerY = ((_startPoint!.dy + _endPoint!.dy) / 2) * scaleY;
+    final double radius = (sqrt(pow(_endPoint!.dx - _startPoint!.dx, 2) +
+                pow(_endPoint!.dy - _startPoint!.dy, 2)) /
+            2) *
+        scaleX; // Assuming uniform scaling
 
     if (kDebugMode) {
       print('Center: ($centerX, $centerY), Radius: $radius');
-      print('Image Size: ${fullImage!.width} x ${fullImage!.height}');
-      print('Mask Size: ${maskImage!.width} x ${maskImage!.height}');
+      print('Image Size: ${fullImage.width} x ${fullImage.height}');
+      print('Mask Size: ${maskImage.width} x ${maskImage.height}');
     }
 
     final Set<int> uniquePixelValues = <int>{};
@@ -122,16 +144,13 @@ class _CircleImageComparisonScreenState
       for (int y = (centerY - radius).toInt();
           y <= (centerY + radius).toInt();
           y++) {
-        if (x >= 0 &&
-            x < fullImage!.width! &&
-            y >= 0 &&
-            y < fullImage!.height!) {
+        if (x >= 0 && x < maskImage.width && y >= 0 && y < maskImage.height) {
           final double dx = x - centerX;
           final double dy = y - centerY;
 
           if (dx * dx + dy * dy <= radius * radius) {
-            //final int pixelValue =maskImage?[y * fullImage!.width!.toInt() + x];
-            //uniquePixelValues.add(pixelValue);
+            final int pixelValue = maskImage.getPixel(x, y);
+            uniquePixelValues.add(pixelValue);
           }
         }
       }
@@ -167,8 +186,19 @@ class _CircleImageComparisonScreenState
                         Image.memory(
                           imageBytes,
                           fit: BoxFit.cover,
-                          width: 600,
-                          height: 600,
+                          width: 600, // Match this to the displayedImageWidth
+                          height: 600, // Match this to the displayedImageHeight
+                        ),
+                        AnimatedOpacity(
+                          opacity: _isVisible ? 0.5 : 0.0,
+                          duration: const Duration(milliseconds: 100),
+                          child: Image.memory(
+                            cmappedMaskImageBytes,
+                            fit: BoxFit.cover,
+                            width: 600, // Match this to the displayedImageWidth
+                            height:
+                                600, // Match this to the displayedImageHeight
+                          ),
                         ),
                         if (_isDrawing &&
                             _startPoint != null &&
