@@ -62,7 +62,6 @@ class _MainScreenState extends State<MainScreen> {
         break;
 
       default:
-
         throw UnimplementedError('no widget for $_selectedPage');
     }
 
