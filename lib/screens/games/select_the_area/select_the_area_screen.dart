@@ -34,6 +34,7 @@ class _CircleImageComparisonScreenState
   Offset? _endPoint;
   bool _isDrawing = false;
   bool _isVisible = false;
+  double imageVisibility = 0.5;
 
   Uint8List imageBytes = Uint8List(0);
   Uint8List maskImageBytes = Uint8List(0);
@@ -174,43 +175,59 @@ class _CircleImageComparisonScreenState
       ),
       body: imageBytes.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : Center(
-              child: ClipRect(
-                child: FittedBox(
-                  child: GestureDetector(
-                    onPanStart: _onPanStart,
-                    onPanUpdate: _onPanUpdate,
-                    onPanEnd: _onPanEnd,
-                    child: Stack(
-                      children: <Widget>[
-                        Image.memory(
-                          imageBytes,
-                          fit: BoxFit.cover,
-                          width: 600, // Match this to the displayedImageWidth
-                          height: 600, // Match this to the displayedImageHeight
+          : Column(
+              children: <Widget>[
+                Slider(
+                  value: imageVisibility,
+                  onChanged: (double value) {
+                    setState(() {
+                      imageVisibility = value;
+                    });
+                  },
+                ),
+                Center(
+                  child: ClipRect(
+                    child: FittedBox(
+                      child: GestureDetector(
+                        onPanStart: _onPanStart,
+                        onPanUpdate: _onPanUpdate,
+                        onPanEnd: _onPanEnd,
+                        child: Stack(
+                          children: <Widget>[
+                            Image.memory(
+                              imageBytes,
+                              fit: BoxFit.cover,
+                              width:
+                                  600, // Match this to the displayedImageWidth
+                              height:
+                                  600, // Match this to the displayedImageHeight
+                            ),
+                            AnimatedOpacity(
+                              opacity: _isVisible ? imageVisibility : 0.0,
+                              duration: const Duration(milliseconds: 100),
+                              child: Image.memory(
+                                cmappedMaskImageBytes,
+                                fit: BoxFit.cover,
+                                width:
+                                    600, // Match this to the displayedImageWidth
+                                height:
+                                    600, // Match this to the displayedImageHeight
+                              ),
+                            ),
+                            if (_isDrawing &&
+                                _startPoint != null &&
+                                _endPoint != null)
+                              CustomPaint(
+                                painter:
+                                    CirclePainter(_startPoint!, _endPoint!),
+                              ),
+                          ],
                         ),
-                        AnimatedOpacity(
-                          opacity: _isVisible ? 0.5 : 0.0,
-                          duration: const Duration(milliseconds: 100),
-                          child: Image.memory(
-                            cmappedMaskImageBytes,
-                            fit: BoxFit.cover,
-                            width: 600, // Match this to the displayedImageWidth
-                            height:
-                                600, // Match this to the displayedImageHeight
-                          ),
-                        ),
-                        if (_isDrawing &&
-                            _startPoint != null &&
-                            _endPoint != null)
-                          CustomPaint(
-                            painter: CirclePainter(_startPoint!, _endPoint!),
-                          ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
     );
   }
