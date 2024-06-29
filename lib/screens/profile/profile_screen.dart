@@ -50,11 +50,11 @@ class ProfileScreen extends StatelessWidget {
           children: <Widget>[
             Text(
               user.name,
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             Text(
               user.email,
-              style: Theme.of(context).textTheme.subtitle1,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
           ],
         ),
@@ -115,7 +115,7 @@ class Header extends StatelessWidget {
       children: <Widget>[
         Text(
           title,
-          style: Theme.of(context).textTheme.headline4,
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
       ],
     );
