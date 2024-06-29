@@ -5,11 +5,11 @@ import '../../models/user_data.dart';
 import '../../utils.dart';
 
 class ProfileScreen extends StatelessWidget {
+   
+  ProfileScreen({super.key});
   final UserManager userManager = UserManager.instance;
   
   final User user = UserManager.instance.user;
-   
-  ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +18,6 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(defaultPadding),
         child: Column(
           children: <Widget>[
-            const Header(
-              title: 'Profile',
-            ),
             const SizedBox(height: defaultPadding),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,17 +43,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildProfileHeader(BuildContext context) {
     return Row(
       children: <Widget>[
-        CircleAvatar(
-          radius: 40,
-          backgroundColor: Colors.blueGrey,
-          child: Text(
-            user.name[0],  // Display the first letter of the user's name
-            style: const TextStyle(
-              fontSize: 40,
-              color: Colors.white,
-            ),
-          ),
-        ),
+        user.circleAvatar,
         const SizedBox(width: defaultPadding),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +53,7 @@ class ProfileScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.headline5,
             ),
             Text(
-              user.nickname,
+              user.email,
               style: Theme.of(context).textTheme.subtitle1,
             ),
           ],

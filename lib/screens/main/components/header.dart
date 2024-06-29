@@ -4,11 +4,14 @@ import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
 import '../../../controllers/menu_app_controller.dart';
+import '../../../models/user_data.dart';
 import '../../../responsive.dart';
+import '../../../utils.dart';
+
 
 class Header extends StatelessWidget {
-  const Header({super.key, this.title});
-  final title;
+  const Header({super.key, required this.title});
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +24,11 @@ class Header extends StatelessWidget {
           ),
         if (!Responsive.isMobile(context))
           Text(
-            'headline',
+            title,
             style: Theme.of(context).textTheme.titleLarge,
           ),
         if (!Responsive.isMobile(context))
           Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
-        const Expanded(child: SearchField()),
         const ProfileCard()
       ],
     );
@@ -34,12 +36,15 @@ class Header extends StatelessWidget {
 }
 
 class ProfileCard extends StatelessWidget {
+
+
   const ProfileCard({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       margin: const EdgeInsets.only(left: defaultPadding),
       padding: const EdgeInsets.symmetric(
@@ -57,57 +62,25 @@ class ProfileCard extends StatelessWidget {
 }
 
 class AccountEntry extends StatelessWidget {
+
   const AccountEntry({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+
+    User user = UserManager.instance.user;
+
     return Row(
       children: <Widget>[
-        Image.asset(
-          'assets/images/profile_pic.png',
-          height: 38,
-        ),
+        user.smallCircleAvatar,
         if (!Responsive.isMobile(context))
-          const Padding(
+        Padding(
             padding: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-            child: Text('Angelina Jolie'),
+            child: Text(user.nickname),
           ),
       ],
-    );
-  }
-}
-
-class SearchField extends StatelessWidget {
-  const SearchField({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'Search',
-        fillColor: secondaryColor,
-        filled: true,
-        border: const OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        suffixIcon: InkWell(
-          onTap: () {},
-          child: Container(
-            padding: const EdgeInsets.all(defaultPadding * 0.75),
-            margin: const EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-            decoration: const BoxDecoration(
-              color: primaryColor,
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            child: SvgPicture.asset('assets/icons/Search.svg'),
-          ),
-        ),
-      ),
     );
   }
 }
