@@ -6,29 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 
-void main() => runApp(const SelectTheAreaGame());
-
-class SelectTheAreaGame extends StatelessWidget {
+class SelectTheAreaGame extends StatefulWidget {
   const SelectTheAreaGame({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: CircleImageComparisonScreen(),
-    );
-  }
-}
-
-class CircleImageComparisonScreen extends StatefulWidget {
-  const CircleImageComparisonScreen({super.key});
 
   @override
   _CircleImageComparisonScreenState createState() =>
       _CircleImageComparisonScreenState();
 }
 
-class _CircleImageComparisonScreenState
-    extends State<CircleImageComparisonScreen> {
+class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   Offset? _startPoint;
   Offset? _endPoint;
   bool _isDrawing = false;
@@ -45,6 +31,14 @@ class _CircleImageComparisonScreenState
 
   late Image renderedFullImage;
   late Image renderedCmappedMaskImage;
+
+//   color_map = {
+//     0: (0, 0, 0),      # Unknown
+//     1: (0, 0, 255),    # Carcinoma
+//     2: (255, 0, 0),    # Necrosis
+//     3: (0, 255, 0),    # Tumor Stroma
+//     4: (0, 255, 255),  # Others
+//  }
 
   @override
   void initState() {
@@ -155,7 +149,8 @@ class _CircleImageComparisonScreenState
           final double dy = y - centerY;
 
           if (dx * dx + dy * dy <= radius * radius) {
-            final int pixelValue = maskImage!.getPixel(x, y);
+            int pixelValue = maskImage!.getPixel(x, y);
+            pixelValue = (pixelValue >> 16) & 0xFF;
             uniquePixelValues.add(pixelValue);
           }
         }
