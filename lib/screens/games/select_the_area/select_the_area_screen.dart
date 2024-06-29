@@ -168,10 +168,6 @@ class _CircleImageComparisonScreenState
         print('Pixel Value: $pixelValue');
       }
     }
-
-    // Reset the points after calculation
-    _startPoint = null;
-    _endPoint = null;
   }
 
   @override
