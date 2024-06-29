@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:game_levels_scrolling_map/helper/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -18,6 +19,8 @@ import 'models/user_data.dart';
 import 'screens/main/main_screen.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'utils.dart';
+
 
 Future<User> checkIfUserOnDisk(String email, String country) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -130,12 +133,13 @@ void main() async {
       print(decodedToken);
     }
   }
-  String email = decodedToken!['email'] as String;
-  String country = decodedToken['country'] as String;
+  final String email = decodedToken!['email'] as String;
+  final String country = decodedToken['country'] as String;
 
   final User user = await checkIfUserOnDisk(email, country);
+  UserManager.instance.user = user;
 
-  print(user);
+  User myuser = UserManager.instance.user;
 
   debugPaintSizeEnabled = false;
   runApp(const MyApp());

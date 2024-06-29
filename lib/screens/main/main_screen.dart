@@ -39,7 +39,7 @@ class _MainScreenState extends State<MainScreen> {
         page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
-        page = const ProfileScreen();
+        page = ProfileScreen();
         break;
       case 2:
         page = const SettingsScreen();

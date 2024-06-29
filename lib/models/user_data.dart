@@ -1,11 +1,4 @@
 class User {
-  String _nickname;
-  String _name;
-  String _email;
-  String _laboratory;
-  int _score;
-  int _level;
-  String _country;
 
   User({
     required String nickname,
@@ -22,8 +15,16 @@ class User {
         _score = score,
         _level = level,
         _country = country;
+        
+  final String _nickname;
+  final String _name;
+  final String _email;
+  final String _laboratory;
+  int _score;
+  int _level;
+  final String _country;
 
-  // Getters
+
   String get nickname => _nickname;
   String get name => _name;
   String get email => _email;
@@ -32,7 +33,6 @@ class User {
   int get level => _level;
   String get country => _country;
 
-  // Setters
   set score(int newScore) {
     _score = newScore;
   }
