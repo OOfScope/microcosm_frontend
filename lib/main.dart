@@ -65,7 +65,7 @@ void main() async {
   UserManager.instance.user = user;
 
   User myuser = UserManager.instance.user;
-  user.addScore(30);
+  user.addScore(50);
   debugPaintSizeEnabled = false;
   runApp(const MyApp());
 }
