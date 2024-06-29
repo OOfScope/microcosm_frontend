@@ -39,9 +39,9 @@ class _CircleImageComparisonScreenState
   Uint8List maskImageBytes = Uint8List(0);
   Uint8List cmappedMaskImageBytes = Uint8List(0);
 
-  late img.Image fullImage;
-  late img.Image maskImage;
-  late img.Image cmappedMaskImage;
+  late img.Image? fullImage;
+  late img.Image? maskImage;
+  late img.Image? cmappedMaskImage;
 
   late Image renderedFullImage;
   late Image renderedCmappedMaskImage;
@@ -61,17 +61,16 @@ class _CircleImageComparisonScreenState
         jsonDecode(response.body) as Map<String, dynamic>;
 
     setState(() {
-      const int imageLenght = 600;
+      const int imageLenght = 1024;
 
       imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
       maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
       cmappedMaskImageBytes =
           base64Decode(jsonImageResponse['rows']![0][3] as String);
 
-      fullImage = img.Image.fromBytes(imageLenght, imageLenght, imageBytes);
-      maskImage = img.Image.fromBytes(imageLenght, imageLenght, maskImageBytes);
-      cmappedMaskImage =
-          img.Image.fromBytes(imageLenght, imageLenght, cmappedMaskImageBytes);
+      fullImage = img.decodeImage(imageBytes);
+      maskImage = img.decodeImage(maskImageBytes);
+      cmappedMaskImage = img.decodeImage(cmappedMaskImageBytes);
 
       renderedFullImage = Image.memory(
         imageBytes,
@@ -88,14 +87,14 @@ class _CircleImageComparisonScreenState
       );
 
       // print all lenghts
-      if (kDebugMode) {
-        print('imageBytes: ${imageBytes.length}');
-        print('maskImageBytes: ${maskImageBytes.length}');
-        print('cmappedMaskImageBytes: ${cmappedMaskImageBytes.length}');
-        print('fullImage: ${fullImage.length}');
-        print('maskImage: ${maskImage.length}');
-        print('cmappedMaskImage: ${cmappedMaskImage.length}');
-      }
+      // if (kDebugMode) {
+      //   print('imageBytes: ${imageBytes.length}');
+      //   print('maskImageBytes: ${maskImageBytes.length}');
+      //   print('cmappedMaskImageBytes: ${cmappedMaskImageBytes.length}');
+      //   print('fullImage: ${fullImage.data.length}');
+      //   print('maskImage: ${maskImage.data.length}');
+      //   print('cmappedMaskImage: ${cmappedMaskImage.length}');
+      // }
     });
   }
 
@@ -130,28 +129,18 @@ class _CircleImageComparisonScreenState
       return;
     }
 
-    const double displayedImageWidth =
-        600; // Adjust based on your displayed image size
-    const double displayedImageHeight =
-        600; // Adjust based on your displayed image size
-
-    // Calculate the scale factor
-    final double scaleX = maskImage.length / displayedImageWidth;
-    final double scaleY = maskImage.length / displayedImageHeight;
-
     // Convert screen coordinates to image coordinates
-    final double centerX = ((_startPoint!.dx + _endPoint!.dx) / 2) * scaleX;
-    final double centerY = ((_startPoint!.dy + _endPoint!.dy) / 2) * scaleY;
-    final double radius = (sqrt(pow(_endPoint!.dx - _startPoint!.dx, 2) +
-                pow(_endPoint!.dy - _startPoint!.dy, 2)) /
-            2) *
-        scaleX; // Assuming uniform scaling
+    final double centerX = (_startPoint!.dx + _endPoint!.dx) / 2;
+    final double centerY = (_startPoint!.dy + _endPoint!.dy) / 2;
+    final double radius = sqrt(pow(_endPoint!.dx - _startPoint!.dx, 2) +
+            pow(_endPoint!.dy - _startPoint!.dy, 2)) /
+        2; // Assuming uniform scaling
 
-    if (kDebugMode) {
-      print('Center: ($centerX, $centerY), Radius: $radius');
-      print('Image Size: ${fullImage.width} x ${fullImage.height}');
-      print('Mask Size: ${maskImage.width} x ${maskImage.height}');
-    }
+    // if (kDebugMode) {
+    //   print('Center: ($centerX, $centerY), Radius: $radius');
+    //   print('Image Size: ${fullImage.width} x ${fullImage.height}');
+    //   print('Mask Size: ${maskImage.width} x ${maskImage.height}');
+    // }
 
     final Set<int> uniquePixelValues = <int>{};
 
@@ -161,12 +150,12 @@ class _CircleImageComparisonScreenState
       for (int y = (centerY - radius).toInt();
           y <= (centerY + radius).toInt();
           y++) {
-        if (x >= 0 && x < maskImage.width && y >= 0 && y < maskImage.height) {
+        if (x >= 0 && x < maskImage!.width && y >= 0 && y < maskImage!.height) {
           final double dx = x - centerX;
           final double dy = y - centerY;
 
           if (dx * dx + dy * dy <= radius * radius) {
-            final int pixelValue = maskImage.getPixel(x, y);
+            final int pixelValue = maskImage!.getPixel(x, y);
             uniquePixelValues.add(pixelValue);
           }
         }
@@ -179,10 +168,6 @@ class _CircleImageComparisonScreenState
         print('Pixel Value: $pixelValue');
       }
     }
-
-    setState(() {
-      _isVisible = true;
-    });
 
     // Reset the points after calculation
     _startPoint = null;
