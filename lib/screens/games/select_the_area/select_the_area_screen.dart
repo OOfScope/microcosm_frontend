@@ -118,7 +118,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   }
 
   Future<void> _loadImages() async {
-    bool keepLoading = true;
+    const bool keepLoading = true;
 
     while (keepLoading) {
       final http.Response response = await http.get(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../models/user_data.dart';
-import '../../../utils.dart';
 
 const double defaultPadding = 16.0;
 

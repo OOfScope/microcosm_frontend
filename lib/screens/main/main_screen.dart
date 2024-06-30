@@ -12,7 +12,6 @@ import '../games/select_the_area/select_the_area_screen.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_screen.dart';
 import 'components/leaderboard.dart';
-import 'components/others.dart';
 import 'components/side_menu.dart';
 
 class MainScreen extends StatefulWidget {
@@ -43,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
     Widget page;
     switch (_selectedPage) {
       case 0:
-      page = Roadmap();
+      page = const Roadmap();
         // page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:

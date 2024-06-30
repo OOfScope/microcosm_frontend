@@ -42,7 +42,7 @@ class RecentFiles extends StatelessWidget {
               ],
               rows: List.generate(
                 demoRecentFiles.length,
-                (int index) => recentFileDataRow(demoRecentFiles[index] as RecentFile),
+                (int index) => recentFileDataRow(demoRecentFiles[index]),
               ),
             ),
           ),

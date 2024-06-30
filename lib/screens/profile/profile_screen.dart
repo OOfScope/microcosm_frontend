@@ -7,9 +7,9 @@ import '../../utils.dart';
 import '../main/components/progress_levels.dart' as pl;
 
 class ProfileScreen extends StatefulWidget {
-  Function() onTestButtonPressed;
 
   ProfileScreen({super.key, required this.onTestButtonPressed});
+  Function() onTestButtonPressed;
 
   final UserManager userManager = UserManager.instance;
 
@@ -89,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       decoration: BoxDecoration(
         color: Colors.blue.shade700, // Dark blue background
         borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
+        boxShadow: <BoxShadow>[
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
             spreadRadius: 2,

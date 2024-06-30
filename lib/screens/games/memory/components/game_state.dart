@@ -52,7 +52,7 @@ class GameState extends ChangeNotifier {
   }
 
   Future<void> _downloadAndSplitImage() async {
-    final List<Image> originalPieces = [];
+    final List<Image> originalPieces = <Image>[];
     const String imageUrl =
         'https://microcosm-backend.gmichele.com/get/low/random/image';
 

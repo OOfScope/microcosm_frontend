@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../../../constants.dart';
 import '../../../models/user_data.dart';
@@ -33,7 +32,7 @@ class LeaderboardState extends State<Leaderboard> {
 
   @override
   Widget build(BuildContext context) {
-    User user = UserManager.instance.user;
+    final User user = UserManager.instance.user;
 
     return Container(
       width: 270,

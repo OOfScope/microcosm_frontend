@@ -8,17 +8,17 @@ enum LevelStatus {
 }
 
 class LevelButton extends StatelessWidget {
-  final int levelNumber;
-  final LevelStatus status;
-  final int stars;
-  final bool isActive;
 
-  LevelButton({
+  const LevelButton({super.key, 
     required this.levelNumber,
     required this.status,
     this.stars = 0,
     this.isActive = false,
   });
+  final int levelNumber;
+  final LevelStatus status;
+  final int stars;
+  final bool isActive;
 
   Color _getColor() {
     switch (status) {
@@ -59,7 +59,7 @@ class LevelButton extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 stars,
-                (index) => const Icon(
+                (int index) => const Icon(
                   Icons.star,
                   color: Colors.white,
                   size: 20,
@@ -73,10 +73,6 @@ class LevelButton extends StatelessWidget {
 }
 
 class DashedLinePainter extends CustomPainter {
-  final Color color;
-  final double strokeWidth;
-  final double gap;
-  final double dashLength;
 
   DashedLinePainter({
     required this.color,
@@ -84,6 +80,10 @@ class DashedLinePainter extends CustomPainter {
     this.gap = 3.0,
     this.dashLength = 5.0,
   });
+  final Color color;
+  final double strokeWidth;
+  final double gap;
+  final double dashLength;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -113,6 +113,8 @@ class DashedLinePainter extends CustomPainter {
 }
 
 class Roadmap extends StatelessWidget {
+  const Roadmap({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,18 +153,18 @@ class Roadmap extends StatelessWidget {
   }
 
   Widget _buildLevelPath(int startLevel, int endLevel) {
-    final random = Random();
+    final Random random = Random();
     final int numRows = (endLevel - startLevel + 1) ~/ 4 + 1; // Calculate number of rows
-    final List<Widget> rows = [];
+    final List<Widget> rows = <Widget>[];
 
     for (int i = startLevel; i <= endLevel; i += 4) {
       final int levelsInRow = min(4, endLevel - i + 1); // Calculate levels in this row
-      final List<Widget> rowChildren = [];
+      final List<Widget> rowChildren = <Widget>[];
 
       for (int j = i; j < i + levelsInRow; j++) {
         final int currentLevel = j;
         final int nextLevel = currentLevel + 1;
-        final bool isActive = true; // Replace with your logic for active levels
+        const bool isActive = true; // Replace with your logic for active levels
         rowChildren.add(
           Expanded(
             child: Column(
@@ -179,8 +181,6 @@ class Roadmap extends StatelessWidget {
                     child: CustomPaint(
                       painter: DashedLinePainter(
                         color: Colors.white,
-                        strokeWidth: 2.0,
-                        gap: 3.0,
                         dashLength: 10.0,
                       ),
                     ),

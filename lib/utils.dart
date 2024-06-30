@@ -38,7 +38,7 @@ Future<User> checkIfUserOnDisk(String email, String country) async {
     final String name = email.split('@').first;
     final String laboratory = prefs.getString('laboratory') ?? 'Unknown Lab';
 
-    User user = User(
+    final User user = User(
       nickname: nickname,
       name: name,
       email: email,
@@ -53,7 +53,7 @@ Future<User> checkIfUserOnDisk(String email, String country) async {
   } else {
     final String name = email.split('@').first;
     
-    final List<String> labNames = ['AI Lab', 'Physics Lab', 'Chemistry Lab', 'Biology Lab', 'Computer Lab'];
+    final List<String> labNames = <String>['AI Lab', 'Physics Lab', 'Chemistry Lab', 'Biology Lab', 'Computer Lab'];
     final String laboratory = labNames[Random().nextInt(labNames.length)];
 
     await prefs.setString('nickname', name);
@@ -64,7 +64,7 @@ Future<User> checkIfUserOnDisk(String email, String country) async {
     await prefs.setInt('level', level);
     await prefs.setString('country', country);
 
-    User user = User(
+    final User user = User(
       nickname: name,
       name: name,
       email: email,

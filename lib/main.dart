@@ -12,7 +12,6 @@ import 'constants.dart';
 import 'controllers/menu_app_controller.dart';
 import 'models/user_data.dart';
 import 'screens/main/main_screen.dart';
-import 'dart:math';
 import 'utils.dart';
 
 void main() async {
@@ -59,7 +58,7 @@ void main() async {
   final User user = await checkIfUserOnDisk(email, country);
   UserManager.instance.user = user;
 
-  User myuser = UserManager.instance.user;
+  final User myuser = UserManager.instance.user;
   user.addScore(50);
   debugPaintSizeEnabled = false;
   runApp(const MyApp());
