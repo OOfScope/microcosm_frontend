@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../constants.dart';
 import '../../controllers/menu_app_controller.dart';
 import '../../responsive.dart';
+import '../dashboard/new_roadmap_screen.dart';
 import '../dashboard/roadmap_screen.dart';
 import '../games/drag_and_drop/drag_and_drop.dart';
 import '../games/memory/memory_screen.dart';
@@ -43,7 +44,8 @@ class _MainScreenState extends State<MainScreen> {
     Widget page;
     switch (_selectedPage) {
       case 0:
-        page = RoadmapScreen(onNavButtonPressed: upNavBarId);
+      page = Roadmap();
+        // page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
         page = ProfileScreen(onTestButtonPressed: updateLeaderboardState);

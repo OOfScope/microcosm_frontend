@@ -60,7 +60,6 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-    - assets/icons/doctors/
 
   #   - images/a_dot_ham.jpeg
 
