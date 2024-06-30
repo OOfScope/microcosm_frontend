@@ -59,7 +59,7 @@ class LevelProgressBar extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             level['name'] as String,
-                            style: Theme.of(context).textTheme.caption,
+                            style: Theme.of(context).textTheme.bodySmall,
                             textAlign: TextAlign.center,
                           ),
                         ],
