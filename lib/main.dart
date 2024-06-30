@@ -16,12 +16,8 @@ import 'screens/main/main_screen.dart';
 import 'dart:math';
 import 'utils.dart';
 
-
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
 
   Map<String, dynamic>? decodedToken;
 
