@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -8,6 +9,7 @@ import 'package:image/image.dart' as img;
 
 import '../../../models/user_data.dart';
 import '../../../utils.dart';
+import '../../main/components/progress_levels.dart';
 
 class SelectTheAreaGame extends StatefulWidget {
   const SelectTheAreaGame({super.key});
@@ -57,9 +59,8 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   void _getPixelsTypeCount() {
     for (int x = 0; x < maskImage!.width; x++) {
       for (int y = 0; y < maskImage!.height; y++) {
-        int pixelValue = maskImage!.getPixel(x, y);
-        pixelValue = (pixelValue >> 16) & 0xFF;
-        pixelCount.update(pixelValue, (int value) => value + 1,
+        final pixelValue = maskImage!.getPixel(x, y);
+        pixelCount.update(pixelValue.r as int, (int value) => value + 1,
             ifAbsent: () => 1);
       }
     }
@@ -132,6 +133,9 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
 
       // Check if 0 is the only pixel value
       if (pixelCount.length == 1 && pixelCount.containsKey(0)) {
+        if (kDebugMode) {
+          print('Only Background Pixels');
+        }
         continue;
       }
 
@@ -217,10 +221,9 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           final double dy = y - centerY;
 
           if (dx * dx + dy * dy <= radius * radius) {
-            int pixelValue = maskImage!.getPixel(x, y);
-            pixelValue = (pixelValue >> 16) & 0xFF;
-            uniquePixelValues.add(pixelValue);
-            pixelCount.update(pixelValue, (int value) => value + 1,
+            final pixelValue = maskImage!.getPixel(x, y);
+            uniquePixelValues.add(pixelValue.r as int);
+            pixelCount.update(pixelValue.r as int, (int value) => value + 1,
                 ifAbsent: () => 1);
           }
         }
@@ -250,7 +253,24 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: <Widget>[
-                const SizedBox(height: 60),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 20),
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'Find the ',
+                      style: DefaultTextStyle.of(context).style.apply(
+                            fontSizeFactor: 2,
+                          ),
+                      children: <TextSpan>[
+                        TextSpan(
+                            text: tissueTypes[indexTissueToFind],
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        const TextSpan(text: ' Tissue!'),
+                      ],
+                    ),
+                  ),
+                ),
                 Row(
                   children: <Widget>[
                     Padding(
@@ -285,14 +305,6 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                         ),
                       ),
                     ),
-                    // Give an explanation of the game and the tissue to find
-                    Column(
-                      children: <Widget>[
-                        const Text('Find the Tissue Type:'),
-                        const SizedBox(height: 10),
-                        Text(tissueTypes[indexTissueToFind]!),
-                      ],
-                    ),
                   ],
                 ),
                 const SizedBox(height: 30),
@@ -302,7 +314,12 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                     if (_isVisible)
                       Column(
                         children: <Widget>[
-                          const Text('Image Visibility'),
+                          Text(
+                            'Image Visibility',
+                            style: DefaultTextStyle.of(context).style.apply(
+                                  fontSizeFactor: 1.5,
+                                ),
+                          ),
                           const SizedBox(height: 10),
                           Slider(
                             value: imageVisibility,
@@ -312,7 +329,12 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                               });
                             },
                           ),
-                          Text(imageVisibility.toStringAsFixed(2)),
+                          Text(
+                            imageVisibility.toStringAsFixed(2),
+                            style: DefaultTextStyle.of(context)
+                                .style
+                                .apply(fontSizeFactor: 1.5),
+                          ),
                         ],
                       ),
                     const Spacer(),
