@@ -46,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
         // page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
-        page = ProfileScreen(onTestButtonPressed: updateLeaderboardState);
+        page = ProfileScreen(onDebugAddScoreButtonPressed: updateLeaderboardState);
         break;
       case 2:
         page = const SettingsScreen();

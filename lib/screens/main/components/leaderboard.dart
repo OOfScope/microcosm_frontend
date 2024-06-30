@@ -54,13 +54,6 @@ class LeaderboardState extends State<Leaderboard> {
           const SizedBox(height: defaultPadding),
           ...accountInfoCards,
           const SizedBox(height: defaultPadding),
-          ElevatedButton(
-            onPressed: () {
-              user.addScore(10);
-              updateLeaderboard();
-            },
-            child: const Text('Debug addScore(10)'),
-          ),
         ],
       ),
     );
