@@ -2,20 +2,26 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
+import 'header.dart';
 
 class LLMChatApp extends StatelessWidget {
   const LLMChatApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Ollama Chat',
+    return Scaffold(
+      appBar: AppBar(
+        title: const Header(title: 'Ollama Chat',),
+      ),
+      body:     MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: const LLMChat(),
+    )
     );
+
   }
 }
 
@@ -27,11 +33,8 @@ class LLMChat extends StatelessWidget {
     // Pass the server URL here
     const String serverUrl = 'https://ollama.vinzlab.com/api/generate';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ollama Chat'),
-      ),
-      body: const Padding(
+    return const Scaffold(
+      body: Padding(
         padding: EdgeInsets.all(16.0),
         child: LLMChatWidget(serverUrl: serverUrl),
       ),
