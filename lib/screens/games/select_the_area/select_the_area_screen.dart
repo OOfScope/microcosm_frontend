@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:admin/models/user_data.dart';
-import 'package:admin/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
+
+import '../../../models/user_data.dart';
+import '../../../utils.dart';
 
 class SelectTheAreaGame extends StatefulWidget {
   const SelectTheAreaGame({super.key});
@@ -53,7 +52,6 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   void initState() {
     super.initState();
     _loadImages();
-    checkImages();
   }
 
   void _getPixelsTypeCount() {
@@ -81,10 +79,10 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     // 3: (0, 255, 0),    # Tumor Stroma
     // 4: (0, 255, 255),  # Others
 
-    // Select randomly one of the tissues pixelCount exept 0
-    final List<int> keysTissueTypes = pixelCount.keys.toList()..remove(0);
-    final int randomIndex = Random().nextInt(tissueTypes.length - 1);
-    indexTissueToFind = keysTissueTypes[randomIndex];
+    // Select randomly one of the keys in pixelCount exept 0
+    final List<int> pixelValues = pixelCount.keys.toList();
+    pixelValues.remove(0);
+    indexTissueToFind = pixelValues[Random().nextInt(pixelValues.length)];
 
     if (kDebugMode) {
       final String tissueName = tissueTypes[indexTissueToFind]!;
@@ -93,49 +91,53 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     }
   }
 
-  Future<void> _loadImages() async {
-    final http.Response response = await http.get(
-        Uri.parse('https://microcosm-backend.gmichele.com/get/low/random/'));
+  void _processImageResponse(Map<String, dynamic> jsonImageResponse) {
+    setState(() {
+      imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
+      maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
+      cmappedMaskImageBytes =
+          base64Decode(jsonImageResponse['rows']![0][3] as String);
 
-    final Map<String, dynamic> jsonImageResponse =
-        jsonDecode(response.body) as Map<String, dynamic>;
+      fullImage = img.decodeImage(imageBytes);
+      maskImage = img.decodeImage(maskImageBytes);
+      cmappedMaskImage = img.decodeImage(cmappedMaskImageBytes);
+      displayedFullImage = Image.memory(
+        imageBytes,
+        fit: BoxFit.cover,
+        width: 600,
+        height: 600,
+      );
 
-    imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
-    maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
-    cmappedMaskImageBytes =
-        base64Decode(jsonImageResponse['rows']![0][3] as String);
-
-    fullImage = img.decodeImage(imageBytes);
-    maskImage = img.decodeImage(maskImageBytes);
-    cmappedMaskImage = img.decodeImage(cmappedMaskImageBytes);
-
-    displayedFullImage = Image.memory(
-      imageBytes,
-      fit: BoxFit.cover,
-      width: 600,
-      height: 600,
-    );
-
-    displayedCmappedMaskImage = Image.memory(
-      cmappedMaskImageBytes,
-      fit: BoxFit.cover,
-      width: 600,
-      height: 600,
-    );
+      displayedCmappedMaskImage = Image.memory(
+        cmappedMaskImageBytes,
+        fit: BoxFit.cover,
+        width: 600,
+        height: 600,
+      );
+    });
   }
 
-  void checkImages() {
-    // If there is only one type of tissue, reload the images
-    _getPixelsTypeCount();
+  Future<void> _loadImages() async {
+    bool keepLoading = true;
 
-    if (pixelCount.length == 1) {
-      _loadImages();
-    }
+    while (keepLoading) {
+      final http.Response response = await http.get(
+          Uri.parse('https://microcosm-backend.gmichele.com/get/low/random/'));
 
-    if (fullImage == null || maskImage == null || cmappedMaskImage == null) {
-      _loadImages();
+      final Map<String, dynamic> jsonImageResponse =
+          jsonDecode(response.body) as Map<String, dynamic>;
+
+      _processImageResponse(jsonImageResponse);
+      _getPixelsTypeCount();
+
+      // Check if 0 is the only pixel value
+      if (pixelCount.length == 1 && pixelCount.containsKey(0)) {
+        continue;
+      }
+
+      _getTissueToFind();
+      break;
     }
-    _getTissueToFind();
   }
 
   void _onPanStart(DragStartDetails details) {
@@ -283,20 +285,13 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                         ),
                       ),
                     ),
-                    //Lorem Ipsum with title
-
-                    Container(
-                      height: 500,
-                      width: 500,
-                      child: const Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
-                        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
-                        'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. '
-                        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. '
-                        'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-                        overflow: TextOverflow.visible,
-                        maxLines: 20,
-                      ),
+                    // Give an explanation of the game and the tissue to find
+                    Column(
+                      children: <Widget>[
+                        const Text('Find the Tissue Type:'),
+                        const SizedBox(height: 10),
+                        Text(tissueTypes[indexTissueToFind]!),
+                      ],
                     ),
                   ],
                 ),
