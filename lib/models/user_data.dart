@@ -57,7 +57,7 @@ class User {
   late String _nextLevelName;
 
 
-  static const String assetPath = 'assets/icons/doctors';
+  static const String assetPath = 'icons/doctors';
 
    
   static final List<Map<String, dynamic>> _levels = <Map<String, dynamic>>[

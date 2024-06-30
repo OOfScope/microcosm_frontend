@@ -25,7 +25,6 @@ class LeaderboardState extends State<Leaderboard> {
 
   void updateLeaderboard() {
     setState(() {
-      print('update leaderboard state');
       accountInfoCards = refreshLeaderboard();
     });
   }
