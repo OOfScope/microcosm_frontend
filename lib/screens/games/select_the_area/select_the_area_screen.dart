@@ -3,8 +3,10 @@ import 'dart:math';
 
 import 'package:admin/models/user_data.dart';
 import 'package:admin/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 
@@ -21,6 +23,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   Offset? _endPoint;
   bool _isDrawing = false;
   bool _isVisible = false;
+  bool _isEnabled = false;
   double imageVisibility = 0.5;
 
   Uint8List imageBytes = Uint8List(0);
@@ -31,8 +34,10 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   late img.Image? maskImage;
   late img.Image? cmappedMaskImage;
 
-  late Image renderedFullImage;
-  late Image renderedCmappedMaskImage;
+  late Image displayedFullImage;
+  late Image displayedCmappedMaskImage;
+
+  Map<int, int> pixelCount = <int, int>{};
 
   User myuser = UserManager.instance.user;
 
@@ -49,6 +54,25 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     super.initState();
 
     _loadImages();
+  }
+
+  void _getPixelsTypeCount() {
+    for (int x = 0; x < maskImage!.width; x++) {
+      for (int y = 0; y < maskImage!.height; y++) {
+        int pixelValue = maskImage!.getPixel(x, y);
+        pixelValue = (pixelValue >> 16) & 0xFF;
+        pixelCount.update(pixelValue, (int value) => value + 1,
+            ifAbsent: () => 1);
+      }
+    }
+
+    // Print each unique pixel value
+    for (final int pixelValue in pixelCount.keys) {
+      if (kDebugMode) {
+        print('Total Pixel Value: $pixelValue');
+        print('Total Pixel Count: ${pixelCount[pixelValue]}');
+      }
+    }
   }
 
   Future<void> _loadImages() async {
@@ -68,14 +92,14 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       maskImage = img.decodeImage(maskImageBytes);
       cmappedMaskImage = img.decodeImage(cmappedMaskImageBytes);
 
-      renderedFullImage = Image.memory(
+      displayedFullImage = Image.memory(
         imageBytes,
         fit: BoxFit.cover,
         width: 600,
         height: 600,
       );
 
-      renderedCmappedMaskImage = Image.memory(
+      displayedCmappedMaskImage = Image.memory(
         cmappedMaskImageBytes,
         fit: BoxFit.cover,
         width: 600,
@@ -91,6 +115,8 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       //   print('maskImage: ${maskImage.data.length}');
       //   print('cmappedMaskImage: ${cmappedMaskImage.length}');
       // }
+
+      _getPixelsTypeCount();
     });
   }
 
@@ -110,13 +136,19 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
 
   void _onPanEnd(DragEndDetails details) {
     setState(() {
-      try {
+      if (_isEnabled) {
         _comparePixels();
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error: $e');
-        }
       }
+
+      _isEnabled = true;
+
+      // try {
+      //   _comparePixels();
+      // } catch (e) {
+      //   if (kDebugMode) {
+      //     print('Error: $e');
+      //   }
+      // }
     });
   }
 
@@ -125,11 +157,11 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       return;
     }
 
-    // Since image and mask has different size we need of a scaling factor
+    // Scaling factor to handle rendered image and mask
     final double scalingFactorX =
-        maskImage!.width / renderedCmappedMaskImage.width!;
+        maskImage!.width / displayedCmappedMaskImage.width!;
     final double scalingFactorY =
-        maskImage!.height / renderedCmappedMaskImage.height!;
+        maskImage!.height / displayedCmappedMaskImage.height!;
 
     // Convert screen coordinates to image coordinates
     final double centerX =
@@ -146,12 +178,13 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       print('Image Size: ${fullImage!.width} x ${fullImage!.height}');
       print('Mask Size: ${maskImage!.width} x ${maskImage!.height}');
       print(
-          'Rendered cmapped Mask Size: ${renderedCmappedMaskImage.width} x ${renderedCmappedMaskImage.height}');
+          'Rendered cmapped Mask Size: ${displayedCmappedMaskImage.width} x ${displayedCmappedMaskImage.height}');
       print(
-          'Rendered Image Size: ${renderedFullImage.width} x ${renderedFullImage.height}');
+          'Rendered Image Size: ${displayedFullImage.width} x ${displayedFullImage.height}');
     }
 
     final Set<int> uniquePixelValues = <int>{};
+    final Map<int, int> pixelCount = <int, int>{};
 
     for (int x = (centerX - radius).toInt();
         x <= (centerX + radius).toInt();
@@ -167,6 +200,8 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
             int pixelValue = maskImage!.getPixel(x, y);
             pixelValue = (pixelValue >> 16) & 0xFF;
             uniquePixelValues.add(pixelValue);
+            pixelCount.update(pixelValue, (int value) => value + 1,
+                ifAbsent: () => 1);
           }
         }
       }
@@ -175,9 +210,14 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     // Print each unique pixel value
     for (final int pixelValue in uniquePixelValues) {
       if (kDebugMode) {
-        print('Pixel Value: $pixelValue');
+        print('Pixel Value in selected Area: $pixelValue');
+        print('Pixel Count in selected Area: ${pixelCount[pixelValue]}');
       }
     }
+  }
+
+  void checkAnswer() {
+    _comparePixels();
   }
 
   @override
@@ -190,59 +230,99 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: <Widget>[
-                if (_isVisible)
-                  Slider(
-                    value: imageVisibility,
-                    onChanged: (double value) {
-                      setState(() {
-                        imageVisibility = value;
-                      });
-                    },
-                  ),
-                const SizedBox(height: 30),
-                Center(
-                  child: ClipRect(
-                    child: FittedBox(
-                      child: GestureDetector(
-                        onPanStart: _onPanStart,
-                        onPanUpdate: _onPanUpdate,
-                        onPanEnd: _onPanEnd,
-                        child: Stack(
-                          children: <Widget>[
-                            renderedFullImage,
-                            AnimatedOpacity(
-                                opacity: _isVisible ? imageVisibility : 0.0,
-                                duration: const Duration(milliseconds: 100),
-                                child: renderedCmappedMaskImage),
-                            if (_isDrawing &&
-                                _startPoint != null &&
-                                _endPoint != null)
-                              CustomPaint(
-                                painter:
-                                    CirclePainter(_startPoint!, _endPoint!),
+                const SizedBox(height: 60),
+                Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: Center(
+                        child: ClipRect(
+                          child: FittedBox(
+                            child: GestureDetector(
+                              onPanStart: _onPanStart,
+                              onPanUpdate: _onPanUpdate,
+                              onPanEnd: _onPanEnd,
+                              child: Stack(
+                                children: <Widget>[
+                                  displayedFullImage,
+                                  AnimatedOpacity(
+                                      opacity:
+                                          _isVisible ? imageVisibility : 0.0,
+                                      duration:
+                                          const Duration(milliseconds: 100),
+                                      child: displayedCmappedMaskImage),
+                                  if (_isDrawing &&
+                                      _startPoint != null &&
+                                      _endPoint != null)
+                                    CustomPaint(
+                                      painter: CirclePainter(
+                                          _startPoint!, _endPoint!),
+                                    ),
+                                ],
                               ),
-                          ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    //Lorem Ipsum with title
+
+                    Container(
+                      height: 500,
+                      width: 500,
+                      child: const Text(
+                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
+                        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
+                        'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. '
+                        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. '
+                        'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                        overflow: TextOverflow.visible,
+                        maxLines: 20,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 30),
                 // Display bottom left button to confirm the selection
-
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      // TO DO: Implement the logic to check if the selected area is correct
-                      if (!_isVisible &&
-                          _startPoint != null &&
-                          _endPoint != null &&
-                          _isDrawing) {
-                        _isVisible = true;
-                      }
-                    });
-                  },
-                  child: const Text('Confirm Selection'),
+                Row(
+                  children: <Widget>[
+                    if (_isVisible)
+                      Column(
+                        children: <Widget>[
+                          const Text('Image Visibility'),
+                          const SizedBox(height: 10),
+                          Slider(
+                            value: imageVisibility,
+                            onChanged: (double value) {
+                              setState(() {
+                                imageVisibility = value;
+                              });
+                            },
+                          ),
+                          Text(imageVisibility.toStringAsFixed(2)),
+                        ],
+                      ),
+                    const Spacer(),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: ElevatedButton(
+                        onPressed: _isEnabled
+                            ? () {
+                                setState(() {
+                                  if (!_isVisible &&
+                                      _startPoint != null &&
+                                      _endPoint != null &&
+                                      _isDrawing) {
+                                    _isVisible = true;
+                                    checkAnswer();
+                                  }
+                                });
+                              }
+                            : null,
+                        child: const Text('Confirm Selection'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
