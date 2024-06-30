@@ -148,7 +148,7 @@ class _LLMChatWidgetState extends State<LLMChatWidget> {
                     child: MarkdownBody(
                       data: message['content']!,
                       styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                        p: Theme.of(context).textTheme.bodyText1,
+                        p: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ),
                   ),
