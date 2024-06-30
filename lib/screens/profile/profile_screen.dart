@@ -7,9 +7,12 @@ import '../../utils.dart';
 import '../main/components/progress_levels.dart' as pl;
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({super.key});
+  Function() onTestButtonPressed;
+
+  ProfileScreen({super.key, required this.onTestButtonPressed});
+
   final UserManager userManager = UserManager.instance;
-  
+
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -70,8 +73,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 30),
             ElevatedButton(
-              onPressed: () => _addScore(10),
-              
+              onPressed: () =>
+                  <void>{_addScore(10), widget.onTestButtonPressed()},
               child: const Text('Debug addScore(10)'),
             ),
           ],

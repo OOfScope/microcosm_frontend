@@ -41,19 +41,19 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
 
   User myuser = UserManager.instance.user;
 
-//   color_map = {
-//     0: (0, 0, 0),      # Unknown
-//     1: (0, 0, 255),    # Carcinoma
-//     2: (255, 0, 0),    # Necrosis
-//     3: (0, 255, 0),    # Tumor Stroma
-//     4: (0, 255, 255),  # Others
-//  }
+  late int indexTissueToFind;
+  Map<int, String> tissueTypes = <int, String>{
+    1: 'Carcinoma',
+    2: 'Necrosis',
+    3: 'Tumor Stroma',
+    4: 'Others',
+  };
 
   @override
   void initState() {
     super.initState();
-
     _loadImages();
+    checkImages();
   }
 
   void _getPixelsTypeCount() {
@@ -75,6 +75,24 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     }
   }
 
+  void _getTissueToFind() {
+    // 1: (0, 0, 255),    # Carcinoma
+    // 2: (255, 0, 0),    # Necrosis
+    // 3: (0, 255, 0),    # Tumor Stroma
+    // 4: (0, 255, 255),  # Others
+
+    // Select randomly one of the tissues pixelCount exept 0
+    final List<int> keysTissueTypes = pixelCount.keys.toList()..remove(0);
+    final int randomIndex = Random().nextInt(tissueTypes.length - 1);
+    indexTissueToFind = keysTissueTypes[randomIndex];
+
+    if (kDebugMode) {
+      final String tissueName = tissueTypes[indexTissueToFind]!;
+      print('Tissue Index to Find: $indexTissueToFind');
+      print('Tissue to Find: $tissueName');
+    }
+  }
+
   Future<void> _loadImages() async {
     final http.Response response = await http.get(
         Uri.parse('https://microcosm-backend.gmichele.com/get/low/random/'));
@@ -82,42 +100,42 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     final Map<String, dynamic> jsonImageResponse =
         jsonDecode(response.body) as Map<String, dynamic>;
 
-    setState(() {
-      imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
-      maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
-      cmappedMaskImageBytes =
-          base64Decode(jsonImageResponse['rows']![0][3] as String);
+    imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
+    maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
+    cmappedMaskImageBytes =
+        base64Decode(jsonImageResponse['rows']![0][3] as String);
 
-      fullImage = img.decodeImage(imageBytes);
-      maskImage = img.decodeImage(maskImageBytes);
-      cmappedMaskImage = img.decodeImage(cmappedMaskImageBytes);
+    fullImage = img.decodeImage(imageBytes);
+    maskImage = img.decodeImage(maskImageBytes);
+    cmappedMaskImage = img.decodeImage(cmappedMaskImageBytes);
 
-      displayedFullImage = Image.memory(
-        imageBytes,
-        fit: BoxFit.cover,
-        width: 600,
-        height: 600,
-      );
+    displayedFullImage = Image.memory(
+      imageBytes,
+      fit: BoxFit.cover,
+      width: 600,
+      height: 600,
+    );
 
-      displayedCmappedMaskImage = Image.memory(
-        cmappedMaskImageBytes,
-        fit: BoxFit.cover,
-        width: 600,
-        height: 600,
-      );
+    displayedCmappedMaskImage = Image.memory(
+      cmappedMaskImageBytes,
+      fit: BoxFit.cover,
+      width: 600,
+      height: 600,
+    );
+  }
 
-      // print all lenghts
-      // if (kDebugMode) {
-      //   print('imageBytes: ${imageBytes.length}');
-      //   print('maskImageBytes: ${maskImageBytes.length}');
-      //   print('cmappedMaskImageBytes: ${cmappedMaskImageBytes.length}');
-      //   print('fullImage: ${fullImage.data.length}');
-      //   print('maskImage: ${maskImage.data.length}');
-      //   print('cmappedMaskImage: ${cmappedMaskImage.length}');
-      // }
+  void checkImages() {
+    // If there is only one type of tissue, reload the images
+    _getPixelsTypeCount();
 
-      _getPixelsTypeCount();
-    });
+    if (pixelCount.length == 1) {
+      _loadImages();
+    }
+
+    if (fullImage == null || maskImage == null || cmappedMaskImage == null) {
+      _loadImages();
+    }
+    _getTissueToFind();
   }
 
   void _onPanStart(DragStartDetails details) {

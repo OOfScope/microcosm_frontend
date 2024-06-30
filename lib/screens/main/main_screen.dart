@@ -24,10 +24,17 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedPage = 0;
+  final GlobalKey<LeaderboardState> _childKey = GlobalKey<LeaderboardState>();
 
   void upNavBarId(int index) {
     setState(() {
       _selectedPage = index;
+    });
+  }
+
+  void updateLeaderboardState() {
+    setState(() {
+      _childKey.currentState!.updateLeaderboard();
     });
   }
 
@@ -39,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
         page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
-        page = ProfileScreen();
+        page = ProfileScreen(onTestButtonPressed: updateLeaderboardState);
         break;
       case 2:
         page = const SettingsScreen();
@@ -80,14 +87,12 @@ class _MainScreenState extends State<MainScreen> {
               flex: 4,
               child: page,
             ),
-            const Expanded(
+            Expanded(
               child: Column(
                 children: <Widget>[
-                  SizedBox(height: 2 * defaultPadding),
-                  Leaderboard(),
-                  SizedBox(height: defaultPadding),
-                  //TO BE CHANGED WITH ChatApp
-                  Flexible(child: Leaderboard()),
+                  const SizedBox(height: 2 * defaultPadding),
+                  Leaderboard(key: _childKey),
+                  const SizedBox(height: defaultPadding),
                 ],
               ),
             ),

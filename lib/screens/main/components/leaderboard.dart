@@ -12,10 +12,10 @@ class Leaderboard extends StatefulWidget {
   });
 
   @override
-  State<Leaderboard> createState() => _LeaderboardState();
+  State<Leaderboard> createState() => LeaderboardState();
 }
 
-class _LeaderboardState extends State<Leaderboard> {
+class LeaderboardState extends State<Leaderboard> {
   late List<AccountInfoCard> accountInfoCards;
 
   @override
@@ -24,8 +24,9 @@ class _LeaderboardState extends State<Leaderboard> {
     accountInfoCards = refreshLeaderboard();
   }
 
-  void _updateLeaderboard() {
+  void updateLeaderboard() {
     setState(() {
+      print('update leaderboard state');
       accountInfoCards = refreshLeaderboard();
     });
   }
@@ -57,7 +58,7 @@ class _LeaderboardState extends State<Leaderboard> {
           ElevatedButton(
             onPressed: () {
               user.addScore(10);
-              _updateLeaderboard();
+              updateLeaderboard();
             },
             child: const Text('Debug addScore(10)'),
           ),
@@ -77,11 +78,16 @@ class _LeaderboardState extends State<Leaderboard> {
       // <String, String>{'name': 'Phyllis Montes', 'score': '20'},
     ];
 
-    accounts.add(<String, String>{'name': user.name, 'score': user.score.toString()});
+    accounts.add(
+        <String, String>{'name': user.name, 'score': user.score.toString()});
 
-    accounts.sort((Map<String, String> a, Map<String, String> b) => int.parse(b['score']!).compareTo(int.parse(a['score']!)));
+    accounts.sort((Map<String, String> a, Map<String, String> b) =>
+        int.parse(b['score']!).compareTo(int.parse(a['score']!)));
 
-    final List<AccountInfoCard> accountInfoCards = accounts.asMap().entries.map((MapEntry<int, Map<String, String>> entry) {
+    final List<AccountInfoCard> accountInfoCards = accounts
+        .asMap()
+        .entries
+        .map((MapEntry<int, Map<String, String>> entry) {
       final int index = entry.key;
       final Map<String, String> account = entry.value;
       final String rank = (index + 1).toString();
