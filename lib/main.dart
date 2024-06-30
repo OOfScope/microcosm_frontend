@@ -3,7 +3,6 @@ import 'dart:js_interop';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:game_levels_scrolling_map/helper/utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
