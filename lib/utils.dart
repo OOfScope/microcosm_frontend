@@ -73,7 +73,6 @@ Future<User> checkIfUserOnDisk(String email, String country) async {
       level: level,
       country: country,
     );
-    print(user);
     return user;
   }
 }

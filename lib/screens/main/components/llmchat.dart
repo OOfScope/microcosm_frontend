@@ -14,13 +14,13 @@ class LLMChatApp extends StatelessWidget {
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const HomePage(),
+      home: const LLMChat(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class LLMChat extends StatelessWidget {
+  const LLMChat({super.key});
 
   @override
   Widget build(BuildContext context) {

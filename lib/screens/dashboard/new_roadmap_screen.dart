@@ -8,17 +8,19 @@ enum LevelStatus {
 }
 
 class LevelButton extends StatelessWidget {
-
-  const LevelButton({super.key, 
-    required this.levelNumber,
-    required this.status,
-    this.stars = 0,
-    this.isActive = false,
-  });
   final int levelNumber;
   final LevelStatus status;
   final int stars;
   final bool isActive;
+  final Function()? onTap;
+
+  LevelButton({
+    required this.levelNumber,
+    required this.status,
+    this.stars = 0,
+    this.isActive = false,
+    this.onTap,
+  });
 
   Color _getColor() {
     switch (status) {
@@ -35,44 +37,55 @@ class LevelButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      height: 100,
-      margin: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: _getColor(),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            levelNumber.toString(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          if (stars > 0)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                stars,
-                (int index) => const Icon(
-                  Icons.star,
-                  color: Colors.white,
-                  size: 20,
-                ),
+    return GestureDetector(
+      onTap: () {
+        if (onTap != null) {
+          onTap!();
+        }
+      },
+      child: Container(
+        width: 100,
+        height: 100,
+        margin: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: _getColor(),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              levelNumber.toString(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
               ),
             ),
-        ],
+            if (stars > 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  stars,
+                  (index) => const Icon(
+                    Icons.star,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class DashedLinePainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double gap;
+  final double dashLength;
 
   DashedLinePainter({
     required this.color,
@@ -80,10 +93,6 @@ class DashedLinePainter extends CustomPainter {
     this.gap = 3.0,
     this.dashLength = 5.0,
   });
-  final Color color;
-  final double strokeWidth;
-  final double gap;
-  final double dashLength;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -93,8 +102,8 @@ class DashedLinePainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     double startX = 0;
-    final double startY = size.height / 2;
-    final double endX = size.width;
+    double startY = size.height / 2;
+    double endX = size.width;
 
     while (startX <= endX) {
       canvas.drawLine(
@@ -114,12 +123,11 @@ class DashedLinePainter extends CustomPainter {
 
 class Roadmap extends StatelessWidget {
   const Roadmap({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Roadmap'),
+        title: const Text('Candy Crush Levels'),
       ),
       body: Stack(
         children: <Widget>[
@@ -153,18 +161,18 @@ class Roadmap extends StatelessWidget {
   }
 
   Widget _buildLevelPath(int startLevel, int endLevel) {
-    final Random random = Random();
-    final int numRows = (endLevel - startLevel + 1) ~/ 4 + 1; // Calculate number of rows
-    final List<Widget> rows = <Widget>[];
+    final random = Random();
+    int numRows = (endLevel - startLevel + 1) ~/ 4 + 1; // Calculate number of rows
+    List<Widget> rows = [];
 
     for (int i = startLevel; i <= endLevel; i += 4) {
-      final int levelsInRow = min(4, endLevel - i + 1); // Calculate levels in this row
-      final List<Widget> rowChildren = <Widget>[];
+      int levelsInRow = min(4, endLevel - i + 1); // Calculate levels in this row
+      List<Widget> rowChildren = [];
 
       for (int j = i; j < i + levelsInRow; j++) {
-        final int currentLevel = j;
-        final int nextLevel = currentLevel + 1;
-        const bool isActive = true; // Replace with your logic for active levels
+        int currentLevel = j;
+        int nextLevel = currentLevel + 1;
+        bool isActive = true; // Replace with your logic for active levels
         rowChildren.add(
           Expanded(
             child: Column(
@@ -174,14 +182,20 @@ class Roadmap extends StatelessWidget {
                   status: LevelStatus.completed, // Example status, modify as needed
                   stars: 3, // Example stars, modify as needed
                   isActive: isActive,
+                  onTap: () {
+                    print('Level $currentLevel clicked');
+                    // You can perform additional actions here based on the button click
+                  },
                 ),
-                if (currentLevel < endLevel && j < i + levelsInRow - 1) //                 if (currentLevel < endLevel && j < i + levelsInRow - 1)
+                if (currentLevel < endLevel && j < i + levelsInRow - 1)
                   SizedBox(
                     width: 60,
                     child: CustomPaint(
                       painter: DashedLinePainter(
                         color: Colors.white,
-                        dashLength: 10.0,
+                        strokeWidth: 2.0,
+                        gap: 3.0,
+                        dashLength: 5.0,
                       ),
                     ),
                   ),
