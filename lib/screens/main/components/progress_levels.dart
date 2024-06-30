@@ -20,7 +20,7 @@ class LevelProgressBar extends StatelessWidget {
         children: <Widget>[     
           Text(
             user.level < user.levels.length ? 'You aim to become a ${user.nextLevelName}!' : 'You reached the highest level!',
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: defaultPadding),
           Stack(
