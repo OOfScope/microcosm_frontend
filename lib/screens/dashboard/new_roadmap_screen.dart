@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../main/components/header.dart';
+
 
 enum LevelStatus {
   locked,
@@ -126,8 +128,9 @@ class Roadmap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       appBar: AppBar(
-        title: const Text('Candy Crush Levels'),
+        title: const Header(title: 'Roadmap'),
       ),
       body: Stack(
         children: <Widget>[
@@ -187,7 +190,7 @@ class Roadmap extends StatelessWidget {
                     // You can perform additional actions here based on the button click
                   },
                 ),
-                if (currentLevel < endLevel && j < i + levelsInRow - 1)
+                if (currentLevel < endLevel && j < i + levelsInRow) //                 if (currentLevel < endLevel && j < i + levelsInRow - 1)
                   SizedBox(
                     width: 60,
                     child: CustomPaint(

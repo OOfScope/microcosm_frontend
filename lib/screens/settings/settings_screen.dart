@@ -8,28 +8,21 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
-      child: SingleChildScrollView(
-        primary: false,
-        padding: EdgeInsets.all(defaultPadding),
-        child: Column(children: <Widget>[
-          Header(title: 'Settings'),
-          SizedBox(height: defaultPadding),
-          Row(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Header(title: 'Settings'),
+      ),
+      body: const SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(defaultPadding),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Expanded(
-                // It takes 5/6 part of the screen
-                flex: 5,
-                child: Column(
-                  children: <Widget>[
-                    Text('Impostazioni'),
-                  ],
-                ),
-              ),
+              Text('Impostazioni'),
+              // Add more widgets as needed
             ],
           ),
-        ]),
+        ),
       ),
     );
   }
