@@ -21,7 +21,6 @@ environment:
   sdk: ">=2.18.6 <3.0.0"
 
 dependencies:
-  game_levels_scrolling_map:
   flutter:
     sdk: flutter
 
