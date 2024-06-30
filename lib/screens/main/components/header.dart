@@ -50,7 +50,7 @@ class ProfileCard extends StatelessWidget {
       margin: const EdgeInsets.only(left: defaultPadding),
       padding: const EdgeInsets.symmetric(
         horizontal: defaultPadding,
-        vertical: defaultPadding / 2,
+        vertical: (defaultPadding / 2) - 3,
       ),
       decoration: BoxDecoration(
         color: secondaryColor,
