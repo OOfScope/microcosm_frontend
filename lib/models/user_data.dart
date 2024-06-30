@@ -103,7 +103,8 @@ class User {
   CircleAvatar get smallCircleAvatar => _smallCircleAvatar;
   int get score => _score;
   int get level => _level;
-
+  String get levelName => _levelName;
+  String get nextLevelName => _nextLevelName;
 
   set score(int newScore) {
     _score = newScore;
@@ -121,8 +122,7 @@ class User {
     _nextLevelName = newNextLevelName;
   }
 
-  String get levelName => _levelName;
-  String get nextLevelName => _nextLevelName;
+
 
   List<Map<String, dynamic>> get levels => _levels;
 

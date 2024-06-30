@@ -133,7 +133,7 @@ Widget _buildLevelingHeader(BuildContext context) {
             _buildDetailRow('Email', user.email),
             _buildDetailRow('Laboratory', user.laboratory),
             _buildDetailRow('Score', user.score.toString()),
-            _buildDetailRow('Level', '${user.level.toString()}/${user.levels.length}'),
+            _buildDetailRow('Level', '${user.level}/${user.levels.length}'),
             _buildDetailRow('Country', user.country),
           ],
         ),
