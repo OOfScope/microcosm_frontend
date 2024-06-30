@@ -20,7 +20,7 @@ class LevelProgressBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[     
           Text(
-            'You aim to become a ${user.nextLevelName}!',
+            user.level < user.levels.length ? 'You aim to become a ${user.nextLevelName}!' : 'You reached the highest level!',
             style: Theme.of(context).textTheme.headline6,
           ),
           const SizedBox(height: defaultPadding),
@@ -34,7 +34,7 @@ class LevelProgressBar extends StatelessWidget {
                 ),
               ),
               FractionallySizedBox(
-                widthFactor: user.score / 100,
+                widthFactor: user.score / 100 > 1 ? 1 : user.score / 100,
                 child: Container(
                   height: 90, // Adjusted height for a thinner progress bar
                   decoration: BoxDecoration(

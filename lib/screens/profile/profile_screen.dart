@@ -6,95 +6,115 @@ import '../../models/user_data.dart';
 import '../../utils.dart';
 import '../main/components/progress_levels.dart' as pl;
 
-
-class ProfileScreen extends StatelessWidget {
-   
+class ProfileScreen extends StatefulWidget {
   ProfileScreen({super.key});
   final UserManager userManager = UserManager.instance;
   
-  final User user = UserManager.instance.user;
-@override
-Widget build(BuildContext context) {
-  return SafeArea(
-    child: SingleChildScrollView(
-      padding: const EdgeInsets.all(pl.defaultPadding),
-      child: Column(
-        children: <Widget>[
-          const SizedBox(height: pl.defaultPadding),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: Column(
-                  children: <Widget>[
-                    _buildProfileHeader(context),
-                    const SizedBox(height: pl.defaultPadding),
-                    _buildProfileDetails(context),
-                  ],
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late User user;
+
+  @override
+  void initState() {
+    super.initState();
+    user = widget.userManager.user;
+  }
+
+  void _addScore(int score) {
+    setState(() {
+      user.addScore(score);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(pl.defaultPadding),
+        child: Column(
+          children: <Widget>[
+            const SizedBox(height: pl.defaultPadding),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    children: <Widget>[
+                      _buildProfileHeader(context),
+                      const SizedBox(height: pl.defaultPadding),
+                      _buildProfileDetails(context),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: Column(
-                  children: <Widget>[
-                    _buildLevelingHeader(context),
-                    const SizedBox(height: pl.defaultPadding),
-                    pl.LevelProgressBar(user: user),
-                  ],
+              ],
+            ),
+            const SizedBox(height: 30),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    children: <Widget>[
+                      _buildLevelingHeader(context),
+                      const SizedBox(height: pl.defaultPadding),
+                      pl.LevelProgressBar(user: user),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () => _addScore(10),
+              
+              child: const Text('Debug addScore(10)'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLevelingHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade700, // Dark blue background
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: const Offset(0, 2), // changes position of shadow
           ),
         ],
       ),
-    ),
-  );
-}
-
-
-
-Widget _buildLevelingHeader(BuildContext context) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-    decoration: BoxDecoration(
-      color: Colors.blue.shade700, // Dark blue background
-      borderRadius: BorderRadius.circular(10.0),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.2),
-          spreadRadius: 2,
-          blurRadius: 4,
-          offset: const Offset(0, 2), // changes position of shadow
-        ),
-      ],
-    ),
-    child: const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Text(
-          'Check your progress!',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            'Check your progress!',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        Icon(
-          Icons.stars,
-          color: Colors.white,
-          size: 28,
-        ),
-      ],
-    ),
-  );
-}
+          Icon(
+            Icons.stars,
+            color: Colors.white,
+            size: 28,
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildProfileHeader(BuildContext context) {
     return Row(
@@ -106,7 +126,7 @@ Widget _buildLevelingHeader(BuildContext context) {
           children: <Widget>[
             Text(
               user.name,
-              style: const TextStyle(color: Colors.white, fontSize: 30)
+              style: const TextStyle(color: Colors.white, fontSize: 30),
             ),
             Text(user.levelName, style: const TextStyle(color: Colors.white)),
             Text(
@@ -161,7 +181,6 @@ Widget _buildLevelingHeader(BuildContext context) {
 }
 
 class Header extends StatelessWidget {
-
   const Header({super.key, required this.title});
   final String title;
 

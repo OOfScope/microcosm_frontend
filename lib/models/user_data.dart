@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class User {
@@ -129,10 +130,12 @@ class User {
   void _updateLevelInfo() {
     _levelName = levels.lastWhere((Map<String, dynamic> level) => (level['score'] as int) <= _score)['name'] as String;
     _level = levels.indexWhere((Map<String, dynamic> level) => (level['score'] as int) > _score);
+
+   _level = _level == -1 ? levels.length : _level;
     // _nextLevelName = levels.firstWhere((Map<String, dynamic> currLevel) => (currLevel['score'] as int) > score)['name'] as String;
 
-    if (_level == -1 || _level >= levels.length) {
-      _nextLevelName = "Max Level";
+    if (_level == _levels.length) {
+      _nextLevelName = 'Max Level';
     } else {
       _nextLevelName = levels[_level]['name'] as String;
     }
@@ -145,6 +148,8 @@ class User {
   int addScore(int scoreToAdd){
     _score += scoreToAdd;
     _updateLevelInfo();
+
+    
     return _score; 
   }
 

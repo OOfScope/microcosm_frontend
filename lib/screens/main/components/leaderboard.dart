@@ -6,16 +6,33 @@ import '../../../models/user_data.dart';
 import '../../../utils.dart';
 import 'account_details.dart';
 
-class Leaderboard extends StatelessWidget {
+class Leaderboard extends StatefulWidget {
   const Leaderboard({
     super.key,
   });
 
   @override
+  State<Leaderboard> createState() => _LeaderboardState();
+}
+
+class _LeaderboardState extends State<Leaderboard> {
+  late List<AccountInfoCard> accountInfoCards;
+
+  @override
+  void initState() {
+    super.initState();
+    accountInfoCards = refreshLeaderboard();
+  }
+
+  void _updateLeaderboard() {
+    setState(() {
+      accountInfoCards = refreshLeaderboard();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     User user = UserManager.instance.user;
-
-    final List<AccountInfoCard> accountInfoCards = refreshLeaderboard(user);
 
     return Container(
       width: 270,
@@ -36,39 +53,47 @@ class Leaderboard extends StatelessWidget {
           ),
           const SizedBox(height: defaultPadding),
           ...accountInfoCards,
+          const SizedBox(height: defaultPadding),
+          ElevatedButton(
+            onPressed: () {
+              user.addScore(10);
+              _updateLeaderboard();
+            },
+            child: const Text('Debug addScore(10)'),
+          ),
         ],
       ),
     );
   }
-}
 
-List<AccountInfoCard> refreshLeaderboard(User user) {
-  final List<Map<String, String>> accounts = <Map<String, String>>[
-    <String, String>{'name': 'Kristofer Weeks', 'score': '80'},
-    <String, String>{'name': 'Deeann Lorine', 'score': '20'},
-    <String, String>{'name': 'Jessie Leopold', 'score': '40'},
-    <String, String>{'name': 'Laraine Izzy', 'score': '50'},
-    // <String, String>{'name': 'Phyllis Montes', 'score': '20'},
-  ];
+  List<AccountInfoCard> refreshLeaderboard() {
+    final User user = UserManager.instance.user;
 
-  accounts.add(<String, String>{'name': user.name, 'score': user.score.toString()});
+    final List<Map<String, String>> accounts = <Map<String, String>>[
+      <String, String>{'name': 'Kristofer Weeks', 'score': '80'},
+      <String, String>{'name': 'Deeann Lorine', 'score': '20'},
+      <String, String>{'name': 'Jessie Leopold', 'score': '40'},
+      <String, String>{'name': 'Laraine Izzy', 'score': '50'},
+      // <String, String>{'name': 'Phyllis Montes', 'score': '20'},
+    ];
 
-  // Sort accounts in descending order by score
-  accounts.sort((Map<String, String> a, Map<String, String> b) => int.parse(b['score']!).compareTo(int.parse(a['score']!)));
+    accounts.add(<String, String>{'name': user.name, 'score': user.score.toString()});
 
-  // Generate account info cards with computed ranks
-  final List<AccountInfoCard> accountInfoCards = accounts.asMap().entries.map((MapEntry<int, Map<String, String>> entry) {
-    final int index = entry.key;
-    final Map<String, String> account = entry.value;
-    final String rank = (index + 1).toString();
-    return AccountInfoCard(
-      rank: rank,
-      name: account['name']!,
-      score: account['score']!,
-    );
-  }).toList();
+    accounts.sort((Map<String, String> a, Map<String, String> b) => int.parse(b['score']!).compareTo(int.parse(a['score']!)));
 
-  return accountInfoCards;
+    final List<AccountInfoCard> accountInfoCards = accounts.asMap().entries.map((MapEntry<int, Map<String, String>> entry) {
+      final int index = entry.key;
+      final Map<String, String> account = entry.value;
+      final String rank = (index + 1).toString();
+      return AccountInfoCard(
+        rank: rank,
+        name: account['name']!,
+        score: account['score']!,
+      );
+    }).toList();
+
+    return accountInfoCards;
+  }
 }
 
 class AccountInfoCard extends StatelessWidget {
