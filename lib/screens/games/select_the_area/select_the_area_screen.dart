@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 
@@ -37,10 +38,12 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   late Image displayedCmappedMaskImage;
 
   Map<int, int> pixelCount = <int, int>{};
+  Map<int, int> totalTissuePixelFound = <int, int>{};
 
   User myuser = UserManager.instance.user;
 
-  late int indexTissueToFind;
+  int tissueToFind = 0;
+
   Map<int, String> tissueTypes = <int, String>{
     1: 'Carcinoma',
     2: 'Necrosis',
@@ -57,19 +60,19 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   void _getPixelsTypeCount() {
     for (int x = 0; x < maskImage!.width; x++) {
       for (int y = 0; y < maskImage!.height; y++) {
-        final img.Pixel pixelValue = maskImage!.getPixel(x, y);
-        pixelCount.update(pixelValue.r as int, (int value) => value + 1,
+        final pixelValue = maskImage!.getPixel(x, y);
+        totalTissuePixelFound.update(
+            pixelValue.r as int, (int value) => value + 1,
             ifAbsent: () => 1);
       }
     }
-
     // Print each unique pixel value
-    for (final int pixelValue in pixelCount.keys) {
-      if (kDebugMode) {
-        print('Total Pixel Value: $pixelValue');
-        print('Total Pixel Count: ${pixelCount[pixelValue]}');
-      }
-    }
+    // for (final int pixelValue in totalTissuePixelFound.keys) {
+    //   if (kDebugMode) {
+    //     print('Total Pixel Value: $pixelValue');
+    //     print('Total Pixel Count: ${totalTissuePixelFound[pixelValue]}');
+    //   }
+    // }
   }
 
   void _getTissueToFind() {
@@ -79,13 +82,13 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     // 4: (0, 255, 255),  # Others
 
     // Select randomly one of the keys in pixelCount exept 0
-    final List<int> pixelValues = pixelCount.keys.toList();
+    final List<int> pixelValues = totalTissuePixelFound.keys.toList();
     pixelValues.remove(0);
-    indexTissueToFind = pixelValues[Random().nextInt(pixelValues.length)];
+    tissueToFind = pixelValues[Random().nextInt(pixelValues.length)];
 
     if (kDebugMode) {
-      final String tissueName = tissueTypes[indexTissueToFind]!;
-      print('Tissue Index to Find: $indexTissueToFind');
+      final String tissueName = tissueTypes[tissueToFind]!;
+      print('Tissue Index to Find: $tissueToFind;');
       print('Tissue to Find: $tissueName');
     }
   }
@@ -130,9 +133,10 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       _getPixelsTypeCount();
 
       // Check if 0 is the only pixel value
-      if (pixelCount.length == 1 && pixelCount.containsKey(0)) {
+      if (totalTissuePixelFound.length == 1 &&
+          totalTissuePixelFound.containsKey(0)) {
         if (kDebugMode) {
-          print('Only Background Pixels');
+          print('Only Unknown Class Pixels');
         }
         continue;
       }
@@ -195,15 +199,15 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
             2) *
         scalingFactorX; // Assuming uniform scaling
 
-    if (kDebugMode) {
-      print('Center: ($centerX, $centerY), Radius: $radius');
-      print('Image Size: ${fullImage!.width} x ${fullImage!.height}');
-      print('Mask Size: ${maskImage!.width} x ${maskImage!.height}');
-      print(
-          'Rendered cmapped Mask Size: ${displayedCmappedMaskImage.width} x ${displayedCmappedMaskImage.height}');
-      print(
-          'Rendered Image Size: ${displayedFullImage.width} x ${displayedFullImage.height}');
-    }
+    // if (kDebugMode) {
+    //   print('Center: ($centerX, $centerY), Radius: $radius');
+    //   print('Image Size: ${fullImage!.width} x ${fullImage!.height}');
+    //   print('Mask Size: ${maskImage!.width} x ${maskImage!.height}');
+    //   print(
+    //       'Rendered cmapped Mask Size: ${displayedCmappedMaskImage.width} x ${displayedCmappedMaskImage.height}');
+    //   print(
+    //       'Rendered Image Size: ${displayedFullImage.width} x ${displayedFullImage.height}');
+    // }
 
     final Set<int> uniquePixelValues = <int>{};
     final Map<int, int> pixelCount = <int, int>{};
@@ -228,13 +232,54 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       }
     }
 
-    // Print each unique pixel value
-    for (final int pixelValue in uniquePixelValues) {
-      if (kDebugMode) {
-        print('Pixel Value in selected Area: $pixelValue');
-        print('Pixel Count in selected Area: ${pixelCount[pixelValue]}');
+    // if tissueToFind is in pixelCount
+    if (pixelCount.containsKey(tissueToFind)) {
+      // sum the total number of pixels in image
+      double totalCoveredPixels = 0;
+      for (final int pixelValue in pixelCount.keys) {
+        totalCoveredPixels += pixelCount[pixelValue]!;
       }
+
+      // if selected pixels cover the whole image area
+      final double coveredArea =
+          totalCoveredPixels / (maskImage!.width * maskImage!.height);
+
+      if (coveredArea > 0.7) {
+        if (kDebugMode) {
+          print(
+              'Devi selezionare solo la parte dell\'immagine in cui è presente il tessuto');
+          return;
+        }
+      }
+
+      // if number of pixel of correct tissue is less than 50% of the total correct tissue pixels
+      if (pixelCount[tissueToFind]! <
+          0.5 * totalTissuePixelFound[tissueToFind]!) {
+        print('Non hai individuato tutto il tessuto corretto');
+        return;
+      }
+
+      if (kDebugMode) {
+        print('Tissue Name: ${tissueTypes[tissueToFind]}');
+        print('Total Pixel Count: ${totalTissuePixelFound[tissueToFind]}');
+        print('Pixel Count in selected Area: ${pixelCount[tissueToFind]}');
+        print('Covered Area: $coveredArea');
+        print('Total Area: ${maskImage!.width * maskImage!.height}');
+        print('Covered Pixels: $totalCoveredPixels');
+      }
+
+      print('Hai individuato il tessuto corretto');
+    } else {
+      print('Non hai individuato il tessuto corretto');
     }
+
+    // Print each unique pixel value
+    // for (final int pixelValue in uniquePixelValues) {
+    //   if (kDebugMode) {
+    //     print('Pixel Value in selected Area: $pixelValue');
+    //     print('Pixel Count in selected Area: ${pixelCount[pixelValue]}');
+    //   }
+    // }
   }
 
   void checkAnswer() {
@@ -247,7 +292,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       appBar: AppBar(
         title: const Text('Circle Area Comparison'),
       ),
-      body: imageBytes.isEmpty
+      body: imageBytes.isEmpty || tissueToFind == 0
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: <Widget>[
@@ -261,7 +306,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                           ),
                       children: <TextSpan>[
                         TextSpan(
-                            text: tissueTypes[indexTissueToFind],
+                            text: tissueTypes[tissueToFind],
                             style:
                                 const TextStyle(fontWeight: FontWeight.bold)),
                         const TextSpan(text: ' Tissue!'),
@@ -272,7 +317,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                 Row(
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      padding: const EdgeInsets.only(left: 50, right: 20),
                       child: Center(
                         child: ClipRect(
                           child: FittedBox(
@@ -303,56 +348,104 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                         ),
                       ),
                     ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        const Row(
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: SizedBox(
+                                height: 200,
+                                width: 550,
+                                child: Text(
+                                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
+                                  'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
+                                  'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. '
+                                  'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. '
+                                  'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    overflow: TextOverflow.visible,
+                                  ),
+                                  maxLines: 20,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                        Row(
+                          children: <Widget>[
+                            if (_isVisible)
+                              Column(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 20),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: 'Image visibility: ',
+                                        style: DefaultTextStyle.of(context)
+                                            .style
+                                            .apply(
+                                              fontSizeFactor: 1.5,
+                                            ),
+                                        children: <TextSpan>[
+                                          TextSpan(
+                                              text: imageVisibility
+                                                  .toStringAsFixed(2),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Slider(
+                                    value: imageVisibility,
+                                    onChanged: (double value) {
+                                      setState(() {
+                                        imageVisibility = value;
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(width: 30),
+                                  const Text('legenda')
+                                ],
+                              ),
+                          ],
+                        )
+                      ],
+                    )
                   ],
                 ),
                 const SizedBox(height: 30),
                 // Display bottom left button to confirm the selection
                 Row(
                   children: <Widget>[
-                    if (_isVisible)
-                      Column(
-                        children: <Widget>[
-                          Text(
-                            'Image Visibility',
-                            style: DefaultTextStyle.of(context).style.apply(
-                                  fontSizeFactor: 1.5,
-                                ),
-                          ),
-                          const SizedBox(height: 10),
-                          Slider(
-                            value: imageVisibility,
-                            onChanged: (double value) {
-                              setState(() {
-                                imageVisibility = value;
-                              });
-                            },
-                          ),
-                          Text(
-                            imageVisibility.toStringAsFixed(2),
-                            style: DefaultTextStyle.of(context)
-                                .style
-                                .apply(fontSizeFactor: 1.5),
-                          ),
-                        ],
-                      ),
                     const Spacer(),
                     Align(
                       alignment: Alignment.bottomRight,
-                      child: ElevatedButton(
-                        onPressed: _isEnabled
-                            ? () {
-                                setState(() {
-                                  if (!_isVisible &&
-                                      _startPoint != null &&
-                                      _endPoint != null &&
-                                      _isDrawing) {
-                                    _isVisible = true;
-                                    checkAnswer();
-                                  }
-                                });
-                              }
-                            : null,
-                        child: const Text('Confirm Selection'),
+                      child: SizedBox(
+                        height: 50,
+                        width: 200,
+                        child: FilledButton(
+                          onPressed: _isEnabled
+                              ? () {
+                                  setState(() {
+                                    if (!_isVisible &&
+                                        _startPoint != null &&
+                                        _endPoint != null &&
+                                        _isDrawing) {
+                                      _isVisible = true;
+                                      checkAnswer();
+                                    }
+                                  });
+                                }
+                              : null,
+                          child: const Text('Confirm Selection'),
+                        ),
                       ),
                     ),
                   ],
