@@ -12,6 +12,7 @@ import '../games/select_the_area/select_the_area_screen.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_screen.dart';
 import 'components/leaderboard.dart';
+import 'components/others.dart';
 import 'components/side_menu.dart';
 
 class MainScreen extends StatefulWidget {
@@ -65,7 +66,7 @@ class _MainScreenState extends State<MainScreen> {
         break;
 
       case 10:
-        page = const SelectTheAreaGame();
+        page = const LLMChatApp();
         break;
 
       default:

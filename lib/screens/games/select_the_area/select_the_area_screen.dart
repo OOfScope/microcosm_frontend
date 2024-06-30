@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -9,7 +8,6 @@ import 'package:image/image.dart' as img;
 
 import '../../../models/user_data.dart';
 import '../../../utils.dart';
-import '../../main/components/progress_levels.dart';
 
 class SelectTheAreaGame extends StatefulWidget {
   const SelectTheAreaGame({super.key});
@@ -59,7 +57,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   void _getPixelsTypeCount() {
     for (int x = 0; x < maskImage!.width; x++) {
       for (int y = 0; y < maskImage!.height; y++) {
-        final pixelValue = maskImage!.getPixel(x, y);
+        final img.Pixel pixelValue = maskImage!.getPixel(x, y);
         pixelCount.update(pixelValue.r as int, (int value) => value + 1,
             ifAbsent: () => 1);
       }
@@ -221,7 +219,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           final double dy = y - centerY;
 
           if (dx * dx + dy * dy <= radius * radius) {
-            final pixelValue = maskImage!.getPixel(x, y);
+            final img.Pixel pixelValue = maskImage!.getPixel(x, y);
             uniquePixelValues.add(pixelValue.r as int);
             pixelCount.update(pixelValue.r as int, (int value) => value + 1,
                 ifAbsent: () => 1);
