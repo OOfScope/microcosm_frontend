@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:math';
 
@@ -8,9 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/user_data.dart';
 
-
 class UserManager {
-
   UserManager._internal();
 
   static final UserManager _instance = UserManager._internal();
@@ -25,7 +22,6 @@ class UserManager {
   User get user => _user;
 }
 
-
 Future<User> checkIfUserOnDisk(String email, String country) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -33,7 +29,9 @@ Future<User> checkIfUserOnDisk(String email, String country) async {
   final int score = prefs.getInt('score') ?? 0;
   final int level = prefs.getInt('level') ?? 0;
 
-  if (nickname != null && prefs.getString('email') == email && prefs.getString('country') == country) {
+  if (nickname != null &&
+      prefs.getString('email') == email &&
+      prefs.getString('country') == country) {
     // User exists on disk
     final String name = email.split('@').first;
     final String laboratory = prefs.getString('laboratory') ?? 'Unknown Lab';
@@ -49,11 +47,16 @@ Future<User> checkIfUserOnDisk(String email, String country) async {
     );
 
     return user;
-
   } else {
     final String name = email.split('@').first;
-    
-    final List<String> labNames = <String>['AI Lab', 'Physics Lab', 'Chemistry Lab', 'Biology Lab', 'Computer Lab'];
+
+    final List<String> labNames = <String>[
+      'AI Lab',
+      'Physics Lab',
+      'Chemistry Lab',
+      'Biology Lab',
+      'Computer Lab'
+    ];
     final String laboratory = labNames[Random().nextInt(labNames.length)];
 
     await prefs.setString('nickname', name);
@@ -76,7 +79,6 @@ Future<User> checkIfUserOnDisk(String email, String country) async {
     return user;
   }
 }
-
 
 Future<Map<String, dynamic>> jwtDecode(String token) async {
   final String jwtDecodeUrl =
