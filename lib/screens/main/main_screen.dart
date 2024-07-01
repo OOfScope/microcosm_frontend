@@ -5,14 +5,11 @@ import '../../constants.dart';
 import '../../controllers/menu_app_controller.dart';
 import '../../responsive.dart';
 import '../dashboard/new_roadmap_screen.dart';
-import '../games/drag_and_drop/drag_and_drop.dart';
-import '../games/memory/memory_screen.dart';
-import '../games/quiz/quiz.dart';
-import '../games/select_the_area/select_the_area_screen.dart';
+import '../dataset_explorer/dataset_explorer.dart';
+import '../llmchat/llmchat.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_screen.dart';
 import 'components/leaderboard.dart';
-import 'components/llmchat.dart';
 import 'components/side_menu.dart';
 
 class MainScreen extends StatefulWidget {
@@ -43,20 +40,23 @@ class _MainScreenState extends State<MainScreen> {
     Widget page;
     switch (_selectedPage) {
       case 0:
-      page = Roadmap();
+      page = const Roadmap();
         // page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
         page = ProfileScreen(onDebugAddScoreButtonPressed: updateLeaderboardState);
         break;
-      case 2:
+      case 9:
         page = const SettingsScreen();
         break;
       case 3:
         page = const LLMChatApp();
         break;
+      case 4:
+        page = const DatasetExplorer();
+        break;
       case 10:
-        page = DragAndDropGame(onNavButtonPressed: upNavBarId);
+        page = const DatasetExplorer();
         break;
       default:
         throw UnimplementedError('no widget for $_selectedPage');
