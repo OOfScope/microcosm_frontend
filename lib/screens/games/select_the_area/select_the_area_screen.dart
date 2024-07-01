@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 
@@ -60,7 +59,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   void _getPixelsTypeCount() {
     for (int x = 0; x < maskImage!.width; x++) {
       for (int y = 0; y < maskImage!.height; y++) {
-        final pixelValue = maskImage!.getPixel(x, y);
+        final img.Pixel pixelValue = maskImage!.getPixel(x, y);
         totalTissuePixelFound.update(
             pixelValue.r as int, (int value) => value + 1,
             ifAbsent: () => 1);
@@ -247,7 +246,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       if (coveredArea > 0.7) {
         if (kDebugMode) {
           print(
-              'Devi selezionare solo la parte dell\'immagine in cui è presente il tessuto');
+              "Devi selezionare solo la parte dell'immagine in cui è presente il tessuto");
           return;
         }
       }
