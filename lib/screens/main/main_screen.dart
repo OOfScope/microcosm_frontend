@@ -59,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
         page = DatasetExplorer();
         break;
       case 10:
-        page = SelectTheAreaGame();
+        page = QuizGame();
         break;
       default:
         throw UnimplementedError('no widget for $_selectedPage');

@@ -1,47 +1,23 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-void main() {
-  runApp(const QuizGame());
-}
+import '../../../constants.dart';
+import '../../../utils.dart';
 
-class QuizGame extends StatelessWidget {
+class QuizGame extends StatefulWidget {
   const QuizGame({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Quiz Game',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Quiz Game'),
-        ),
-        body: const QuizWidget(),
-      ),
-    );
-  }
-}
-
-class QuizWidget extends StatefulWidget {
-  const QuizWidget({super.key});
 
   @override
   _QuizWidgetState createState() => _QuizWidgetState();
 }
 
-class _QuizWidgetState extends State<QuizWidget> {
+class _QuizWidgetState extends State<QuizGame> {
   final String imageUrl =
       'https://microcosm-backend.gmichele.com/get/low/random/';
-  Uint8List? imageBytes;
+  ImageResponse imageHandler = ImageResponse();
+
   int selectedAnswer = -1;
-  int correctAnswer = 2; // Index of the correct answer
-  List<String> answers = <String>['Dog', 'Cat', 'Owl', 'Eagle'];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -50,17 +26,10 @@ class _QuizWidgetState extends State<QuizWidget> {
   }
 
   Future<void> _fetchImage() async {
-    final http.Response response = await http.get(Uri.parse(imageUrl));
-    if (response.statusCode == 200) {
-      final Map<String, String> jsonResponse =
-          json.decode(response.body) as Map<String, String>;
-      final String base64Image = jsonResponse['rows']![0][0];
-      setState(() {
-        imageBytes = base64.decode(base64Image);
-      });
-    } else {
-      throw Exception('Failed to load image');
-    }
+    await imageHandler.loadImages(imageUrl);
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   ButtonStyle _buttonStyle(Color backgroundColor) {
@@ -82,44 +51,50 @@ class _QuizWidgetState extends State<QuizWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return imageBytes == null
-        ? const Center(child: CircularProgressIndicator())
-        : Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Image.memory(imageBytes!, width: 400, height: 400),
-                const SizedBox(height: 20),
-                ...List.generate(answers.length, (int index) {
-                  Color buttonColor;
-                  if (selectedAnswer == -1) {
-                    buttonColor = Colors.blue;
-                  } else if (selectedAnswer == index) {
-                    buttonColor =
-                        (index == correctAnswer) ? Colors.green : Colors.red;
-                  } else {
-                    buttonColor =
-                        (index == correctAnswer) ? Colors.green : Colors.blue;
-                  }
+    return Scaffold(
+      appBar: AppBar(title: const Text('Quiz Game')),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Image.memory(imageHandler.imageBytes,
+                      width: 400, height: 400),
+                  const SizedBox(height: 20),
+                  ...List.generate(tissueTypes.length, (int index) {
+                    Color buttonColor;
+                    if (selectedAnswer == -1) {
+                      buttonColor = Colors.blue;
+                    } else if (selectedAnswer == index) {
+                      buttonColor = (index == imageHandler.tissueToFind)
+                          ? Colors.green
+                          : Colors.red;
+                    } else {
+                      buttonColor = (index == imageHandler.tissueToFind)
+                          ? Colors.green
+                          : Colors.blue;
+                    }
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 50.0),
-                    child: ElevatedButton(
-                      style: _buttonStyle(buttonColor),
-                      onPressed: selectedAnswer == -1
-                          ? () {
-                              setState(() {
-                                selectedAnswer = index;
-                              });
-                            }
-                          : null,
-                      child: Text(answers[index]),
-                    ),
-                  );
-                }),
-              ],
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 50.0),
+                      child: ElevatedButton(
+                        style: _buttonStyle(buttonColor),
+                        onPressed: selectedAnswer == -1
+                            ? () {
+                                setState(() {
+                                  selectedAnswer = index;
+                                });
+                              }
+                            : null,
+                        child: Text(tissueTypes[index] ?? 'Unknown Tissue'),
+                      ),
+                    );
+                  }),
+                ],
+              ),
             ),
-          );
+    );
   }
 }
