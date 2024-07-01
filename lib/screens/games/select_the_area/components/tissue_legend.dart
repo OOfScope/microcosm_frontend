@@ -14,9 +14,9 @@ class TissueTypeLegend extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-        text: '\u2022 Observed Tissue Types: \n',
+        text: 'Observed Tissue Types: \n',
         style: DefaultTextStyle.of(context).style.apply(
-              fontSizeFactor: 1.5,
+              fontSizeFactor: 1.7,
             ),
         children: <InlineSpan>[
           for (final int pixelValue in totalTissuePixelFound.keys)
@@ -38,7 +38,7 @@ class TissueTypeLegend extends StatelessWidget {
                           tissueTypes[pixelValue]!,
                           style: TextStyle(
                             color: DefaultTextStyle.of(context).style.color,
-                            fontSize: 16,
+                            fontSize: 18,
                           ),
                         ),
                       ],
