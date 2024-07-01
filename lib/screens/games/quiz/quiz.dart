@@ -51,7 +51,6 @@ class _QuizWidgetState extends State<QuizGame> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Quiz Game')),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Center(

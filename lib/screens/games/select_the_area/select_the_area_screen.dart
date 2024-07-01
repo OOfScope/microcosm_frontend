@@ -161,7 +161,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       if (coveredArea > 0.7) {
         setState(() {
           _answerWidget = const Text(
-            "Devi selezionare solo la parte dell'immagine in cui è presente il tessuto",
+            'You must select only the part of the image where the tissue is present',
             style: TextStyle(
                 color: Colors.red,
                 fontSize: answerFontSize,
@@ -174,12 +174,13 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       }
 
       // if number of pixel of correct tissue is less than 50% of the total correct tissue pixels
+
       if (pixelCount[imageHandler.tissueToFind]! <
           0.5 *
               imageHandler.totalTissuePixelFound[imageHandler.tissueToFind]!) {
         setState(() {
           _answerWidget = const Text(
-            'Non hai individuato tutto il tessuto corretto',
+            'You have not identified all the correct tissue',
             style: TextStyle(
                 color: Colors.red,
                 fontSize: answerFontSize,
@@ -205,7 +206,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
 
       setState(() {
         _answerWidget = const Text(
-          'Hai individuato correttamente il tessuto!',
+          'You have correctly identified the tissue!',
           style: TextStyle(
               color: Colors.green,
               fontSize: answerFontSize,
@@ -217,7 +218,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     } else {
       setState(() {
         _answerWidget = const Text(
-          'Non hai individuato il tessuto corretto',
+          'You have not identified the correct tissue!',
           style: TextStyle(
               color: Colors.red,
               fontSize: answerFontSize,
@@ -244,9 +245,6 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Circle Area Comparison'),
-      ),
       body: _isLoading ||
               imageHandler.imageBytes.isEmpty ||
               imageHandler.tissueToFind == 0
@@ -267,8 +265,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 4.0, vertical: 2.0),
                               decoration: BoxDecoration(
-                                color: Colors
-                                    .white, // Change to your desired highlight color
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
@@ -336,7 +333,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                           children: <Widget>[
                             Container(
                               alignment: Alignment.center,
-                              height: 200,
+                              height: 150,
                               width: 550,
                               child: Text(
                                 tissueDescription[imageHandler.tissueToFind]!,
@@ -352,7 +349,11 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                             ),
 
                             // Display answer
-                            if (_isConfirmed)
+                            if (!_isConfirmed)
+                              Container(
+                                height: 250,
+                              )
+                            else
                               SizedBox(
                                   width: 550,
                                   height: 100,
@@ -365,7 +366,84 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                                       totalTissuePixelFound:
                                           imageHandler.totalTissuePixelFound)
                               ],
-                            )
+                            ),
+                            Row(
+                              children: <Widget>[
+                                if (_isConfirmed)
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Mask Transparency: ',
+                                            style: DefaultTextStyle.of(context)
+                                                .style
+                                                .apply(
+                                                  fontSizeFactor: 1.5,
+                                                ),
+                                          ),
+                                          Text(
+                                            imageVisibility.toStringAsFixed(2),
+                                            style: DefaultTextStyle.of(context)
+                                                .style
+                                                .apply(
+                                                  fontSizeFactor: 1.5,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Slider(
+                                        value: imageVisibility,
+                                        onChanged: (double value) {
+                                          setState(() {
+                                            imageVisibility = value;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 70, right: 50),
+                                    child: SizedBox(
+                                      height: 60,
+                                      width: 170,
+                                      child: FilledButton(
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all<Color>(
+                                                  _isEnabled
+                                                      ? Colors.blue
+                                                      : Colors.grey),
+                                        ),
+                                        onPressed: _isEnabled
+                                            ? () {
+                                                setState(() {
+                                                  if (!_isVisible &&
+                                                      _startPoint != null &&
+                                                      _endPoint != null &&
+                                                      _isDrawing) {
+                                                    _isVisible = true;
+                                                    checkAnswer();
+                                                  }
+                                                });
+                                              }
+                                            : null,
+                                        child: const Text('Confirm Selection',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.white)),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ],
@@ -373,75 +451,6 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                   ],
                 ),
                 // Display bottom left button to confirm the selection
-                Row(
-                  children: <Widget>[
-                    const Spacer(),
-                    if (_isConfirmed)
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Row(
-                            children: [
-                              Text(
-                                'Mask Transparency: ',
-                                style: DefaultTextStyle.of(context).style.apply(
-                                      fontSizeFactor: 1.5,
-                                    ),
-                              ),
-                              Text(
-                                imageVisibility.toStringAsFixed(2),
-                                style: DefaultTextStyle.of(context).style.apply(
-                                      fontSizeFactor: 1.5,
-                                    ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Slider(
-                            value: imageVisibility,
-                            onChanged: (double value) {
-                              setState(() {
-                                imageVisibility = value;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 70, right: 50),
-                        child: SizedBox(
-                          height: 60,
-                          width: 170,
-                          child: FilledButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  _isEnabled ? Colors.blue : Colors.grey),
-                            ),
-                            onPressed: _isEnabled
-                                ? () {
-                                    setState(() {
-                                      if (!_isVisible &&
-                                          _startPoint != null &&
-                                          _endPoint != null &&
-                                          _isDrawing) {
-                                        _isVisible = true;
-                                        checkAnswer();
-                                      }
-                                    });
-                                  }
-                                : null,
-                            child: const Text('Confirm Selection',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 17, color: Colors.white)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
     );

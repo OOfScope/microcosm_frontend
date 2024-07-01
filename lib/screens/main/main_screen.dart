@@ -6,8 +6,7 @@ import '../../controllers/menu_app_controller.dart';
 import '../../responsive.dart';
 import '../dashboard/new_roadmap_screen.dart';
 import '../dataset_explorer/dataset_explorer.dart';
-import '../games/quiz/quiz.dart';
-import '../games/select_the_area/select_the_area_screen.dart';
+import '../games/game_screen.dart';
 import '../llmchat/llmchat.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_screen.dart';
@@ -59,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
         page = DatasetExplorer();
         break;
       case 10:
-        page = QuizGame();
+        page = GameScreen();
         break;
       default:
         throw UnimplementedError('no widget for $_selectedPage');

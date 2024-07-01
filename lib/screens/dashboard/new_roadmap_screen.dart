@@ -1,7 +1,7 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../main/components/header.dart';
-
 
 enum LevelStatus {
   locked,
@@ -10,8 +10,8 @@ enum LevelStatus {
 }
 
 class LevelButton extends StatelessWidget {
-
-  const LevelButton({super.key, 
+  const LevelButton({
+    super.key,
     required this.levelNumber,
     required this.status,
     this.stars = 0,
@@ -84,7 +84,6 @@ class LevelButton extends StatelessWidget {
 }
 
 class DashedLinePainter extends CustomPainter {
-
   DashedLinePainter({
     required this.color,
     this.strokeWidth = 2.0,
@@ -128,7 +127,6 @@ class Roadmap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: AppBar(
         title: const Header(title: 'Roadmap'),
       ),
@@ -165,11 +163,13 @@ class Roadmap extends StatelessWidget {
 
   Widget _buildLevelPath(int startLevel, int endLevel) {
     final Random random = Random();
-    final int numRows = (endLevel - startLevel + 1) ~/ 4 + 1; // Calculate number of rows
+    final int numRows =
+        (endLevel - startLevel + 1) ~/ 4 + 1; // Calculate number of rows
     final List<Widget> rows = <Widget>[];
 
     for (int i = startLevel; i <= endLevel; i += 4) {
-      final int levelsInRow = min(4, endLevel - i + 1); // Calculate levels in this row
+      final int levelsInRow =
+          min(4, endLevel - i + 1); // Calculate levels in this row
       final List<Widget> rowChildren = <Widget>[];
 
       for (int j = i; j < i + levelsInRow; j++) {
@@ -182,15 +182,19 @@ class Roadmap extends StatelessWidget {
               children: <Widget>[
                 LevelButton(
                   levelNumber: currentLevel,
-                  status: LevelStatus.completed, // Example status, modify as needed
+                  status:
+                      LevelStatus.completed, // Example status, modify as needed
                   stars: 3, // Example stars, modify as needed
                   isActive: isActive,
                   onTap: () {
-                    print('Level $currentLevel clicked');
+                    if (kDebugMode) {
+                      print('Level $currentLevel clicked');
+                    }
                     // You can perform additional actions here based on the button click
                   },
                 ),
-                if (currentLevel < endLevel && j < i + levelsInRow) //                 if (currentLevel < endLevel && j < i + levelsInRow - 1)
+                if (currentLevel < endLevel &&
+                    j < i + levelsInRow) //                 if (currentLevel < endLevel && j < i + levelsInRow - 1)
                   SizedBox(
                     width: 60,
                     child: CustomPaint(
