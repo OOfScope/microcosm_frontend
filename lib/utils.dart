@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:admin/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as img;
 
 import 'models/user_data.dart';
 
@@ -57,6 +60,7 @@ Future<User> checkIfUserOnDisk(String email, String country) async {
       'Biology Lab',
       'Computer Lab'
     ];
+
     final String laboratory = labNames[Random().nextInt(labNames.length)];
 
     await prefs.setString('nickname', name);
@@ -94,5 +98,106 @@ Future<Map<String, dynamic>> jwtDecode(String token) async {
     final Map<String, dynamic> ret =
         jsonDecode(response.body) as Map<String, dynamic>;
     return ret;
+  }
+}
+
+class ImageResponse {
+  Uint8List imageBytes = Uint8List(0);
+  Uint8List maskImageBytes = Uint8List(0);
+  Uint8List cmappedMaskImageBytes = Uint8List(0);
+
+  late img.Image? fullImage;
+  late img.Image? maskImage;
+  late img.Image? cmappedMaskImage;
+
+  late Image displayedFullImage;
+  late Image displayedCmappedMaskImage;
+
+  int tissueToFind = 0;
+
+  Map<int, int> totalTissuePixelFound = <int, int>{};
+
+  void getPixelsTypeCount() {
+    for (int x = 0; x < maskImage!.width; x++) {
+      for (int y = 0; y < maskImage!.height; y++) {
+        final img.Pixel pixelValue = maskImage!.getPixel(x, y);
+        totalTissuePixelFound.update(
+            pixelValue.r as int, (int value) => value + 1,
+            ifAbsent: () => 1);
+      }
+    }
+
+    // Print each unique pixel value
+    for (final int pixelValue in totalTissuePixelFound.keys) {
+      if (kDebugMode) {
+        print('Total Pixel Value: $pixelValue');
+        print('Total Pixel Count: ${totalTissuePixelFound[pixelValue]}');
+      }
+    }
+  }
+
+  void getTissueToFind() {
+    // Select randomly one of the keys in pixelCount exept 0
+    final List<int> pixelValues = totalTissuePixelFound.keys.toList();
+    pixelValues.remove(0);
+
+    tissueToFind = pixelValues[Random().nextInt(pixelValues.length)];
+
+    if (kDebugMode) {
+      final String tissueName = tissueTypes[tissueToFind]!;
+      print('Tissue Index to Find: $tissueToFind;');
+      print('Tissue to Find: $tissueName');
+    }
+  }
+
+  void processImageResponse(Map<String, dynamic> jsonImageResponse) {
+    imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
+    maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
+    cmappedMaskImageBytes =
+        base64Decode(jsonImageResponse['rows']![0][3] as String);
+
+    fullImage = img.decodeImage(imageBytes);
+    maskImage = img.decodeImage(maskImageBytes);
+    cmappedMaskImage = img.decodeImage(cmappedMaskImageBytes);
+
+    displayedFullImage = Image.memory(
+      imageBytes,
+      fit: BoxFit.cover,
+      width: 600,
+      height: 600,
+    );
+
+    displayedCmappedMaskImage = Image.memory(
+      cmappedMaskImageBytes,
+      fit: BoxFit.cover,
+      width: 600,
+      height: 600,
+    );
+  }
+
+  Future<void> loadImages(String url) async {
+    const bool keepLoading = true;
+
+    while (keepLoading) {
+      final http.Response response = await http.get(Uri.parse(url));
+
+      final Map<String, dynamic> jsonImageResponse =
+          jsonDecode(response.body) as Map<String, dynamic>;
+
+      processImageResponse(jsonImageResponse);
+      getPixelsTypeCount();
+
+      // Check if 0 is the only pixel value
+      if (totalTissuePixelFound.length == 1 &&
+          totalTissuePixelFound.containsKey(0)) {
+        if (kDebugMode) {
+          print('Only Unknown Class Pixels');
+        }
+        continue;
+      }
+
+      getTissueToFind();
+      break;
+    }
   }
 }

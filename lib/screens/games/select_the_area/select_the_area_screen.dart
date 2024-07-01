@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 
 import 'package:admin/constants.dart';
@@ -13,6 +12,7 @@ import '../../../models/user_data.dart';
 import '../../../utils.dart';
 import 'components/circle_painter.dart';
 import 'components/tissue_legend.dart';
+import 'package:admin/utils.dart';
 
 class SelectTheAreaGame extends StatefulWidget {
   const SelectTheAreaGame({super.key});
@@ -25,120 +25,34 @@ class SelectTheAreaGame extends StatefulWidget {
 class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   Offset? _startPoint;
   Offset? _endPoint;
+
+  bool _isLoading = true;
   bool _isDrawing = false;
   bool _isVisible = false;
   bool _isEnabled = false;
   bool _isConfirmed = false;
+
   double imageVisibility = 0.5;
-
-  Uint8List imageBytes = Uint8List(0);
-  Uint8List maskImageBytes = Uint8List(0);
-  Uint8List cmappedMaskImageBytes = Uint8List(0);
-
-  late img.Image? fullImage;
-  late img.Image? maskImage;
-  late img.Image? cmappedMaskImage;
-
-  late Image displayedFullImage;
-  late Image displayedCmappedMaskImage;
 
   late Text _answerWidget;
 
   Map<int, int> pixelCount = <int, int>{};
-  Map<int, int> totalTissuePixelFound = <int, int>{};
 
+  ImageResponse imageHandler = ImageResponse();
   User myuser = UserManager.instance.user;
-
-  int tissueToFind = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadImages();
+    _loadWSI();
   }
 
-  void _getPixelsTypeCount() {
-    for (int x = 0; x < maskImage!.width; x++) {
-      for (int y = 0; y < maskImage!.height; y++) {
-        final img.Pixel pixelValue = maskImage!.getPixel(x, y);
-        totalTissuePixelFound.update(
-            pixelValue.r as int, (int value) => value + 1,
-            ifAbsent: () => 1);
-      }
-    }
-    // Print each unique pixel value
-    for (final int pixelValue in totalTissuePixelFound.keys) {
-      if (kDebugMode) {
-        print('Total Pixel Value: $pixelValue');
-        print('Total Pixel Count: ${totalTissuePixelFound[pixelValue]}');
-      }
-    }
-  }
-
-  void _getTissueToFind() {
-    // Select randomly one of the keys in pixelCount exept 0
-    final List<int> pixelValues = totalTissuePixelFound.keys.toList();
-    pixelValues.remove(0);
-    tissueToFind = pixelValues[Random().nextInt(pixelValues.length)];
-
-    if (kDebugMode) {
-      final String tissueName = tissueTypes[tissueToFind]!;
-      print('Tissue Index to Find: $tissueToFind;');
-      print('Tissue to Find: $tissueName');
-    }
-  }
-
-  void _processImageResponse(Map<String, dynamic> jsonImageResponse) {
+  Future<void> _loadWSI() async {
+    await imageHandler
+        .loadImages('https://microcosm-backend.gmichele.com/get/low/random/');
     setState(() {
-      imageBytes = base64Decode(jsonImageResponse['rows']![0][1] as String);
-      maskImageBytes = base64Decode(jsonImageResponse['rows']![0][2] as String);
-      cmappedMaskImageBytes =
-          base64Decode(jsonImageResponse['rows']![0][3] as String);
-
-      fullImage = img.decodeImage(imageBytes);
-      maskImage = img.decodeImage(maskImageBytes);
-      cmappedMaskImage = img.decodeImage(cmappedMaskImageBytes);
-      displayedFullImage = Image.memory(
-        imageBytes,
-        fit: BoxFit.cover,
-        width: 600,
-        height: 600,
-      );
-
-      displayedCmappedMaskImage = Image.memory(
-        cmappedMaskImageBytes,
-        fit: BoxFit.cover,
-        width: 600,
-        height: 600,
-      );
+      _isLoading = false;
     });
-  }
-
-  Future<void> _loadImages() async {
-    const bool keepLoading = true;
-
-    while (keepLoading) {
-      final http.Response response = await http.get(
-          Uri.parse('https://microcosm-backend.gmichele.com/get/low/random/'));
-
-      final Map<String, dynamic> jsonImageResponse =
-          jsonDecode(response.body) as Map<String, dynamic>;
-
-      _processImageResponse(jsonImageResponse);
-      _getPixelsTypeCount();
-
-      // Check if 0 is the only pixel value
-      if (totalTissuePixelFound.length == 1 &&
-          totalTissuePixelFound.containsKey(0)) {
-        if (kDebugMode) {
-          print('Only Unknown Class Pixels');
-        }
-        continue;
-      }
-
-      _getTissueToFind();
-      break;
-    }
   }
 
   void _onPanStart(DragStartDetails details) {
@@ -185,10 +99,10 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     }
 
     // Scaling factor to handle rendered image and mask
-    final double scalingFactorX =
-        maskImage!.width / displayedCmappedMaskImage.width!;
-    final double scalingFactorY =
-        maskImage!.height / displayedCmappedMaskImage.height!;
+    final double scalingFactorX = imageHandler.maskImage!.width /
+        imageHandler.displayedCmappedMaskImage.width!;
+    final double scalingFactorY = imageHandler.maskImage!.height /
+        imageHandler.displayedCmappedMaskImage.height!;
 
     // Convert screen coordinates to image coordinates
     final double centerX =
@@ -219,12 +133,15 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       for (int y = (centerY - radius).toInt();
           y <= (centerY + radius).toInt();
           y++) {
-        if (x >= 0 && x < maskImage!.width && y >= 0 && y < maskImage!.height) {
+        if (x >= 0 &&
+            x < imageHandler.maskImage!.width &&
+            y >= 0 &&
+            y < imageHandler.maskImage!.height) {
           final double dx = x - centerX;
           final double dy = y - centerY;
 
           if (dx * dx + dy * dy <= radius * radius) {
-            final img.Pixel pixelValue = maskImage!.getPixel(x, y);
+            final img.Pixel pixelValue = imageHandler.maskImage!.getPixel(x, y);
             uniquePixelValues.add(pixelValue.r as int);
             pixelCount.update(pixelValue.r as int, (int value) => value + 1,
                 ifAbsent: () => 1);
@@ -234,7 +151,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
     }
 
     // if tissueToFind is in pixelCount
-    if (pixelCount.containsKey(tissueToFind)) {
+    if (pixelCount.containsKey(imageHandler.tissueToFind)) {
       // sum the total number of pixels in image
       double totalCoveredPixels = 0;
       for (final int pixelValue in pixelCount.keys) {
@@ -242,8 +159,8 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       }
 
       // if selected pixels cover the whole image area
-      final double coveredArea =
-          totalCoveredPixels / (maskImage!.width * maskImage!.height);
+      final double coveredArea = totalCoveredPixels /
+          (imageHandler.maskImage!.width * imageHandler.maskImage!.height);
 
       if (coveredArea > 0.7) {
         setState(() {
@@ -261,8 +178,9 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       }
 
       // if number of pixel of correct tissue is less than 50% of the total correct tissue pixels
-      if (pixelCount[tissueToFind]! <
-          0.5 * totalTissuePixelFound[tissueToFind]!) {
+      if (pixelCount[imageHandler.tissueToFind]! <
+          0.5 *
+              imageHandler.totalTissuePixelFound[imageHandler.tissueToFind]!) {
         setState(() {
           _answerWidget = const Text(
             'Non hai individuato tutto il tessuto corretto',
@@ -278,11 +196,14 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       }
 
       if (kDebugMode) {
-        print('Tissue Name: ${tissueTypes[tissueToFind]}');
-        print('Total Pixel Count: ${totalTissuePixelFound[tissueToFind]}');
-        print('Pixel Count in selected Area: ${pixelCount[tissueToFind]}');
+        print('Tissue Name: ${tissueTypes[imageHandler.tissueToFind]}');
+        print(
+            'Total Pixel Count: ${imageHandler.totalTissuePixelFound[imageHandler.tissueToFind]}');
+        print(
+            'Pixel Count in selected Area: ${pixelCount[imageHandler.tissueToFind]}');
         print('Covered Area: $coveredArea');
-        print('Total Area: ${maskImage!.width * maskImage!.height}');
+        print(
+            'Total Area: ${imageHandler.maskImage!.width * imageHandler.maskImage!.height}');
         print('Covered Pixels: $totalCoveredPixels');
       }
 
@@ -330,7 +251,9 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       appBar: AppBar(
         title: const Text('Circle Area Comparison'),
       ),
-      body: imageBytes.isEmpty || tissueToFind == 0
+      body: _isLoading ||
+              imageHandler.imageBytes.isEmpty ||
+              imageHandler.tissueToFind == 0
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: <Widget>[
@@ -353,7 +276,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
-                                tissueTypes[tissueToFind]!,
+                                tissueTypes[imageHandler.tissueToFind]!,
                                 style: DefaultTextStyle.of(context).style.apply(
                                       fontSizeFactor: 2.5,
                                       color: Colors.black,
@@ -387,13 +310,14 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                               onPanEnd: _onPanEnd,
                               child: Stack(
                                 children: <Widget>[
-                                  displayedFullImage,
+                                  imageHandler.displayedFullImage,
                                   AnimatedOpacity(
                                       opacity:
                                           _isVisible ? imageVisibility : 0.0,
                                       duration:
                                           const Duration(milliseconds: 100),
-                                      child: displayedCmappedMaskImage),
+                                      child: imageHandler
+                                          .displayedCmappedMaskImage),
                                   if (_isDrawing &&
                                       _startPoint != null &&
                                       _endPoint != null)
@@ -419,7 +343,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                               height: 200,
                               width: 550,
                               child: Text(
-                                tissueDescription[tissueToFind]!,
+                                tissueDescription[imageHandler.tissueToFind]!,
                                 style: const TextStyle(
                                   fontSize: tissueDescriptionFontSize,
                                   overflow: TextOverflow.visible,
@@ -443,7 +367,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                                 if (_isVisible)
                                   TissueTypeLegend(
                                       totalTissuePixelFound:
-                                          totalTissuePixelFound)
+                                          imageHandler.totalTissuePixelFound)
                               ],
                             )
                           ],
