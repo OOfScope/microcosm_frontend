@@ -40,11 +40,12 @@ class _MainScreenState extends State<MainScreen> {
     Widget page;
     switch (_selectedPage) {
       case 0:
-      page = const Roadmap();
+        page = const Roadmap();
         // page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
-        page = ProfileScreen(onDebugAddScoreButtonPressed: updateLeaderboardState);
+        page =
+            ProfileScreen(onDebugAddScoreButtonPressed: updateLeaderboardState);
         break;
       case 9:
         page = const SettingsScreen();

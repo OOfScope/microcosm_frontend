@@ -1,13 +1,18 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 
+import 'package:admin/constants.dart';
+
 import '../../../models/user_data.dart';
 import '../../../utils.dart';
+import 'components/circle_painter.dart';
+import 'components/tissue_legend.dart';
 
 class SelectTheAreaGame extends StatefulWidget {
   const SelectTheAreaGame({super.key});
@@ -23,6 +28,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   bool _isDrawing = false;
   bool _isVisible = false;
   bool _isEnabled = false;
+  bool _isConfirmed = false;
   double imageVisibility = 0.5;
 
   Uint8List imageBytes = Uint8List(0);
@@ -36,19 +42,14 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   late Image displayedFullImage;
   late Image displayedCmappedMaskImage;
 
+  late Text _answerWidget;
+
   Map<int, int> pixelCount = <int, int>{};
   Map<int, int> totalTissuePixelFound = <int, int>{};
 
   User myuser = UserManager.instance.user;
 
   int tissueToFind = 0;
-
-  Map<int, String> tissueTypes = <int, String>{
-    1: 'Carcinoma',
-    2: 'Necrosis',
-    3: 'Tumor Stroma',
-    4: 'Others',
-  };
 
   @override
   void initState() {
@@ -66,20 +67,15 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       }
     }
     // Print each unique pixel value
-    // for (final int pixelValue in totalTissuePixelFound.keys) {
-    //   if (kDebugMode) {
-    //     print('Total Pixel Value: $pixelValue');
-    //     print('Total Pixel Count: ${totalTissuePixelFound[pixelValue]}');
-    //   }
-    // }
+    for (final int pixelValue in totalTissuePixelFound.keys) {
+      if (kDebugMode) {
+        print('Total Pixel Value: $pixelValue');
+        print('Total Pixel Count: ${totalTissuePixelFound[pixelValue]}');
+      }
+    }
   }
 
   void _getTissueToFind() {
-    // 1: (0, 0, 255),    # Carcinoma
-    // 2: (255, 0, 0),    # Necrosis
-    // 3: (0, 255, 0),    # Tumor Stroma
-    // 4: (0, 255, 255),  # Others
-
     // Select randomly one of the keys in pixelCount exept 0
     final List<int> pixelValues = totalTissuePixelFound.keys.toList();
     pixelValues.remove(0);
@@ -147,34 +143,40 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
 
   void _onPanStart(DragStartDetails details) {
     setState(() {
-      _startPoint = details.localPosition;
-      _endPoint = details.localPosition;
-      _isDrawing = true;
+      if (!_isConfirmed) {
+        _startPoint = details.localPosition;
+        _endPoint = details.localPosition;
+        _isDrawing = true;
+      }
     });
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
     setState(() {
-      _endPoint = details.localPosition;
+      if (!_isConfirmed) {
+        _endPoint = details.localPosition;
+      }
     });
   }
 
   void _onPanEnd(DragEndDetails details) {
-    setState(() {
-      if (_isEnabled) {
-        _comparePixels();
-      }
+    if (!_isConfirmed) {
+      setState(() {
+        if (_isEnabled) {
+          _comparePixels();
+        }
 
-      _isEnabled = true;
+        _isEnabled = true;
 
-      // try {
-      //   _comparePixels();
-      // } catch (e) {
-      //   if (kDebugMode) {
-      //     print('Error: $e');
-      //   }
-      // }
-    });
+        // try {
+        //   _comparePixels();
+        // } catch (e) {
+        //   if (kDebugMode) {
+        //     print('Error: $e');
+        //   }
+        // }
+      });
+    }
   }
 
   void _comparePixels() {
@@ -244,17 +246,34 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           totalCoveredPixels / (maskImage!.width * maskImage!.height);
 
       if (coveredArea > 0.7) {
-        if (kDebugMode) {
-          print(
-              "Devi selezionare solo la parte dell'immagine in cui è presente il tessuto");
-          return;
-        }
+        setState(() {
+          _answerWidget = const Text(
+            "Devi selezionare solo la parte dell'immagine in cui è presente il tessuto",
+            style: TextStyle(
+                color: Colors.red,
+                fontSize: answerFontSize,
+                fontWeight: FontWeight.bold),
+            overflow: TextOverflow.visible,
+          );
+        });
+        _isConfirmed = true;
+        return;
       }
 
       // if number of pixel of correct tissue is less than 50% of the total correct tissue pixels
       if (pixelCount[tissueToFind]! <
           0.5 * totalTissuePixelFound[tissueToFind]!) {
-        print('Non hai individuato tutto il tessuto corretto');
+        setState(() {
+          _answerWidget = const Text(
+            'Non hai individuato tutto il tessuto corretto',
+            style: TextStyle(
+                color: Colors.red,
+                fontSize: answerFontSize,
+                fontWeight: FontWeight.bold),
+            overflow: TextOverflow.visible,
+          );
+        });
+        _isConfirmed = true;
         return;
       }
 
@@ -267,9 +286,29 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
         print('Covered Pixels: $totalCoveredPixels');
       }
 
-      print('Hai individuato il tessuto corretto');
+      setState(() {
+        _answerWidget = const Text(
+          'Hai individuato correttamente il tessuto!',
+          style: TextStyle(
+              color: Colors.green,
+              fontSize: answerFontSize,
+              fontWeight: FontWeight.bold),
+          overflow: TextOverflow.visible,
+        );
+        _isConfirmed = true;
+      });
     } else {
-      print('Non hai individuato il tessuto corretto');
+      setState(() {
+        _answerWidget = const Text(
+          'Non hai individuato il tessuto corretto',
+          style: TextStyle(
+              color: Colors.red,
+              fontSize: answerFontSize,
+              fontWeight: FontWeight.bold),
+          overflow: TextOverflow.visible,
+        );
+        _isConfirmed = true;
+      });
     }
 
     // Print each unique pixel value
@@ -296,24 +335,46 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           : Column(
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 20),
-                  child: RichText(
-                    text: TextSpan(
-                      text: 'Find the ',
-                      style: DefaultTextStyle.of(context).style.apply(
-                            fontSizeFactor: 2,
+                    padding: const EdgeInsets.only(top: 20, bottom: 20),
+                    child: RichText(
+                      text: TextSpan(
+                        text: 'Find the ',
+                        style: DefaultTextStyle.of(context).style.apply(
+                              fontSizeFactor: 2.5,
+                            ),
+                        children: <InlineSpan>[
+                          WidgetSpan(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4.0, vertical: 2.0),
+                              decoration: BoxDecoration(
+                                color: Colors
+                                    .white, // Change to your desired highlight color
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                tissueTypes[tissueToFind]!,
+                                style: DefaultTextStyle.of(context).style.apply(
+                                      fontSizeFactor: 2.5,
+                                      color: Colors.black,
+                                      fontWeightDelta: 2,
+                                    ),
+                              ),
+                            ),
                           ),
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: tissueTypes[tissueToFind],
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        const TextSpan(text: ' Tissue!'),
-                      ],
-                    ),
-                  ),
-                ),
+                          TextSpan(
+                            text: ' Tissue!',
+                            style: DefaultTextStyle.of(context)
+                                .style
+                                .apply(fontSizeFactor: 2.5),
+                          ),
+                        ],
+                      ),
+                    )),
+                const SizedBox(height: 20),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.only(left: 50, right: 20),
@@ -348,73 +409,56 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                       ),
                     ),
                     Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        const Row(
+                        Column(
                           children: <Widget>[
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: SizedBox(
-                                height: 200,
-                                width: 550,
-                                child: Text(
-                                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
-                                  'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
-                                  'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. '
-                                  'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. '
-                                  'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    overflow: TextOverflow.visible,
-                                  ),
-                                  maxLines: 20,
+                            Container(
+                              alignment: Alignment.center,
+                              height: 200,
+                              width: 550,
+                              child: Text(
+                                tissueDescription[tissueToFind]!,
+                                style: const TextStyle(
+                                  fontSize: tissueDescriptionFontSize,
+                                  overflow: TextOverflow.visible,
                                 ),
+                                maxLines: 20,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 30),
-                        Row(
-                          children: <Widget>[
-                            if (_isVisible)
-                              Column(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20),
-                                    child: RichText(
-                                      text: TextSpan(
-                                        text: 'Image visibility: ',
-                                        style: DefaultTextStyle.of(context)
-                                            .style
-                                            .apply(
-                                              fontSizeFactor: 1.5,
-                                            ),
-                                        children: <TextSpan>[
-                                          TextSpan(
-                                              text: imageVisibility
-                                                  .toStringAsFixed(2),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold)),
+                            const SizedBox(
+                              height: 100,
+                            ),
+
+                            // Display answer
+                            if (_isConfirmed)
+                              SizedBox(
+                                  width: 550,
+                                  height: 150,
+                                  child: _answerWidget),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                if (_isVisible)
+                                  Row(
+                                    children: <Widget>[
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          TissueTypeLegend(
+                                              totalTissuePixelFound:
+                                                  totalTissuePixelFound)
                                         ],
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 10),
-                                  Slider(
-                                    value: imageVisibility,
-                                    onChanged: (double value) {
-                                      setState(() {
-                                        imageVisibility = value;
-                                      });
-                                    },
-                                  ),
-                                  const SizedBox(width: 30),
-                                  const Text('legenda')
-                                ],
-                              ),
+                              ],
+                            )
                           ],
-                        )
+                        ),
                       ],
                     )
                   ],
@@ -424,26 +468,64 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                 Row(
                   children: <Widget>[
                     const Spacer(),
+                    if (_isConfirmed)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          RichText(
+                            text: TextSpan(
+                              text: 'Mask Transparency: ',
+                              style: DefaultTextStyle.of(context).style.apply(
+                                    fontSizeFactor: 1.3,
+                                  ),
+                              children: <TextSpan>[
+                                TextSpan(
+                                    text: imageVisibility.toStringAsFixed(2),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Slider(
+                            value: imageVisibility,
+                            onChanged: (double value) {
+                              setState(() {
+                                imageVisibility = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     Align(
                       alignment: Alignment.bottomRight,
-                      child: SizedBox(
-                        height: 50,
-                        width: 200,
-                        child: FilledButton(
-                          onPressed: _isEnabled
-                              ? () {
-                                  setState(() {
-                                    if (!_isVisible &&
-                                        _startPoint != null &&
-                                        _endPoint != null &&
-                                        _isDrawing) {
-                                      _isVisible = true;
-                                      checkAnswer();
-                                    }
-                                  });
-                                }
-                              : null,
-                          child: const Text('Confirm Selection'),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 50, right: 50),
+                        child: SizedBox(
+                          height: 60,
+                          width: 200,
+                          child: FilledButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  _isEnabled ? Colors.blue : Colors.grey),
+                            ),
+                            onPressed: _isEnabled
+                                ? () {
+                                    setState(() {
+                                      if (!_isVisible &&
+                                          _startPoint != null &&
+                                          _endPoint != null &&
+                                          _isDrawing) {
+                                        _isVisible = true;
+                                        checkAnswer();
+                                      }
+                                    });
+                                  }
+                                : null,
+                            child: const Text('Confirm Selection',
+                                style: TextStyle(
+                                    fontSize: 17, color: Colors.white)),
+                          ),
                         ),
                       ),
                     ),
@@ -452,31 +534,5 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
               ],
             ),
     );
-  }
-}
-
-class CirclePainter extends CustomPainter {
-  CirclePainter(this.startPoint, this.endPoint);
-  final Offset startPoint;
-  final Offset endPoint;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double centerX = (startPoint.dx + endPoint.dx) / 2;
-    final double centerY = (startPoint.dy + endPoint.dy) / 2;
-    final double radius = sqrt(pow(endPoint.dx - startPoint.dx, 2) +
-            pow(endPoint.dy - startPoint.dy, 2)) /
-        2;
-
-    final Paint paint = Paint()
-      ..color = Colors.blue.withOpacity(0.5)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(Offset(centerX, centerY), radius, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
   }
 }
