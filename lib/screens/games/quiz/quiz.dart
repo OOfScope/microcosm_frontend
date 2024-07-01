@@ -36,7 +36,8 @@ class QuizWidget extends StatefulWidget {
 }
 
 class _QuizWidgetState extends State<QuizWidget> {
-  final String imageUrl = 'https://microcosm-backend.gmichele.com/1/image';
+  final String imageUrl =
+      'https://microcosm-backend.gmichele.com/get/low/random/';
   Uint8List? imageBytes;
   int selectedAnswer = -1;
   int correctAnswer = 2; // Index of the correct answer
