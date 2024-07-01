@@ -53,22 +53,11 @@ class _MainScreenState extends State<MainScreen> {
         page = const SettingsScreen();
         break;
       case 3:
-        page = DragAndDropGame(onNavButtonPressed: upNavBarId);
-        break;
-      case 4:
-        page = const MemoryGame();
-        break;
-      case 5:
-        page = const QuizGame();
-        break;
-      case 6:
-        page = const SelectTheAreaGame();
-        break;
-
-      case 10:
         page = const LLMChatApp();
         break;
-
+      case 10:
+        page = DragAndDropGame(onNavButtonPressed: upNavBarId);
+        break;
       default:
         throw UnimplementedError('no widget for $_selectedPage');
     }

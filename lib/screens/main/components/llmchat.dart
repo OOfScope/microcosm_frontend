@@ -11,7 +11,7 @@ class LLMChatApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Header(title: 'Ollama Chat',),
+        title: const Header(title: 'Medyc-AId LLM',),
       ),
       body:     MaterialApp(
       theme: ThemeData(
