@@ -15,7 +15,7 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
   int highCount = 0;
   int lowCount = 0;
   final int batchSize = 30;
-  final List<String> classes = <String>['Unknown class', 'Carcinoma', 'Necrosis', 'Tumor Stroma', 'Others'];
+  final List<String> classes = <String>['Unknown', 'Carcinoma', 'Necrosis', 'Tumor Stroma', 'Others'];
   List<int> highLoadedIndices = <int>[];
   List<int> lowLoadedIndices = <int>[];
   late ScrollController _scrollController;
@@ -105,7 +105,7 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
         color: _getColor(index),
         value: sectionValue,
         title: className,
-        radius: 50,
+        radius: 80,
         titleStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
       );
     }).toList();
@@ -179,8 +179,8 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        Image.memory(base64Decode(images![0]), height: 100),
-                        Image.memory(base64Decode(images[1]), height: 100),
+                        Image.memory(base64Decode(images![0]), height: 250),
+                        Image.memory(base64Decode(images[1]), height: 250),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -257,10 +257,66 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Low image count: $lowCount', style: const TextStyle(fontSize: 18)),
-                      Text('High image count: $highCount', style: const TextStyle(fontSize: 18)),
-                      Text('Total image count: ${lowCount + highCount}', style: const TextStyle(fontSize: 18)),
-                      Text('Classes available: ${classes.join(', ')}', style: const TextStyle(fontSize: 18)),
+RichText(
+  text: TextSpan(
+    style: const TextStyle(fontSize: 20, color: Colors.black),
+    children: [
+      TextSpan(
+        text: 'Low image count:',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      TextSpan(
+        text: ' $lowCount',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+      ),
+    ],
+  ),
+),
+RichText(
+  text: TextSpan(
+    style: const TextStyle(fontSize: 20, color: Colors.black),
+    children: [
+      TextSpan(
+        text: 'High image count:',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      TextSpan(
+        text: ' $highCount',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+      ),
+    ],
+  ),
+),
+RichText(
+  text: TextSpan(
+    style: const TextStyle(fontSize: 20, color: Colors.black),
+    children: [
+      TextSpan(
+        text: 'Total image count:',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      TextSpan(
+        text: ' ${lowCount + highCount}',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+      ),
+    ],
+  ),
+),
+RichText(
+  text: TextSpan(
+    style: const TextStyle(fontSize: 20, color: Colors.black),
+    children: [
+      TextSpan(
+        text: 'Classes available:',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      ),
+      TextSpan(
+        text: ' ${classes.join(', ')}',
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+      ),
+    ],
+  ),
+),
                     ],
                   ),
                 ),
