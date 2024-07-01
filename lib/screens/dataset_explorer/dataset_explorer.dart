@@ -225,7 +225,7 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Header(title: 'Dataset Explorer',),
+        title: const Header(title: 'Dataset Explorer',),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.view_module),
@@ -258,72 +258,72 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-RichText(
-  text: TextSpan(
-    style: const TextStyle(fontSize: 20, color: Colors.black),
-    children: [
-      TextSpan(
-        text: 'Low image count:',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      TextSpan(
-        text: ' $lowCount',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
-      ),
-    ],
-  ),
-),
-RichText(
-  text: TextSpan(
-    style: const TextStyle(fontSize: 20, color: Colors.black),
-    children: [
-      TextSpan(
-        text: 'High image count:',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      TextSpan(
-        text: ' $highCount',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
-      ),
-    ],
-  ),
-),
-RichText(
-  text: TextSpan(
-    style: const TextStyle(fontSize: 20, color: Colors.black),
-    children: [
-      TextSpan(
-        text: 'Total image count:',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      TextSpan(
-        text: ' ${lowCount + highCount}',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
-      ),
-    ],
-  ),
-),
-RichText(
-  text: TextSpan(
-    style: const TextStyle(fontSize: 20, color: Colors.black),
-    children: [
-      TextSpan(
-        text: 'Classes available:',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-      ),
-      TextSpan(
-        text: ' ${classes.join(', ')}',
-        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
-      ),
-    ],
-  ),
-),
+                                        children: <Widget>[
+                    RichText(
+                      text: TextSpan(
+                        style: const TextStyle(fontSize: 20, color: Colors.black),
+                        children: [
+                          const TextSpan(
+                            text: 'Low image count:',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          TextSpan(
+                            text: ' $lowCount',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        style: const TextStyle(fontSize: 20, color: Colors.black),
+                        children: [
+                          const TextSpan(
+                            text: 'High image count:',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          TextSpan(
+                            text: ' $highCount',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        style: const TextStyle(fontSize: 20, color: Colors.black),
+                        children: [
+                          const TextSpan(
+                            text: 'Total image count:',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          TextSpan(
+                            text: ' ${lowCount + highCount}',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+                          ),
+                        ],
+                      ),
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        style: const TextStyle(fontSize: 20, color: Colors.black),
+                        children: [
+                          const TextSpan(
+                            text: 'Classes available:',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          TextSpan(
+                            text: ' ${classes.join(', ')}',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+                          ),
+                        ],
+                      ),
+                    ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Center(
                 child: Container(
                   height: 200,
@@ -338,7 +338,7 @@ RichText(
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               const Text('High Resolution Images', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               Column(
                 children: highLoadedIndices.map((int index) => _buildImageCard('high', index)).toList(),
