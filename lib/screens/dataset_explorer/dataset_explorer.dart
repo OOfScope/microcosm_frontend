@@ -14,12 +14,13 @@ class DatasetExplorer extends StatefulWidget {
 class _DatasetExplorerState extends State<DatasetExplorer> {
   int highCount = 0;
   int lowCount = 0;
-  final int batchSize = 10;
+  final int batchSize = 30;
   final List<String> classes = <String>['Unknown class', 'Carcinoma', 'Necrosis', 'Tumor Stroma', 'Others'];
   List<int> highLoadedIndices = <int>[];
   List<int> lowLoadedIndices = <int>[];
   late ScrollController _scrollController;
-
+  bool isCompactView = false;
+  
   @override
   void initState() {
     super.initState();
@@ -45,8 +46,8 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
       setState(() {
         highCount = highData['rows'][0][0] as int;
         lowCount = lowData['rows'][0][0] as int;
-        highLoadedIndices = List.generate(batchSize < highCount ? batchSize : highCount, (int index) => index);
-        lowLoadedIndices = List.generate(batchSize < lowCount ? batchSize : lowCount, (int index) => index);
+        highLoadedIndices = List.generate(batchSize < highCount ? batchSize : highCount, (int index) => index + 1);
+        lowLoadedIndices = List.generate(batchSize < lowCount ? batchSize : lowCount, (int index) => index + 1);
       });
     } else {
       print('Failed to load counts');
@@ -54,6 +55,8 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
   }
 
   Future<List<String>> _fetchImage(String type, int id) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+
     final http.Response imageResponse = await http.get(Uri.parse('https://microcosm-backend.gmichele.com/get/$type/$id/image'));
     final http.Response cmapResponse = await http.get(Uri.parse('https://microcosm-backend.gmichele.com/get/$type/$id/cmap'));
 
@@ -64,7 +67,7 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
       return <String>[imageData['rows'][0][0] as String, cmapData['rows'][0][0] as String];
     } else {
       print('Failed to load images');
-      return <String>['', ''];
+      return <String>['', 'Failed to load images'];
     }
   }
 
@@ -77,16 +80,16 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
   void _loadMoreImages() {
     setState(() {
       if (highLoadedIndices.length < highCount) {
-        final int nextBatchEnd = highLoadedIndices.length + batchSize < highCount
+        int nextBatchEnd = highLoadedIndices.length + batchSize < highCount
             ? highLoadedIndices.length + batchSize
             : highCount;
-        highLoadedIndices.addAll(List.generate(nextBatchEnd - highLoadedIndices.length, (int index) => highLoadedIndices.length + index));
+        highLoadedIndices.addAll(List.generate(nextBatchEnd - highLoadedIndices.length, (int index) => highLoadedIndices.length + index + 1));
       }
       if (lowLoadedIndices.length < lowCount) {
-        final int nextBatchEnd = lowLoadedIndices.length + batchSize < lowCount
+        int nextBatchEnd = lowLoadedIndices.length + batchSize < lowCount
             ? lowLoadedIndices.length + batchSize
             : lowCount;
-        lowLoadedIndices.addAll(List.generate(nextBatchEnd - lowLoadedIndices.length, (int index) => lowLoadedIndices.length + index));
+        lowLoadedIndices.addAll(List.generate(nextBatchEnd - lowLoadedIndices.length, (int index) => lowLoadedIndices.length + index + 1));
       }
     });
   }
@@ -132,23 +135,85 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return const Center(child: Text('Error loading images'));
-        } else {
-          final List<String>? images = snapshot.data;
           return Card(
             elevation: 4,
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: Padding(
               padding: const EdgeInsets.all(10.0),
-              child: Row(
+              child: Column(
                 children: <Widget>[
-                  Expanded(child: Image.memory(base64Decode(images![0]))),
-                  const SizedBox(width: 10),
-                  Expanded(child: Image.memory(base64Decode(images[1]))),
+                  Text(
+                    'ID: $id',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 50,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Oops! Something went wrong.',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  const Text(
+                    'Failed to load images.',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ],
               ),
             ),
           );
+        } else {
+          final List<String>? images = snapshot.data;
+          if (isCompactView) {
+            // Compact view: Images and cmap side by side
+            return Card(
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Image.memory(base64Decode(images![0]), height: 100),
+                        Image.memory(base64Decode(images[1]), height: 100),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'ID: $id',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          } else {
+            // Default view: Larger images stacked vertically
+            return Card(
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      'ID: $id',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    Image.memory(base64Decode(images![0])),
+                    const SizedBox(height: 10),
+                    Image.memory(base64Decode(images[1])),
+                  ],
+                ),
+              ),
+            );
+          }
         }
       },
     );
@@ -159,6 +224,16 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dataset Explorer'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.view_module),
+            onPressed: () {
+              setState(() {
+                isCompactView = !isCompactView;
+              });
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         controller: _scrollController,
@@ -169,14 +244,14 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
             children: <Widget>[
               const Center(
                 child: Text(
-                  'Remote Dataset Info',
+                  'Remote Dataset Explorer',
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 20),
               Card(
                 elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 10),
+                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
@@ -206,12 +281,12 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text('High Images', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text('High Resolution Images', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               Column(
                 children: highLoadedIndices.map((int index) => _buildImageCard('high', index)).toList(),
               ),
               const SizedBox(height: 20),
-              const Text('Low Images', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text('Low Resolution Images', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               Column(
                 children: lowLoadedIndices.map((int index) => _buildImageCard('low', index)).toList(),
               ),
@@ -231,8 +306,8 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
 }
 
 class ChartData {
-
-  ChartData(this.className, this.count);
   final String className;
   final int count;
+
+  ChartData(this.className, this.count);
 }

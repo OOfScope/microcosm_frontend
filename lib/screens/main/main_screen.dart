@@ -53,10 +53,10 @@ class _MainScreenState extends State<MainScreen> {
         page = const LLMChatApp();
         break;
       case 4:
-        page = const DatasetExplorer();
+        page = DatasetExplorer();
         break;
       case 10:
-        page = const DatasetExplorer();
+        page = DatasetExplorer();
         break;
       default:
         throw UnimplementedError('no widget for $_selectedPage');
