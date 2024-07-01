@@ -435,26 +435,15 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                             if (_isConfirmed)
                               SizedBox(
                                   width: 550,
-                                  height: 150,
+                                  height: 100,
                                   child: _answerWidget),
 
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: <Widget>[
                                 if (_isVisible)
-                                  Row(
-                                    children: <Widget>[
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          TissueTypeLegend(
-                                              totalTissuePixelFound:
-                                                  totalTissuePixelFound)
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                  TissueTypeLegend(
+                                      totalTissuePixelFound:
+                                          totalTissuePixelFound)
                               ],
                             )
                           ],
@@ -463,7 +452,6 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                     )
                   ],
                 ),
-                const SizedBox(height: 30),
                 // Display bottom left button to confirm the selection
                 Row(
                   children: <Widget>[
@@ -472,19 +460,21 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          RichText(
-                            text: TextSpan(
-                              text: 'Mask Transparency: ',
-                              style: DefaultTextStyle.of(context).style.apply(
-                                    fontSizeFactor: 1.3,
-                                  ),
-                              children: <TextSpan>[
-                                TextSpan(
-                                    text: imageVisibility.toStringAsFixed(2),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                              ],
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                'Mask Transparency: ',
+                                style: DefaultTextStyle.of(context).style.apply(
+                                      fontSizeFactor: 1.5,
+                                    ),
+                              ),
+                              Text(
+                                imageVisibility.toStringAsFixed(2),
+                                style: DefaultTextStyle.of(context).style.apply(
+                                      fontSizeFactor: 1.5,
+                                    ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 10),
                           Slider(
@@ -500,10 +490,10 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                     Align(
                       alignment: Alignment.bottomRight,
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 50, right: 50),
+                        padding: const EdgeInsets.only(left: 70, right: 50),
                         child: SizedBox(
                           height: 60,
-                          width: 200,
+                          width: 170,
                           child: FilledButton(
                             style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all<Color>(
@@ -523,6 +513,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                                   }
                                 : null,
                             child: const Text('Confirm Selection',
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
                                     fontSize: 17, color: Colors.white)),
                           ),
