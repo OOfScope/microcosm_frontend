@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../main/components/header.dart';
+
 
 class DatasetExplorer extends StatefulWidget {
   const DatasetExplorer({super.key});
@@ -223,7 +225,7 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dataset Explorer'),
+        title: Header(title: 'Dataset Explorer',),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.view_module),
