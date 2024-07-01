@@ -1,18 +1,14 @@
-import 'dart:convert';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
-import 'package:admin/constants.dart';
-
+import '../../../constants.dart';
 import '../../../models/user_data.dart';
 import '../../../utils.dart';
 import 'components/circle_painter.dart';
 import 'components/tissue_legend.dart';
-import 'package:admin/utils.dart';
 
 class SelectTheAreaGame extends StatefulWidget {
   const SelectTheAreaGame({super.key});

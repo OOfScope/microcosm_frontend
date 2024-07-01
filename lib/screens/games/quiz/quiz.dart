@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../constants.dart';
 import '../../../utils.dart';
@@ -45,7 +44,7 @@ class _QuizWidgetState extends State<QuizGame> {
           )
         : ElevatedButton.styleFrom(
             minimumSize: const Size(200, 60),
-            textStyle: const TextStyle(fontSize: 24, color: Colors.black),
+            textStyle: const TextStyle(fontSize: 24, color: Colors.white),
           );
   }
 
@@ -58,6 +57,7 @@ class _QuizWidgetState extends State<QuizGame> {
           : Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Image.memory(imageHandler.imageBytes,
                       width: 400, height: 400),
@@ -79,7 +79,7 @@ class _QuizWidgetState extends State<QuizGame> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 50.0),
-                      child: ElevatedButton(
+                      child: FilledButton(
                         style: _buttonStyle(buttonColor),
                         onPressed: selectedAnswer == -1
                             ? () {
