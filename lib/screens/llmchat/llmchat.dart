@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
-import 'header.dart';
+import '../main/components/header.dart';
 
 class LLMChatApp extends StatelessWidget {
   const LLMChatApp({super.key});
