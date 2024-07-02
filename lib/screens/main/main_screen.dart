@@ -49,14 +49,16 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       if (levelButtons[index].stars < 3) {
         if (index >= 0 && index < levelButtons.length) {
+          levelButtons[index].stars += 1;
+
           if (levelButtons[index].stars == 3) {
             levelButtons[index].status = LevelStatus.completed;
             levelButtons[index + 1].status = LevelStatus.inProgress;
             levelButtons[index + 1].isActive = true;
+            return;
           }
 
           levelButtons[index].addLevelScore(score);
-          levelButtons[index].stars += 1;
         }
       }
     });

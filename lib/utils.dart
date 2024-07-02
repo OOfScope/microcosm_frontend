@@ -226,7 +226,6 @@ List<LevelButton> initializeLevelButtons() {
       LevelButton(
         levelNumber: i,
         status: i == 1 ? LevelStatus.inProgress : LevelStatus.locked,
-        stars: i == 1 ? 1 : 0,
         isActive: i == 1,
       ),
     );
