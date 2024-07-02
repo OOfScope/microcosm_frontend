@@ -16,6 +16,7 @@ class _GameScreenState extends State<GameScreen> {
   int _timeLeft = 20; // Time left in seconds
   late Timer _timer;
   bool _gameLoaded = false; // Tracks if the game is loaded
+  bool _gameOver = false; // Tracks if the game is over
 
   @override
   void initState() {
@@ -29,9 +30,12 @@ class _GameScreenState extends State<GameScreen> {
       (Timer timer) {
         if (_progress <= 0 || _timeLeft <= 0) {
           timer.cancel();
+          setState(() {
+            _gameOver = true;
+          });
         } else {
           setState(() {
-            _progress -= 0.05;
+            _progress -= 1 / 20; // Decrease progress based on total time
             _timeLeft -= 1;
           });
         }
@@ -64,53 +68,90 @@ class _GameScreenState extends State<GameScreen> {
       appBar: AppBar(
         title: const Header(title: 'Quiz Game'),
       ),
-      body: Column(
+      body: Stack(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Expanded(
-                  child: SizedBox(
-                    height: 20, // Make the progress bar thicker
-                    child: TweenAnimationBuilder(
-                      tween: Tween<double>(begin: 1.0, end: _progress),
-                      duration: const Duration(milliseconds: 500),
-                      builder: (context, value, child) {
-                        return LinearProgressIndicator(
-                          value: value,
-                          backgroundColor: Colors.grey[300],
-                          color: Colors.blue,
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+          Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      'Score: $_score',
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade700, // Dark blue background
+                          borderRadius: BorderRadius.circular(20.0),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2), // Shadow position
+                            ),
+                          ],
+                        ),
+                        height: 30, // Make the progress bar thicker
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20.0),
+                          child: TweenAnimationBuilder(
+                            tween: Tween<double>(begin: 1.0, end: _progress),
+                            duration: const Duration(milliseconds: 500),
+                            builder: (BuildContext context, double value,
+                                Widget? child) {
+                              return LinearProgressIndicator(
+                                value: value,
+                                backgroundColor: Colors.grey[300],
+                                color: Colors.blue,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     ),
-                    Text(
-                      'Time Left: $_timeLeft s',
-                      style: const TextStyle(fontSize: 16),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          'Score: $_score',
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          'Time Left: $_timeLeft s',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              Expanded(
+                child: GameWrapper(
+                  onLoaded: onGameLoaded,
+                  onScoreUpdate: updateScore,
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: GameWrapper(
-              onLoaded: onGameLoaded,
-              onScoreUpdate: updateScore,
+          if (_gameOver)
+            Positioned.fill(
+              child: Container(
+                color: Colors.grey.withOpacity(0.7),
+                child: const Center(
+                  child: Text(
+                    'Game Over!',
+                    style: TextStyle(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -127,7 +168,7 @@ class GameWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Simulate a delay for loading the game
-    Future.delayed(const Duration(seconds: 2), onLoaded);
+    Future.delayed(const Duration(seconds: 4), onLoaded);
 
     return const Center(
       child: SelectTheAreaGame(),
