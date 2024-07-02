@@ -92,9 +92,16 @@ class _GameScreenState extends State<GameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final GameWrapper game = GameWrapper(
+      onLoaded: onGameLoaded,
+      onScoreUpdate: updateScore,
+    );
     return Scaffold(
       appBar: AppBar(
-        title: const Header(title: 'Quiz Game'),
+        // title will be Level: this.level - Difficulty: this.difficulty - Game:
+        title: Header(
+            title:
+                'Level: ${widget.level} - Difficulty: ${widget.difficulty} - Game: ${game.title}'),
       ),
       body: Stack(
         children: <Widget>[
@@ -157,10 +164,7 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
               Expanded(
-                child: GameWrapper(
-                  onLoaded: onGameLoaded,
-                  onScoreUpdate: updateScore,
-                ),
+                child: game,
               ),
             ],
           ),

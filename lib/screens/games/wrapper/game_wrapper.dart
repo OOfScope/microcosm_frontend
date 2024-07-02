@@ -6,6 +6,7 @@ import '../select_the_area/select_the_area_screen.dart';
 class GameWrapper extends StatelessWidget {
   const GameWrapper(
       {super.key, required this.onLoaded, required this.onScoreUpdate});
+  final String title = 'Select the Area';
   final VoidCallback onLoaded;
   final ValueChanged<int> onScoreUpdate;
 

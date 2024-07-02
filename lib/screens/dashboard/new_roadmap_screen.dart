@@ -40,7 +40,7 @@ class LevelButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (onTapLevelButton != null) {
+        if ((onTapLevelButton != null) && isActive) {
           onTapLevelButton!(levelNumber, stars);
         }
       },
@@ -179,7 +179,6 @@ class Roadmap extends StatelessWidget {
       for (int j = i; j < i + levelsInRow; j++) {
         final int currentLevel = j;
         final int nextLevel = currentLevel + 1;
-        const bool isActive = true; // Replace with your logic for active levels
         rowChildren.add(
           Expanded(
             child: Column(
@@ -193,7 +192,7 @@ class Roadmap extends StatelessWidget {
                   stars: currentLevel == 1
                       ? 1
                       : 0, // Random stars for illustration
-                  isActive: currentLevel == 1 ? isActive : !isActive,
+                  isActive: currentLevel == 1 ? true : false,
                   onTapLevelButton: onLevelButtonPressed,
                 ),
                 if (currentLevel < endLevel &&
