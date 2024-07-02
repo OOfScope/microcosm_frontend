@@ -43,7 +43,6 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   Map<int, int> pixelCount = <int, int>{};
 
   ImageResponse imageHandler = ImageResponse();
-  User myuser = UserManager.instance.user;
 
   @override
   void initState() {

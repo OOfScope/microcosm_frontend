@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../constants.dart';
 import '../../controllers/menu_app_controller.dart';
 import '../../responsive.dart';
+import '../../utils.dart';
+import '../dashboard/components/level_button.dart';
 import '../dashboard/new_roadmap_screen.dart';
 import '../dataset_explorer/dataset_explorer.dart';
 import '../games/game_screen.dart';
@@ -25,7 +27,6 @@ class _MainScreenState extends State<MainScreen> {
   int _difficulty = 0;
   int _level = 0;
   final GlobalKey<LeaderboardState> _childKey = GlobalKey<LeaderboardState>();
-  final GlobalKey<RoadmapState> _roadmapKey = GlobalKey<RoadmapState>();
 
   void upNavBarId(int index) {
     setState(() {
@@ -42,8 +43,22 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void updateLevelScore(int index, int score) {
+    final List<LevelButton> levelButtons =
+        LevelButtonManager.instance.levelButtons;
+    index -= 1;
     setState(() {
-      _roadmapKey.currentState!.updateLevelScore(index, score);
+      if (levelButtons[index].stars < 3) {
+        if (index >= 0 && index < levelButtons.length) {
+          if (levelButtons[index].stars == 3) {
+            levelButtons[index].status = LevelStatus.completed;
+            levelButtons[index + 1].status = LevelStatus.inProgress;
+            levelButtons[index + 1].isActive = true;
+          }
+
+          levelButtons[index].addLevelScore(score);
+          levelButtons[index].stars += 1;
+        }
+      }
     });
   }
 
@@ -58,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
     Widget page;
     switch (_selectedPage) {
       case 0:
-        page = Roadmap(key: _roadmapKey, onLevelButtonPressed: loadGame);
+        page = Roadmap(onLevelButtonPressed: loadGame);
         // page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:

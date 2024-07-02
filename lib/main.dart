@@ -11,6 +11,7 @@ import 'package:web/web.dart';
 import 'constants.dart';
 import 'controllers/menu_app_controller.dart';
 import 'models/user_data.dart';
+import 'screens/dashboard/components/level_button.dart';
 import 'screens/main/main_screen.dart';
 import 'utils.dart';
 
@@ -59,7 +60,12 @@ void main() async {
   UserManager.instance.user = user;
 
   final User myuser = UserManager.instance.user;
+
   user.addScore(50);
+
+  final List<LevelButton> levels = initializeLevelButtons();
+  LevelButtonManager.instance.levelButtons = levels;
+
   debugPaintSizeEnabled = false;
   runApp(const MyApp());
 }

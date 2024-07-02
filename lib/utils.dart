@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants.dart';
 import 'models/user_data.dart';
+import 'screens/dashboard/components/level_button.dart';
 
 class UserManager {
   UserManager._internal();
@@ -199,5 +200,43 @@ class ImageResponse {
       getTissueToFind();
       break;
     }
+  }
+}
+
+class LevelButtonManager {
+  LevelButtonManager._internal();
+
+  static final LevelButtonManager _instance = LevelButtonManager._internal();
+  late List<LevelButton> _levels;
+
+  static LevelButtonManager get instance => _instance;
+
+  set levelButtons(List<LevelButton> levels) {
+    _levels = levels;
+  }
+
+  List<LevelButton> get levelButtons => _levels;
+}
+
+List<LevelButton> initializeLevelButtons() {
+  final List<LevelButton> levelButtons = <LevelButton>[];
+
+  for (int i = 1; i <= 40; i++) {
+    levelButtons.add(
+      LevelButton(
+        levelNumber: i,
+        status: i == 1 ? LevelStatus.inProgress : LevelStatus.locked,
+        stars: i == 1 ? 1 : 0,
+        isActive: i == 1,
+      ),
+    );
+  }
+  return levelButtons;
+}
+
+void setOnTapMethod(
+    List<LevelButton> levels, Function(int, int) onTapLevelButton) {
+  for (final LevelButton level in levels) {
+    level.onTapLevelButton = onTapLevelButton;
   }
 }
