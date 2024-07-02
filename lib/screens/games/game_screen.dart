@@ -1,9 +1,11 @@
 // Level 1 | Difficulty Easy |
 
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../games/select_the_area/select_the_area_screen.dart';
 import '../main/components/header.dart';
+import 'wrapper/game_wrapper.dart';
 
 class GameScreen extends StatefulWidget {
   @override
@@ -17,6 +19,7 @@ class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
   bool _gameLoaded = false; // Tracks if the game is loaded
   bool _gameOver = false; // Tracks if the game is over
+  bool _isStarted = false; // Tracks if the timer is started
 
   @override
   void initState() {
@@ -24,23 +27,32 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void startTimer() {
-    const Duration oneSec = Duration(seconds: 1);
-    _timer = Timer.periodic(
-      oneSec,
-      (Timer timer) {
-        if (_progress <= 0 || _timeLeft <= 0) {
-          timer.cancel();
-          setState(() {
-            _gameOver = true;
-          });
-        } else {
-          setState(() {
-            _progress -= 1 / 20; // Decrease progress based on total time
-            _timeLeft -= 1;
-          });
-        }
-      },
-    );
+    if (!_isStarted) {
+      _isStarted = true;
+      _timer = Timer.periodic(
+        const Duration(seconds: 1),
+        (Timer timer) {
+          if (_progress <= 0 || _timeLeft <= 0) {
+            timer.cancel();
+            setState(() {
+              _gameOver = true;
+            });
+          } else {
+            setState(() {
+              _timeLeft -= 1;
+
+              _progress =
+                  _timeLeft / 20; // Decrease progress based on total time
+
+              if (kDebugMode) {
+                print('Time Left: $_timeLeft');
+                print('Progress: $_progress');
+              }
+            });
+          }
+        },
+      );
+    }
   }
 
   void updateScore(int points) {
@@ -154,24 +166,6 @@ class _GameScreenState extends State<GameScreen> {
             ),
         ],
       ),
-    );
-  }
-}
-
-// Assume that the SelectTheAreaGame widget has a callback for when the game is loaded
-class GameWrapper extends StatelessWidget {
-  const GameWrapper(
-      {super.key, required this.onLoaded, required this.onScoreUpdate});
-  final VoidCallback onLoaded;
-  final ValueChanged<int> onScoreUpdate;
-
-  @override
-  Widget build(BuildContext context) {
-    // Simulate a delay for loading the game
-    Future.delayed(const Duration(seconds: 4), onLoaded);
-
-    return const Center(
-      child: SelectTheAreaGame(),
     );
   }
 }
