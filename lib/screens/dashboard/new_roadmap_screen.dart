@@ -75,7 +75,7 @@ class RoadmapState extends State<Roadmap> {
             child: Column(
               children: <Widget>[
                 _levelButtons[currentLevel - 1],
-                if (currentLevel < endLevel && j < i + levelsInRow - 1)
+                if (currentLevel < endLevel && j < i + levelsInRow)
                   SizedBox(
                     width: 60,
                     child: CustomPaint(
