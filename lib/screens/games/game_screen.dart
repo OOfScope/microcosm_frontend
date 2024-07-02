@@ -4,16 +4,17 @@ import '../main/components/header.dart';
 import 'wrapper/game_wrapper.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({
-    super.key,
-    required this.difficulty,
-    required this.level,
-    required this.onGameEnd,
-  });
+  const GameScreen(
+      {super.key,
+      required this.difficulty,
+      required this.level,
+      required this.onGameEnd,
+      required this.scoreUpdate});
 
   final int difficulty;
   final int level;
   final void Function(int) onGameEnd;
+  final void Function(int, int) scoreUpdate;
 
   @override
   GameScreenState createState() => GameScreenState();
@@ -63,7 +64,7 @@ class GameScreenState extends State<GameScreen> {
   void updateScore(int points) {
     if (mounted) {
       setState(() {
-        _score += points;
+        widget.scoreUpdate(widget.level, points);
       });
     }
   }

@@ -348,7 +348,11 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                             // Display answer
                             if (!_isConfirmed)
                               Container(
-                                height: 250,
+                                height: 65 *
+                                    (1 +
+                                        imageHandler
+                                            .totalTissuePixelFound.length
+                                            .toDouble()),
                               )
                             else
                               SizedBox(width: 550, height: 100, child: _answer),

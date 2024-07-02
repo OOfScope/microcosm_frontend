@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
     Widget page;
     switch (_selectedPage) {
       case 0:
-        page = Roadmap(onLevelButtonPressed: loadGame);
+        page = Roadmap(key: _roadmapKey, onLevelButtonPressed: loadGame);
         // page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
@@ -79,6 +79,7 @@ class _MainScreenState extends State<MainScreen> {
           level: _level,
           difficulty: _difficulty,
           onGameEnd: upNavBarId,
+          scoreUpdate: updateLevelScore,
         );
         break;
       default:

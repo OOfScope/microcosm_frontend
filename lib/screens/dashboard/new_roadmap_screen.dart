@@ -128,16 +128,15 @@ class DashedLinePainter extends CustomPainter {
 }
 
 class Roadmap extends StatefulWidget {
-  final void Function(int level, int difficulty) onLevelButtonPressed;
-
   const Roadmap({super.key, required this.onLevelButtonPressed});
+  final void Function(int level, int difficulty) onLevelButtonPressed;
 
   @override
   RoadmapState createState() => RoadmapState();
 }
 
 class RoadmapState extends State<Roadmap> {
-  final List<LevelButton> _levelButtons = [];
+  final List<LevelButton> _levelButtons = <LevelButton>[];
 
   @override
   void initState() {
@@ -161,6 +160,7 @@ class RoadmapState extends State<Roadmap> {
 
   void updateLevelScore(int index, int score) {
     setState(() {
+      print('Roadmap Updating level $index with score $score');
       if (_levelButtons[index].stars < 3) {
         if (index >= 0 && index < _levelButtons.length) {
           if (_levelButtons[index].stars == 3) {
