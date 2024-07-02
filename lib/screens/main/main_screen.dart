@@ -25,6 +25,7 @@ class _MainScreenState extends State<MainScreen> {
   int _difficulty = 0;
   int _level = 0;
   final GlobalKey<LeaderboardState> _childKey = GlobalKey<LeaderboardState>();
+  final GlobalKey<RoadmapState> _roadmapKey = GlobalKey<RoadmapState>();
 
   void upNavBarId(int index) {
     setState(() {
@@ -37,6 +38,12 @@ class _MainScreenState extends State<MainScreen> {
       _selectedPage = 10;
       _difficulty = difficulty;
       _level = level;
+    });
+  }
+
+  void updateLevelScore(int index, int score) {
+    setState(() {
+      _roadmapKey.currentState!.updateLevelScore(index, score);
     });
   }
 

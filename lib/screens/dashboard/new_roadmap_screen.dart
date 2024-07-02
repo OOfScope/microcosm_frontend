@@ -9,18 +9,20 @@ enum LevelStatus {
 }
 
 class LevelButton extends StatelessWidget {
-  const LevelButton(
+  LevelButton(
       {super.key,
       required this.levelNumber,
       required this.status,
+      this.levelScore = 0,
       this.stars = 0,
       this.isActive = false,
       this.onTapLevelButton});
 
   final int levelNumber;
-  final LevelStatus status;
-  final int stars;
-  final bool isActive;
+  LevelStatus status;
+  int levelScore;
+  int stars;
+  bool isActive;
   final void Function(int, int)? onTapLevelButton;
 
   Color _getColor() {
@@ -34,6 +36,10 @@ class LevelButton extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+
+  void addLevelScore(int score) {
+    levelScore += score;
   }
 
   @override
@@ -121,14 +127,57 @@ class DashedLinePainter extends CustomPainter {
   }
 }
 
-class Roadmap extends StatelessWidget {
+class Roadmap extends StatefulWidget {
   final void Function(int level, int difficulty) onLevelButtonPressed;
 
   const Roadmap({super.key, required this.onLevelButtonPressed});
+
+  @override
+  RoadmapState createState() => RoadmapState();
+}
+
+class RoadmapState extends State<Roadmap> {
+  final List<LevelButton> _levelButtons = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeLevelButtons();
+  }
+
+  void _initializeLevelButtons() {
+    for (int i = 1; i <= 40; i++) {
+      _levelButtons.add(
+        LevelButton(
+          levelNumber: i,
+          status: i == 1 ? LevelStatus.inProgress : LevelStatus.locked,
+          stars: i == 1 ? 1 : 0,
+          isActive: i == 1,
+          onTapLevelButton: widget.onLevelButtonPressed,
+        ),
+      );
+    }
+  }
+
+  void updateLevelScore(int index, int score) {
+    setState(() {
+      if (_levelButtons[index].stars < 3) {
+        if (index >= 0 && index < _levelButtons.length) {
+          if (_levelButtons[index].stars == 3) {
+            _levelButtons[index].status = LevelStatus.completed;
+            _levelButtons[index + 1].status = LevelStatus.inProgress;
+            _levelButtons[index + 1].isActive = true;
+          }
+
+          _levelButtons[index].addLevelScore(score);
+          _levelButtons[index].stars += 1;
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Create a list of LevelButtons
-
     final Column levels = Column(
       children: <Widget>[
         _buildLevelPath(1, 5),
@@ -166,37 +215,20 @@ class Roadmap extends StatelessWidget {
   }
 
   Widget _buildLevelPath(int startLevel, int endLevel) {
-    final Random random = Random();
-    final int numRows =
-        (endLevel - startLevel + 1) ~/ 4 + 1; // Calculate number of rows
     final List<Widget> rows = <Widget>[];
 
     for (int i = startLevel; i <= endLevel; i += 4) {
-      final int levelsInRow =
-          min(4, endLevel - i + 1); // Calculate levels in this row
+      final int levelsInRow = min(4, endLevel - i + 1);
       final List<Widget> rowChildren = <Widget>[];
 
       for (int j = i; j < i + levelsInRow; j++) {
         final int currentLevel = j;
-        final int nextLevel = currentLevel + 1;
         rowChildren.add(
           Expanded(
             child: Column(
               children: <Widget>[
-                LevelButton(
-                  levelNumber: currentLevel,
-                  status: currentLevel == 1
-                      ? LevelStatus.inProgress
-                      : LevelStatus.locked,
-
-                  stars: currentLevel == 1
-                      ? 1
-                      : 0, // Random stars for illustration
-                  isActive: currentLevel == 1 ? true : false,
-                  onTapLevelButton: onLevelButtonPressed,
-                ),
-                if (currentLevel < endLevel &&
-                    j < i + levelsInRow) //                 if (currentLevel < endLevel && j < i + levelsInRow - 1)
+                _levelButtons[currentLevel - 1],
+                if (currentLevel < endLevel && j < i + levelsInRow - 1)
                   SizedBox(
                     width: 60,
                     child: CustomPaint(

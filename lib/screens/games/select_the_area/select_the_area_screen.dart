@@ -7,30 +7,38 @@ import 'package:image/image.dart' as img;
 import '../../../constants.dart';
 import '../../../models/user_data.dart';
 import '../../../utils.dart';
+import 'components/answer_widget.dart';
 import 'components/circle_painter.dart';
 import 'components/tissue_legend.dart';
 
 class SelectTheAreaGame extends StatefulWidget {
-  const SelectTheAreaGame({super.key});
+  const SelectTheAreaGame(
+      {super.key,
+      required this.onUpdate,
+      required this.onCompleted,
+      required this.onNext});
+
+  final ValueChanged<int> onUpdate;
+  final VoidCallback onCompleted;
+  final VoidCallback onNext;
 
   @override
-  _CircleImageComparisonScreenState createState() =>
-      _CircleImageComparisonScreenState();
+  CircleImageComparisonScreenState createState() =>
+      CircleImageComparisonScreenState();
 }
 
-class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
+class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   Offset? _startPoint;
   Offset? _endPoint;
 
   bool _isLoading = true;
-  bool _isDrawing = false;
-  bool _isVisible = false;
   bool _isEnabled = false;
   bool _isConfirmed = false;
+  bool _isCompleted = false;
 
   double imageVisibility = 0.5;
 
-  late Text _answerWidget;
+  late AnswerWidget _answer;
 
   Map<int, int> pixelCount = <int, int>{};
 
@@ -56,7 +64,6 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       if (!_isConfirmed) {
         _startPoint = details.localPosition;
         _endPoint = details.localPosition;
-        _isDrawing = true;
       }
     });
   }
@@ -75,8 +82,9 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
         if (_isEnabled) {
           _comparePixels();
         }
-
-        _isEnabled = true;
+        if (_startPoint != null && _endPoint != null) {
+          _isEnabled = true;
+        }
 
         // try {
         //   _comparePixels();
@@ -90,7 +98,7 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   }
 
   void _comparePixels() {
-    if (_startPoint == null || _endPoint == null) {
+    if (_startPoint == null || _endPoint == null || !_isConfirmed) {
       return;
     }
 
@@ -160,16 +168,14 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
 
       if (coveredArea > 0.7) {
         setState(() {
-          _answerWidget = const Text(
-            'You must select only the part of the image where the tissue is present',
-            style: TextStyle(
-                color: Colors.red,
-                fontSize: answerFontSize,
-                fontWeight: FontWeight.bold),
-            overflow: TextOverflow.visible,
+          _answer = const AnswerWidget(
+            text:
+                'You must select only the part of the image where the tissue is present',
+            answerColor: Colors.red,
           );
+          widget.onUpdate(0);
         });
-        _isConfirmed = true;
+
         return;
       }
 
@@ -179,16 +185,13 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           0.5 *
               imageHandler.totalTissuePixelFound[imageHandler.tissueToFind]!) {
         setState(() {
-          _answerWidget = const Text(
-            'You have not identified all the correct tissue',
-            style: TextStyle(
-                color: Colors.red,
-                fontSize: answerFontSize,
-                fontWeight: FontWeight.bold),
-            overflow: TextOverflow.visible,
+          _answer = const AnswerWidget(
+            text: 'You have not identified all the correct tissue',
+            answerColor: Colors.red,
           );
+          widget.onUpdate(0);
         });
-        _isConfirmed = true;
+
         return;
       }
 
@@ -205,27 +208,21 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       }
 
       setState(() {
-        _answerWidget = const Text(
-          'You have correctly identified the tissue!',
-          style: TextStyle(
-              color: Colors.green,
-              fontSize: answerFontSize,
-              fontWeight: FontWeight.bold),
-          overflow: TextOverflow.visible,
+        _answer = const AnswerWidget(
+          text: 'You have correctly identified the tissue!',
+          answerColor: Colors.green,
         );
-        _isConfirmed = true;
+
+        widget.onUpdate(10);
       });
     } else {
       setState(() {
-        _answerWidget = const Text(
-          'You have not identified the correct tissue!',
-          style: TextStyle(
-              color: Colors.red,
-              fontSize: answerFontSize,
-              fontWeight: FontWeight.bold),
-          overflow: TextOverflow.visible,
+        _answer = const AnswerWidget(
+          text: 'You have not identified the correct tissue!',
+          answerColor: Colors.red,
         );
-        _isConfirmed = true;
+
+        widget.onUpdate(0);
       });
     }
 
@@ -239,6 +236,8 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
   }
 
   void checkAnswer() {
+    _isCompleted = true;
+    widget.onCompleted();
     _comparePixels();
   }
 
@@ -306,14 +305,12 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                                   imageHandler.displayedFullImage,
                                   AnimatedOpacity(
                                       opacity:
-                                          _isVisible ? imageVisibility : 0.0,
+                                          _isConfirmed ? imageVisibility : 0.0,
                                       duration:
                                           const Duration(milliseconds: 100),
                                       child: imageHandler
                                           .displayedCmappedMaskImage),
-                                  if (_isDrawing &&
-                                      _startPoint != null &&
-                                      _endPoint != null)
+                                  if (_startPoint != null && _endPoint != null)
                                     CustomPaint(
                                       painter: CirclePainter(
                                           _startPoint!, _endPoint!),
@@ -354,14 +351,11 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                                 height: 250,
                               )
                             else
-                              SizedBox(
-                                  width: 550,
-                                  height: 100,
-                                  child: _answerWidget),
+                              SizedBox(width: 550, height: 100, child: _answer),
 
                             Row(
                               children: <Widget>[
-                                if (_isVisible)
+                                if (_isConfirmed)
                                   TissueTypeLegend(
                                       totalTissuePixelFound:
                                           imageHandler.totalTissuePixelFound)
@@ -423,19 +417,26 @@ class _CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                                         onPressed: _isEnabled
                                             ? () {
                                                 setState(() {
-                                                  if (!_isVisible &&
+                                                  if (!_isConfirmed &&
                                                       _startPoint != null &&
-                                                      _endPoint != null &&
-                                                      _isDrawing) {
-                                                    _isVisible = true;
+                                                      _endPoint != null) {
+                                                    _isConfirmed = true;
                                                     checkAnswer();
+                                                    return;
+                                                  }
+
+                                                  if (_isCompleted) {
+                                                    widget.onNext();
                                                   }
                                                 });
                                               }
                                             : null,
-                                        child: const Text('Confirm Selection',
+                                        child: Text(
+                                            _isCompleted
+                                                ? 'Next'
+                                                : 'Confirm Selection',
                                             textAlign: TextAlign.center,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontSize: 17,
                                                 color: Colors.white)),
                                       ),

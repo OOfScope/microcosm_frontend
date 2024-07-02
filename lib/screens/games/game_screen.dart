@@ -4,10 +4,6 @@ import '../main/components/header.dart';
 import 'wrapper/game_wrapper.dart';
 
 class GameScreen extends StatefulWidget {
-  final int difficulty;
-  final int level;
-  final void Function(int) onGameEnd;
-
   const GameScreen({
     super.key,
     required this.difficulty,
@@ -15,11 +11,15 @@ class GameScreen extends StatefulWidget {
     required this.onGameEnd,
   });
 
+  final int difficulty;
+  final int level;
+  final void Function(int) onGameEnd;
+
   @override
-  _GameScreenState createState() => _GameScreenState();
+  GameScreenState createState() => GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class GameScreenState extends State<GameScreen> {
   double _progress = 1.0; // Progress for the timer (1.0 means 100%)
   int _score = 0; // Initial score
   int _timeLeft = 20; // Time left in seconds
@@ -68,7 +68,7 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
-  void onGameLoaded() {
+  void gameLoaded() {
     if (mounted) {
       setState(() {
         startTimer();
@@ -84,6 +84,20 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  void nextLevel() {
+    if (mounted) {
+      widget.onGameEnd(0);
+    }
+  }
+
+  void gameCompleted() {
+    if (mounted) {
+      setState(() {
+        _timer?.cancel();
+      });
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -93,8 +107,10 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final GameWrapper game = GameWrapper(
-      onLoaded: onGameLoaded,
+      onGameLoaded: gameLoaded,
       onScoreUpdate: updateScore,
+      onGameCompleted: gameCompleted,
+      onNextLevel: nextLevel,
     );
     return Scaffold(
       appBar: AppBar(
