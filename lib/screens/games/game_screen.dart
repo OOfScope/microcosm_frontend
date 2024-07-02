@@ -1,13 +1,20 @@
-// Level 1 | Difficulty Easy |
-
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../games/select_the_area/select_the_area_screen.dart';
 import '../main/components/header.dart';
 import 'wrapper/game_wrapper.dart';
 
 class GameScreen extends StatefulWidget {
+  final int difficulty;
+  final int level;
+  final void Function(int) onGameEnd;
+
+  const GameScreen({
+    super.key,
+    required this.difficulty,
+    required this.level,
+    required this.onGameEnd,
+  });
+
   @override
   _GameScreenState createState() => _GameScreenState();
 }
@@ -16,8 +23,7 @@ class _GameScreenState extends State<GameScreen> {
   double _progress = 1.0; // Progress for the timer (1.0 means 100%)
   int _score = 0; // Initial score
   int _timeLeft = 20; // Time left in seconds
-  late Timer _timer;
-  bool _gameLoaded = false; // Tracks if the game is loaded
+  Timer? _timer;
   bool _gameOver = false; // Tracks if the game is over
   bool _isStarted = false; // Tracks if the timer is started
 
@@ -34,21 +40,20 @@ class _GameScreenState extends State<GameScreen> {
         (Timer timer) {
           if (_progress <= 0 || _timeLeft <= 0) {
             timer.cancel();
-            setState(() {
-              _gameOver = true;
-            });
+            if (mounted) {
+              setState(() {
+                _gameOver = true;
+              });
+            }
+            _triggerGameEnd();
           } else {
-            setState(() {
-              _timeLeft -= 1;
-
-              _progress =
-                  _timeLeft / 20; // Decrease progress based on total time
-
-              if (kDebugMode) {
-                print('Time Left: $_timeLeft');
-                print('Progress: $_progress');
-              }
-            });
+            if (mounted) {
+              setState(() {
+                _timeLeft -= 1;
+                _progress =
+                    _timeLeft / 20; // Decrease progress based on total time
+              });
+            }
           }
         },
       );
@@ -56,21 +61,32 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void updateScore(int points) {
-    setState(() {
-      _score += points;
-    });
+    if (mounted) {
+      setState(() {
+        _score += points;
+      });
+    }
   }
 
   void onGameLoaded() {
-    setState(() {
-      _gameLoaded = true;
-      startTimer();
+    if (mounted) {
+      setState(() {
+        startTimer();
+      });
+    }
+  }
+
+  void _triggerGameEnd() {
+    Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        widget.onGameEnd(0);
+      }
     });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 

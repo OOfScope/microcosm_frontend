@@ -22,11 +22,21 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedPage = 0;
+  int _difficulty = 0;
+  int _level = 0;
   final GlobalKey<LeaderboardState> _childKey = GlobalKey<LeaderboardState>();
 
   void upNavBarId(int index) {
     setState(() {
       _selectedPage = index;
+    });
+  }
+
+  void loadGame(int level, int difficulty) {
+    setState(() {
+      _selectedPage = 10;
+      _difficulty = difficulty;
+      _level = level;
     });
   }
 
@@ -41,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
     Widget page;
     switch (_selectedPage) {
       case 0:
-        page = const Roadmap();
+        page = Roadmap(onLevelButtonPressed: loadGame);
         // page = RoadmapScreen(onNavButtonPressed: upNavBarId);
         break;
       case 1:
@@ -55,10 +65,14 @@ class _MainScreenState extends State<MainScreen> {
         page = const LLMChatApp();
         break;
       case 4:
-        page = DatasetExplorer();
+        page = const DatasetExplorer();
         break;
       case 10:
-        page = GameScreen();
+        page = GameScreen(
+          level: _level,
+          difficulty: _difficulty,
+          onGameEnd: upNavBarId,
+        );
         break;
       default:
         throw UnimplementedError('no widget for $_selectedPage');

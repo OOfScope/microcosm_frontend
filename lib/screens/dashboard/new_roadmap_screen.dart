@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../main/components/header.dart';
 
@@ -10,19 +9,19 @@ enum LevelStatus {
 }
 
 class LevelButton extends StatelessWidget {
-  const LevelButton({
-    super.key,
-    required this.levelNumber,
-    required this.status,
-    this.stars = 0,
-    this.isActive = false,
-    this.onTap,
-  });
+  const LevelButton(
+      {super.key,
+      required this.levelNumber,
+      required this.status,
+      this.stars = 0,
+      this.isActive = false,
+      this.onTapLevelButton});
+
   final int levelNumber;
   final LevelStatus status;
   final int stars;
   final bool isActive;
-  final Function()? onTap;
+  final void Function(int, int)? onTapLevelButton;
 
   Color _getColor() {
     switch (status) {
@@ -41,8 +40,8 @@ class LevelButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (onTap != null) {
-          onTap!();
+        if (onTapLevelButton != null) {
+          onTapLevelButton!(levelNumber, stars);
         }
       },
       child: Container(
@@ -123,9 +122,25 @@ class DashedLinePainter extends CustomPainter {
 }
 
 class Roadmap extends StatelessWidget {
-  const Roadmap({super.key});
+  final void Function(int level, int difficulty) onLevelButtonPressed;
+
+  const Roadmap({super.key, required this.onLevelButtonPressed});
   @override
   Widget build(BuildContext context) {
+    // Create a list of LevelButtons
+
+    final Column levels = Column(
+      children: <Widget>[
+        _buildLevelPath(1, 5),
+        _buildLevelPath(6, 10),
+        _buildLevelPath(11, 15),
+        _buildLevelPath(16, 20),
+        _buildLevelPath(21, 25),
+        _buildLevelPath(26, 30),
+        _buildLevelPath(31, 35),
+        _buildLevelPath(36, 40),
+      ],
+    );
     return Scaffold(
       appBar: AppBar(
         title: const Header(title: 'Roadmap'),
@@ -143,18 +158,7 @@ class Roadmap extends StatelessWidget {
             ),
           ),
           SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                _buildLevelPath(1, 5),
-                _buildLevelPath(6, 10),
-                _buildLevelPath(11, 15),
-                _buildLevelPath(16, 20),
-                _buildLevelPath(21, 25),
-                _buildLevelPath(26, 30),
-                _buildLevelPath(31, 35),
-                _buildLevelPath(36, 40),
-              ],
-            ),
+            child: levels,
           ),
         ],
       ),
@@ -182,16 +186,15 @@ class Roadmap extends StatelessWidget {
               children: <Widget>[
                 LevelButton(
                   levelNumber: currentLevel,
-                  status:
-                      LevelStatus.completed, // Example status, modify as needed
-                  stars: 3, // Example stars, modify as needed
-                  isActive: isActive,
-                  onTap: () {
-                    if (kDebugMode) {
-                      print('Level $currentLevel clicked');
-                    }
-                    // You can perform additional actions here based on the button click
-                  },
+                  status: currentLevel == 1
+                      ? LevelStatus.inProgress
+                      : LevelStatus.locked,
+
+                  stars: currentLevel == 1
+                      ? 1
+                      : 0, // Random stars for illustration
+                  isActive: currentLevel == 1 ? isActive : !isActive,
+                  onTapLevelButton: onLevelButtonPressed,
                 ),
                 if (currentLevel < endLevel &&
                     j < i + levelsInRow) //                 if (currentLevel < endLevel && j < i + levelsInRow - 1)
