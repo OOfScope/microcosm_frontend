@@ -172,7 +172,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                 'You must select only the part of the image where the tissue is present',
             answerColor: Colors.red,
           );
-          widget.onUpdate(0);
+          widget.onUpdate(10);
         });
 
         return;
@@ -188,7 +188,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
             text: 'You have not identified all the correct tissue',
             answerColor: Colors.red,
           );
-          widget.onUpdate(0);
+          widget.onUpdate(10);
         });
 
         return;
@@ -221,7 +221,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           answerColor: Colors.red,
         );
 
-        widget.onUpdate(0);
+        widget.onUpdate(10);
       });
     }
 

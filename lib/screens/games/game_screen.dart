@@ -25,7 +25,7 @@ class GameScreenState extends State<GameScreen> {
   int _score = 0; // Initial score
   int _timeLeft = 20; // Time left in seconds
   Timer? _timer;
-  bool _gameOver = false; // Tracks if the game is over
+  bool _isGameOver = false; // Tracks if the game is over
   bool _isStarted = false; // Tracks if the timer is started
 
   @override
@@ -43,7 +43,7 @@ class GameScreenState extends State<GameScreen> {
             timer.cancel();
             if (mounted) {
               setState(() {
-                _gameOver = true;
+                _isGameOver = true;
               });
             }
             _triggerGameEnd();
@@ -78,7 +78,7 @@ class GameScreenState extends State<GameScreen> {
   }
 
   void _triggerGameEnd() {
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 4), () {
       if (mounted) {
         widget.onGameEnd(0);
       }
@@ -115,10 +115,10 @@ class GameScreenState extends State<GameScreen> {
     );
     return Scaffold(
       appBar: AppBar(
-        // title will be Level: this.level - Difficulty: this.difficulty - Game:
+        // Rendere le variabili bold
         title: Header(
             title:
-                'Level: ${widget.level} - Difficulty: ${widget.difficulty} - Game: ${game.title}'),
+                'Level: ${widget.level} - Difficulty: ${widget.difficulty == 0 ? 'Easy' : widget.difficulty == 1 ? 'Medium' : 'Hard'} - Game: ${game.title}'),
       ),
       body: Stack(
         children: <Widget>[
@@ -185,18 +185,32 @@ class GameScreenState extends State<GameScreen> {
               ),
             ],
           ),
-          if (_gameOver)
+          if (_isGameOver)
             Positioned.fill(
               child: Container(
                 color: Colors.grey.withOpacity(0.7),
                 child: const Center(
-                  child: Text(
-                    'Game Over!',
-                    style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Game Over!\n',
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Complete the game to continue',
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      )
+                    ],
                   ),
                 ),
               ),

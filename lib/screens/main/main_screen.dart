@@ -52,6 +52,8 @@ class _MainScreenState extends State<MainScreen> {
           levelButtons[index].stars += 1;
 
           if (levelButtons[index].stars == 3) {
+            UserManager.instance.user.addScore(levelButtons[index].levelScore);
+            levelButtons[index].levelScore = 0;
             levelButtons[index].status = LevelStatus.completed;
             levelButtons[index + 1].status = LevelStatus.inProgress;
             levelButtons[index + 1].isActive = true;

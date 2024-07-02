@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class User {
-
   User({
     required String nickname,
     required String name,
@@ -40,10 +39,10 @@ class User {
               fontSize: 15,
             ),
           ),
-        ){
-          _updateLevelInfo();
-        }
-        
+        ) {
+    _updateLevelInfo();
+  }
+
   final String _nickname;
   final String _name;
   final String _email;
@@ -56,10 +55,8 @@ class User {
   late String _levelName;
   late String _nextLevelName;
 
-
   static const String assetPath = 'icons/doctors';
 
-   
   static final List<Map<String, dynamic>> _levels = <Map<String, dynamic>>[
     <String, dynamic>{
       'name': 'Resident Doctor',
@@ -93,7 +90,6 @@ class User {
     },
   ];
 
-
   String get nickname => _nickname;
   String get name => _name;
   String get email => _email;
@@ -122,15 +118,15 @@ class User {
     _nextLevelName = newNextLevelName;
   }
 
-
-
   List<Map<String, dynamic>> get levels => _levels;
 
   void _updateLevelInfo() {
-    _levelName = levels.lastWhere((Map<String, dynamic> level) => (level['score'] as int) <= _score)['name'] as String;
-    _level = levels.indexWhere((Map<String, dynamic> level) => (level['score'] as int) > _score);
+    _levelName = levels.lastWhere((Map<String, dynamic> level) =>
+        (level['score'] as int) <= _score)['name'] as String;
+    _level = levels.indexWhere(
+        (Map<String, dynamic> level) => (level['score'] as int) > _score);
 
-   _level = _level == -1 ? levels.length : _level;
+    _level = _level == -1 ? levels.length : _level;
     // _nextLevelName = levels.firstWhere((Map<String, dynamic> currLevel) => (currLevel['score'] as int) > score)['name'] as String;
 
     if (_level == _levels.length) {
@@ -140,21 +136,19 @@ class User {
     }
   }
 
-    // _levelName = levels.firstWhere((Map<String, dynamic> level) => level['score'] == score)['name'] as String;
-    // _nextLevelName = levels.firstWhere((Map<String, dynamic> level) => (level['score'] as int) > score)['name'] as String;
-    // _level = levels.indexWhere((Map<String, dynamic> level) => (level['score'] as int) > score) + 1; // levels are zero indexed
+  // _levelName = levels.firstWhere((Map<String, dynamic> level) => level['score'] == score)['name'] as String;
+  // _nextLevelName = levels.firstWhere((Map<String, dynamic> level) => (level['score'] as int) > score)['name'] as String;
+  // _level = levels.indexWhere((Map<String, dynamic> level) => (level['score'] as int) > score) + 1; // levels are zero indexed
 
-  int addScore(int scoreToAdd){
+  int addScore(int scoreToAdd) {
     _score += scoreToAdd;
     _updateLevelInfo();
 
-    
-    return _score; 
+    return _score;
   }
 
   @override
   String toString() {
     return 'User(nickname: $_nickname, name: $_name, email: $_email, laboratory: $_laboratory, score: $_score, level: $_level, country: $_country)';
   }
-
 }
