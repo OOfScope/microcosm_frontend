@@ -64,6 +64,8 @@ class _MainScreenState extends State<MainScreen> {
             levelButtons[index + 1].isActive = true;
             updateLeaderboardState();
           }
+        } else {
+          // spaced repetition
         }
       }
     });

@@ -23,7 +23,7 @@ class QuizGame extends StatefulWidget {
 class _QuizWidgetState extends State<QuizGame> {
   final String imageUrl =
       'https://microcosm-backend.gmichele.com/get/low/random/';
-  ImageResponse imageHandler = ImageResponse();
+  ImageUtils imageHandler = ImageUtils();
 
   int selectedAnswer = -1;
   bool _isLoading = true;

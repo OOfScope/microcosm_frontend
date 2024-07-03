@@ -6,6 +6,7 @@ import '../drag_and_drop/drag_and_drop.dart';
 import '../memory/memory_screen.dart';
 import '../quiz/quiz.dart';
 import '../select_the_area/select_the_area_screen.dart';
+import '../spaced_repetition/spaced_repetition_screen.dart';
 
 class GameWrapper extends StatelessWidget {
   GameWrapper(
@@ -25,6 +26,11 @@ class GameWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<int, Widget> games = <int, Widget>{
+      0: SpacedRepetitionGame(
+        onUpdate: onScoreUpdate,
+        onCompleted: onGameCompleted,
+        onNext: onNextLevel,
+      ),
       1: QuizGame(
         onUpdate: onScoreUpdate,
         onCompleted: onGameCompleted,
@@ -49,16 +55,18 @@ class GameWrapper extends StatelessWidget {
       ),
     };
     // Simulate a delay for loading the game
-    if (games[index] is QuizGame) {
+    if (games[index % 5] is QuizGame) {
       Future.delayed(const Duration(seconds: 4), onGameLoaded);
-    } else if (games[index] is DragAndDropGame) {
+    } else if (games[index % 5] is DragAndDropGame) {
       Future.delayed(const Duration(seconds: 26), onGameLoaded);
-    } else if (games[index] is MemoryGame) {
+    } else if (games[index % 5] is MemoryGame) {
+      Future.delayed(const Duration(seconds: 10), onGameLoaded);
+    } else if (games[index % 5] is SelectTheAreaGame) {
       Future.delayed(const Duration(seconds: 4), onGameLoaded);
-    } else if (games[index] is SelectTheAreaGame) {
-      Future.delayed(const Duration(seconds: 4), onGameLoaded);
+    } else if (games[index % 5] is SpacedRepetitionGame) {
+      Future.delayed(const Duration(seconds: 10), onGameLoaded);
     }
 
-    return Center(child: games[index]);
+    return Center(child: games[index % 5]);
   }
 }

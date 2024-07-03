@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../constants.dart';
 import '../../utils.dart';
-import '../main/components/header.dart';
 import 'wrapper/game_wrapper.dart';
 
 class GameScreen extends StatefulWidget {
@@ -25,6 +24,7 @@ class GameScreen extends StatefulWidget {
 class GameScreenState extends State<GameScreen> {
   double _progress = 1.0; // Progress for the timer (1.0 means 100%)
   int _timeLeft = 20; // Time left in seconds
+  final int _totalTime = 20; // Total time in seconds
   Timer? _timer;
   bool _isGameOver = false; // Tracks if the game is over
   bool _isStarted = false; // Tracks if the timer is started
@@ -55,8 +55,8 @@ class GameScreenState extends State<GameScreen> {
             if (mounted) {
               setState(() {
                 _timeLeft -= 1;
-                _progress =
-                    _timeLeft / 20; // Decrease progress based on total time
+                _progress = _timeLeft /
+                    _totalTime; // Decrease progress based on total time
               });
             }
           }
@@ -277,7 +277,7 @@ class GameScreenHeader extends StatelessWidget {
               ),
               const TextSpan(text: ' - Game: '),
               TextSpan(
-                text: '${gameTitles[widget.level]}',
+                text: '${gameTitles[widget.level % 5]}',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ],

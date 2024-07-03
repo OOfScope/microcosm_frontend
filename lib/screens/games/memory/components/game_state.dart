@@ -1,9 +1,9 @@
-// lib/game_state.dart
-import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
+import '../../../../utils.dart';
 
 class GameState extends ChangeNotifier {
   List<int> cards = <int>[];
@@ -16,8 +16,8 @@ class GameState extends ChangeNotifier {
   bool get allMatched => cardMatched.every((bool matched) => matched);
 
   Future<void> initialize() async {
-    await _downloadAndSplitImage();
-    _shuffleCards();
+    await _loadImages();
+    _setupCards();
     notifyListeners();
   }
 
@@ -38,7 +38,7 @@ class GameState extends ChangeNotifier {
 
     await Future.delayed(const Duration(seconds: 1));
 
-    if (cards[flippedCards[0]] == cards[flippedCards[1]]) {
+    if (_isMatch(flippedCards[0], flippedCards[1])) {
       cardMatched[flippedCards[0]] = true;
       cardMatched[flippedCards[1]] = true;
     } else {
@@ -51,33 +51,30 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _downloadAndSplitImage() async {
-    final List<Image> originalPieces = <Image>[];
+  bool _isMatch(int index1, int index2) {
+    // Check if the cards are a circular match
+    final int id1 = cards[index1];
+    final int id2 = cards[index2];
+    return (id1 + 4) % 8 == id2 || (id2 + 4) % 8 == id1;
+  }
+
+  Future<void> _loadImages() async {
     const String imageUrl =
         'https://microcosm-backend.gmichele.com/get/low/random/image';
 
-    for (int i = 0; i < 4; i++) {
-      final http.Response response = await http.get(Uri.parse(imageUrl));
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonImageResponse =
-            jsonDecode(response.body) as Map<String, dynamic>;
-
-        final Image fullImage = Image.memory(
-            base64Decode(jsonImageResponse['rows'][0][0] as String));
-
-        originalPieces.add(fullImage);
-
-        // Duplicate the pieces
-      } else {
-        throw Exception('Failed to download image');
-      }
-    }
-    pieces = <Image>[...originalPieces, ...originalPieces];
+    pieces = await loadOnlyImages(imageUrl, 8);
   }
 
-  void _shuffleCards() {
-    cards = <int>[0, 1, 2, 3, 0, 1, 2, 3];
-    cards.shuffle(Random());
+  void _setupCards() {
+    cards = <int>[0, 1, 2, 3, 4, 5, 6, 7];
+    //cards.shuffle(Random());
+    if (kDebugMode) {
+      // Print the solution pairs
+      for (int i = 0; i < 4; i++) {
+        final int pairIndex = (i + 4) % 8;
+        print('Card ${cards[i]} is paired with Card ${cards[pairIndex]}');
+      }
+      print(cards);
+    }
   }
 }

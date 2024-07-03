@@ -27,7 +27,7 @@ class DragAndDropWidgetState extends State<DragAndDropGame> {
   final String imageUrl =
       'https://microcosm-backend.gmichele.com/get/low/random/';
 
-  late List<ImageResponse> images;
+  late List<ImageUtils> images;
   String resultMessage = '';
 
   bool _areAllCorrect = false;
@@ -86,15 +86,10 @@ class DragAndDropWidgetState extends State<DragAndDropGame> {
                           _buildImageGrid(),
                           if (_isConfirmed)
                             Center(
-                              child: Text(
-                                resultMessage,
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  color: !_areAllCorrect
-                                      ? Colors.red
-                                      : Colors.green,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              child: AnswerWidget(
+                                text: resultMessage,
+                                answerColor:
+                                    _areAllCorrect ? Colors.green : Colors.red,
                               ),
                             ),
                         ],

@@ -2,9 +2,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 
+import '../../../constants.dart';
+import '../../../utils.dart';
 import 'components/game_state.dart';
 
 class MemoryGame extends StatelessWidget {
@@ -22,31 +25,63 @@ class MemoryGame extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (BuildContext context) => GameState()..initialize(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Memory Game'),
-        ),
-        body: Column(
-          children: <Widget>[
-            const Expanded(child: MyHomePage()),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Consumer<GameState>(
-                builder:
-                    (BuildContext context, GameState gameState, Widget? child) {
-                  if (gameState.allMatched) {
-                    return const Text(
-                      'Well Done',
-                      style: TextStyle(fontSize: 24, color: Colors.green),
-                    );
-                  } else {
-                    return Container(); // Empty container if not all matched
-                  }
-                },
-              ),
+      child: Column(
+        children: <Widget>[
+          RichText(
+            text: TextSpan(
+              text:
+                  'Match the cards based on the same tissue pattern to win the game!',
+              style: DefaultTextStyle.of(context).style.apply(
+                    fontSizeFactor: 2,
+                    fontWeightDelta: 2,
+                  ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 10),
+          const Expanded(child: MyHomePage()),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Consumer<GameState>(
+              builder:
+                  (BuildContext context, GameState gameState, Widget? child) {
+                if (gameState.allMatched) {
+                  SchedulerBinding.instance.addPostFrameCallback((_) {
+                    onCompleted();
+                    onUpdate(correctAnswerScore);
+                  });
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      const AnswerWidget(
+                        text: 'Well Done',
+                        answerColor: Colors.green,
+                      ),
+                      SizedBox(
+                        height: 60,
+                        width: 170,
+                        child: FilledButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.blue),
+                          ),
+                          onPressed: () {
+                            onNext();
+                          },
+                          child: const Text('Next',
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 17, color: Colors.white)),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Container(); // Empty container if not all matched
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -58,17 +93,24 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GameState gameState = Provider.of<GameState>(context);
-    return GridView.builder(
-      padding: const EdgeInsets.all(16.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        mainAxisSpacing: 16.0,
-        crossAxisSpacing: 16.0,
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: SizedBox(
+        height: 700,
+        width: 1100,
+        child: GridView.builder(
+          padding: const EdgeInsets.all(16.0),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            mainAxisSpacing: 16.0,
+            crossAxisSpacing: 16.0,
+          ),
+          itemCount: gameState.cards.length,
+          itemBuilder: (BuildContext context, int index) {
+            return CardTile(index: index);
+          },
+        ),
       ),
-      itemCount: gameState.cards.length,
-      itemBuilder: (BuildContext context, int index) {
-        return CardTile(index: index);
-      },
     );
   }
 }
@@ -143,8 +185,21 @@ class CardFace extends StatelessWidget {
     final List<Image> pieces = gameState.pieces;
 
     return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: Colors.black26,
+              offset: Offset(2, 2),
+              blurRadius: 5,
+            ),
+          ],
+        ),
         child: pieces.isNotEmpty
-            ? pieces[gameState.cards[index]]
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: pieces[gameState.cards[index]],
+              )
             : const CircularProgressIndicator());
   }
 }
@@ -154,9 +209,19 @@ class CardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(
-      color: Colors.grey,
-      child: Center(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: Colors.black26,
+            offset: Offset(2, 2),
+            blurRadius: 5,
+          ),
+        ],
+      ),
+      child: const Center(
         child: Text(
           '?',
           style: TextStyle(fontSize: 24, color: Colors.white),

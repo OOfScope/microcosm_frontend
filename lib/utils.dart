@@ -102,7 +102,7 @@ Future<Map<String, dynamic>> jwtDecode(String token) async {
   }
 }
 
-class ImageResponse {
+class ImageUtils {
   Uint8List imageBytes = Uint8List(0);
   Uint8List maskImageBytes = Uint8List(0);
   Uint8List cmappedMaskImageBytes = Uint8List(0);
@@ -138,7 +138,7 @@ class ImageResponse {
   }
 
   void getTissueToFind() {
-    // Select randomly one of the keys in pixelCount exept 0
+    // Select randomly one of the keys in pixelCount except 0
     final List<int> pixelValues = totalTissuePixelFound.keys.toList();
     pixelValues.remove(0);
 
@@ -203,16 +203,33 @@ class ImageResponse {
   }
 }
 
-Future<List<ImageResponse>> loadMoreImages(String url, int amout) async {
-  final List<ImageResponse> imageResponses = <ImageResponse>[];
+Future<List<ImageUtils>> loadMoreImages(String url, int amount) async {
+  final List<ImageUtils> imageResponses = <ImageUtils>[];
 
-  for (int i = 0; i < amout; i++) {
-    final ImageResponse imageResponse = ImageResponse();
+  for (int i = 0; i < amount; i++) {
+    final ImageUtils imageResponse = ImageUtils();
     await imageResponse.loadImages(url);
     imageResponses.add(imageResponse);
   }
 
   return imageResponses;
+}
+
+Future<List<Image>> loadOnlyImages(String url, int amount) async {
+  final List<Image> images = <Image>[];
+  Map<String, dynamic> jsonImageResponse;
+  Uint8List imageBytes;
+  for (int i = 0; i < amount; i++) {
+    final http.Response response = await http.get(Uri.parse(url));
+
+    jsonImageResponse = jsonDecode(response.body) as Map<String, dynamic>;
+    imageBytes = base64Decode(jsonImageResponse['rows']![0][0] as String);
+    images.add(Image.memory(
+      imageBytes,
+    ));
+  }
+
+  return images;
 }
 
 class LevelButtonManager {
@@ -249,5 +266,27 @@ void setOnTapMethod(
     List<LevelButton> levels, Function(int, int) onTapLevelButton) {
   for (final LevelButton level in levels) {
     level.onTapLevelButton = onTapLevelButton;
+  }
+}
+
+class AnswerWidget extends StatelessWidget {
+  const AnswerWidget({
+    super.key,
+    required this.text,
+    required this.answerColor,
+  });
+
+  final String text;
+  final Color answerColor;
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: TextStyle(
+          color: answerColor,
+          fontSize: answerFontSize,
+          fontWeight: FontWeight.bold),
+      overflow: TextOverflow.visible,
+    );
   }
 }

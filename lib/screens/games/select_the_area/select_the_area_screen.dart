@@ -6,7 +6,6 @@ import 'package:image/image.dart' as img;
 
 import '../../../constants.dart';
 import '../../../utils.dart';
-import 'components/answer_widget.dart';
 import 'components/circle_painter.dart';
 import 'components/tissue_legend.dart';
 
@@ -41,7 +40,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
 
   Map<int, int> pixelCount = <int, int>{};
 
-  ImageResponse imageHandler = ImageResponse();
+  ImageUtils imageHandler = ImageUtils();
 
   @override
   void initState() {
@@ -366,7 +365,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Row(
-                                        children: [
+                                        children: <Widget>[
                                           Text(
                                             'Mask Transparency: ',
                                             style: DefaultTextStyle.of(context)
