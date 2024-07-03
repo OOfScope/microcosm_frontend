@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -21,24 +22,32 @@ class SideMenu extends StatelessWidget {
                 SizedBox(
                   width: 150,
                   height: 110,
-                  child: Image.asset('/images/microcosm.png'),
+                  child: kDebugMode
+                      ? Image.asset('/images/microcosm.png')
+                      : Image.asset('assets/images/microcosm.png'),
                 ),
                 SizedBox(
                   width: 100,
                   height: 15,
-                  child: Image.asset('/images/stroke_microcosm.png'),
+                  child: kDebugMode
+                      ? Image.asset('/images/stroke_microcosm.png')
+                      : Image.asset('assets/images/stroke_microcosm.png'),
                 ),
               ],
             ),
           ),
           DrawerListTile(
             title: 'Dashboard',
-            svgSrc: '/icons/menu_dashboard.svg',
+            svgSrc: kDebugMode
+                ? '/icons/menu_dashboard.svg'
+                : 'assets/icons/menu_dashboard.svg',
             press: () => onNavButtonPressed(0),
           ),
           DrawerListTile(
             title: 'Profile',
-            svgSrc: '/icons/menu_profile.svg',
+            svgSrc: kDebugMode
+                ? '/icons/menu_profile.svg'
+                : 'assets/icons/menu_profile.svg',
             press: () => onNavButtonPressed(1),
           ),
           DrawerListTile(
@@ -48,12 +57,16 @@ class SideMenu extends StatelessWidget {
           ),
           DrawerListTile(
             title: 'Dataset Explorer',
-            svgSrc: '/icons/menu_setting.svg',
+            svgSrc: kDebugMode
+                ? '/icons/menu_setting.svg'
+                : 'assets/icons/menu_setting.svg',
             press: () => onNavButtonPressed(4),
           ),
           DrawerListTile(
             title: 'Settings',
-            svgSrc: '/icons/menu_setting.svg',
+            svgSrc: kDebugMode
+                ? '/icons/menu_setting.svg'
+                : 'assets/icons/menu_setting.svg',
             press: () => onNavButtonPressed(9),
           ),
         ],

@@ -31,7 +31,9 @@ class GameWrapper extends StatelessWidget {
         onNext: onNextLevel,
       ),
       2: DragAndDropGame(
-        onNavButtonPressed: (int index) {},
+        onUpdate: onScoreUpdate,
+        onCompleted: onGameCompleted,
+        onNext: onNextLevel,
       ),
       3: MemoryGame(
         onUpdate: onScoreUpdate,

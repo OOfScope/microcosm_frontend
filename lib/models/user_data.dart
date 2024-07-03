@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class User {
@@ -55,7 +56,8 @@ class User {
   late String _levelName;
   late String _nextLevelName;
 
-  static const String assetPath = 'icons/doctors';
+  static const String assetPath =
+      kDebugMode ? 'icons/doctors' : 'assets/icons/doctors';
 
   static final List<Map<String, dynamic>> _levels = <Map<String, dynamic>>[
     <String, dynamic>{

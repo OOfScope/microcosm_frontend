@@ -10,18 +10,18 @@ class LLMChatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Header(title: 'Medyc-AId LLM',),
-      ),
-      body:     MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const LLMChat(),
-    )
-    );
-
+        appBar: AppBar(
+          title: const Header(
+            title: 'Medyc-AId LLM',
+          ),
+        ),
+        body: MaterialApp(
+          theme: ThemeData(
+            primarySwatch: Colors.teal,
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+          ),
+          home: const LLMChat(),
+        ));
   }
 }
 
@@ -43,7 +43,6 @@ class LLMChat extends StatelessWidget {
 }
 
 class LLMChatWidget extends StatefulWidget {
-
   const LLMChatWidget({super.key, required this.serverUrl});
   final String serverUrl;
 
@@ -70,7 +69,8 @@ class _LLMChatWidgetState extends State<LLMChatWidget> {
     String serverResponse = '';
     bool done = false;
     final Uri url = Uri.parse(widget.serverUrl);
-    final String body = jsonEncode(<String, String>{'model': 'gemma:2b', 'prompt': message});
+    final String body =
+        jsonEncode(<String, String>{'model': 'gemma:2b', 'prompt': message});
 
     // Add an initial empty response box for the server response
     setState(() {
@@ -78,14 +78,17 @@ class _LLMChatWidgetState extends State<LLMChatWidget> {
     });
 
     while (!done) {
-      final http.Response response = await http.post(url, body: body, headers: <String, String>{'Content-Type': 'application/json'});
+      final http.Response response = await http.post(url,
+          body: body,
+          headers: <String, String>{'Content-Type': 'application/json'});
 
       if (response.statusCode == 200) {
         final List<String> lines = response.body.split('\n');
         for (final String line in lines) {
           if (line.isNotEmpty) {
             final data = jsonDecode(line);
-            serverResponse += _cleanResponse(data['response'] as String); // Clean response from Unicode characters
+            serverResponse += _cleanResponse(data['response']
+                as String); // Clean response from Unicode characters
             done = data['done'] as bool; // Update done as bool
             setState(() {
               _messages[_messages.length - 1]['content'] = serverResponse;
@@ -94,7 +97,8 @@ class _LLMChatWidgetState extends State<LLMChatWidget> {
         }
       } else {
         setState(() {
-          _messages[_messages.length - 1]['content'] = 'Error: ${response.reasonPhrase}';
+          _messages[_messages.length - 1]['content'] =
+              'Error: ${response.reasonPhrase}';
         });
         break;
       }
@@ -138,7 +142,8 @@ class _LLMChatWidgetState extends State<LLMChatWidget> {
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
                     decoration: BoxDecoration(
                       color: message['role'] == 'user'
                           ? Colors.teal[100]
@@ -147,7 +152,9 @@ class _LLMChatWidgetState extends State<LLMChatWidget> {
                     ),
                     child: MarkdownBody(
                       data: message['content']!,
-                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                      styleSheet:
+                          MarkdownStyleSheet.fromTheme(Theme.of(context))
+                              .copyWith(
                         p: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ),
@@ -168,16 +175,19 @@ class _LLMChatWidgetState extends State<LLMChatWidget> {
                     border: OutlineInputBorder(),
                     labelText: 'Enter your message',
                   ),
-                  onSubmitted: (_) => _handleSubmitted(_controller.text), // Handle sending message on Enter
+                  onSubmitted: (_) => _handleSubmitted(
+                      _controller.text), // Handle sending message on Enter
                 ),
               ),
               const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: () {
-                  _handleSubmitted(_controller.text); // Send message on button press
+                  _handleSubmitted(
+                      _controller.text); // Send message on button press
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20), // Larger button size
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15, horizontal: 20), // Larger button size
                   textStyle: const TextStyle(fontSize: 18),
                 ),
                 child: const Text('Send'),

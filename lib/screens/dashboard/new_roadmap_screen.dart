@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../utils.dart';
 import '../main/components/header.dart';
@@ -24,6 +25,8 @@ class RoadmapState extends State<Roadmap> {
 
   @override
   Widget build(BuildContext context) {
+    const String assetPath = kDebugMode ? '/images' : 'asset/images';
+
     final List<Widget> levels = <Widget>[
       _buildLevelPath(1, 5),
       _buildLevelPath(6, 10),
@@ -44,7 +47,7 @@ class RoadmapState extends State<Roadmap> {
           Opacity(
             opacity: 0.5,
             child: Image.asset(
-              '/images/improved_rm.jpeg',
+              '$assetPath/improved_rm.jpeg',
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,

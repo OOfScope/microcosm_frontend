@@ -62,51 +62,88 @@ class _QuizWidgetState extends State<QuizGame> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Image.memory(imageHandler.imageBytes,
-                      width: 400, height: 400),
-                  const SizedBox(height: 20),
-                  ...List.generate(tissueTypes.length, (int index) {
-                    Color buttonColor;
-                    if (selectedAnswer == -1) {
-                      buttonColor = Colors.blue;
-                    } else if (selectedAnswer == index) {
-                      buttonColor = (index == imageHandler.tissueToFind)
-                          ? Colors.green
-                          : Colors.red;
-                    } else {
-                      buttonColor = (index == imageHandler.tissueToFind)
-                          ? Colors.green
-                          : Colors.blue;
-                    }
+              child: Row(
+                children: [
+                  // Left Column: Game Screen
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Image.memory(imageHandler.imageBytes,
+                            width: 400, height: 400),
+                        const SizedBox(height: 20),
+                        ...List.generate(tissueTypes.length, (int index) {
+                          Color buttonColor;
+                          if (selectedAnswer == -1) {
+                            buttonColor = Colors.blue;
+                          } else if (selectedAnswer == index) {
+                            buttonColor = (index == imageHandler.tissueToFind)
+                                ? Colors.green
+                                : Colors.red;
+                          } else {
+                            buttonColor = (index == imageHandler.tissueToFind)
+                                ? Colors.green
+                                : Colors.blue;
+                          }
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 50.0),
-                      child: FilledButton(
-                        style: _buttonStyle(buttonColor),
-                        onPressed: selectedAnswer == -1
-                            ? () {
-                                setState(() {
-                                  selectedAnswer = index;
-                                  if (selectedAnswer ==
-                                      imageHandler.tissueToFind) {
-                                    widget.onUpdate(correctAnswerScore);
-                                    widget.onCompleted();
-                                  } else {
-                                    widget.onUpdate(wrongAnswerScore);
-                                    widget.onCompleted();
-                                  }
-                                });
-                              }
-                            : null,
-                        child: Text(tissueTypes[index] ?? 'Unknown Tissue'),
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 50.0),
+                            child: FilledButton(
+                              style: _buttonStyle(buttonColor),
+                              onPressed: selectedAnswer == -1
+                                  ? () {
+                                      setState(() {
+                                        selectedAnswer = index;
+                                        if (selectedAnswer ==
+                                            imageHandler.tissueToFind) {
+                                          widget.onUpdate(correctAnswerScore);
+                                          widget.onCompleted();
+                                        } else {
+                                          widget.onUpdate(wrongAnswerScore);
+                                          widget.onCompleted();
+                                        }
+                                      });
+                                    }
+                                  : null,
+                              child:
+                                  Text(tissueTypes[index] ?? 'Unknown Tissue'),
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                  // Right Column: Game Explanation
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Game Explanation',
+                            style: Theme.of(context).textTheme.headline5,
+                          ),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Select the correct tissue type from the options given. If your answer is correct, you will see a green button, otherwise, it will turn red. Once you have made a choice, click the "Next" button to proceed to the next question.',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                          const SizedBox(height: 40),
+                          if (selectedAnswer != -1)
+                            Center(
+                              child: ElevatedButton(
+                                onPressed: widget.onNext,
+                                child: const Text('Click Me'),
+                              ),
+                            ),
+                        ],
                       ),
-                    );
-                  }),
+                    ),
+                  ),
                 ],
               ),
             ),
