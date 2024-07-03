@@ -8,7 +8,15 @@ import 'package:provider/provider.dart';
 import 'components/game_state.dart';
 
 class MemoryGame extends StatelessWidget {
-  const MemoryGame({super.key});
+  const MemoryGame(
+      {super.key,
+      required this.onUpdate,
+      required this.onCompleted,
+      required this.onNext});
+
+  final void Function(int) onUpdate;
+  final VoidCallback onCompleted;
+  final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {

@@ -172,7 +172,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                 'You must select only the part of the image where the tissue is present',
             answerColor: Colors.red,
           );
-          widget.onUpdate(10);
+          widget.onUpdate(wrongAnswerScore);
         });
 
         return;
@@ -188,7 +188,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
             text: 'You have not identified all the correct tissue',
             answerColor: Colors.red,
           );
-          widget.onUpdate(10);
+          widget.onUpdate(wrongAnswerScore);
         });
 
         return;
@@ -212,7 +212,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           answerColor: Colors.green,
         );
 
-        widget.onUpdate(10);
+        widget.onUpdate(correctAnswerScore);
       });
     } else {
       setState(() {
@@ -221,7 +221,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           answerColor: Colors.red,
         );
 
-        widget.onUpdate(10);
+        widget.onUpdate(wrongAnswerScore);
       });
     }
 
@@ -347,11 +347,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
                             // Display answer
                             if (!_isConfirmed)
                               Container(
-                                height: 65 *
-                                    (1 +
-                                        imageHandler
-                                            .totalTissuePixelFound.length
-                                            .toDouble()),
+                                height: 230,
                               )
                             else
                               SizedBox(width: 550, height: 100, child: _answer),

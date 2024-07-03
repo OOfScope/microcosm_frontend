@@ -12,18 +12,12 @@ class DragAndDropGame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Drag and Drop Game',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Drag and Drop Game'),
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Drag and Drop Game'),
-        ),
-        body: DragAndDropWidget(
-          onNavButtonPressed: onNavButtonPressed,
-        ),
+      body: DragAndDropWidget(
+        onNavButtonPressed: onNavButtonPressed,
       ),
     );
   }

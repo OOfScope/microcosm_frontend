@@ -4,7 +4,15 @@ import '../../../constants.dart';
 import '../../../utils.dart';
 
 class QuizGame extends StatefulWidget {
-  const QuizGame({super.key});
+  const QuizGame(
+      {super.key,
+      required this.onUpdate,
+      required this.onCompleted,
+      required this.onNext});
+
+  final void Function(int) onUpdate;
+  final VoidCallback onCompleted;
+  final VoidCallback onNext;
 
   @override
   _QuizWidgetState createState() => _QuizWidgetState();
@@ -84,6 +92,14 @@ class _QuizWidgetState extends State<QuizGame> {
                             ? () {
                                 setState(() {
                                   selectedAnswer = index;
+                                  if (selectedAnswer ==
+                                      imageHandler.tissueToFind) {
+                                    widget.onUpdate(correctAnswerScore);
+                                    widget.onCompleted();
+                                  } else {
+                                    widget.onUpdate(wrongAnswerScore);
+                                    widget.onCompleted();
+                                  }
                                 });
                               }
                             : null,

@@ -27,6 +27,7 @@ class _MainScreenState extends State<MainScreen> {
   int _difficulty = 0;
   int _level = 0;
   final GlobalKey<LeaderboardState> _childKey = GlobalKey<LeaderboardState>();
+  final GlobalKey<GameScreenState> _gameKey = GlobalKey<GameScreenState>();
 
   void upNavBarId(int index) {
     setState(() {
@@ -49,18 +50,20 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       if (levelButtons[index].stars < 3) {
         if (index >= 0 && index < levelButtons.length) {
-          levelButtons[index].stars += 1;
+          if (score != 0) {
+            levelButtons[index].stars += 1;
 
-          if (levelButtons[index].stars == 3) {
-            UserManager.instance.user.addScore(levelButtons[index].levelScore);
-            levelButtons[index].levelScore = 0;
-            levelButtons[index].status = LevelStatus.completed;
+            if (levelButtons[index].stars == 3) {
+              levelButtons[index].status = LevelStatus.completed;
+              return;
+            }
+
+            UserManager.instance.user.addScore(score);
+            levelButtons[index].addLevelScore(score);
             levelButtons[index + 1].status = LevelStatus.inProgress;
             levelButtons[index + 1].isActive = true;
-            return;
+            updateLeaderboardState();
           }
-
-          levelButtons[index].addLevelScore(score);
         }
       }
     });

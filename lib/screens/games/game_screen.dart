@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../constants.dart';
+import '../../utils.dart';
 import '../main/components/header.dart';
 import 'wrapper/game_wrapper.dart';
 
@@ -22,15 +24,17 @@ class GameScreen extends StatefulWidget {
 
 class GameScreenState extends State<GameScreen> {
   double _progress = 1.0; // Progress for the timer (1.0 means 100%)
-  int _score = 0; // Initial score
   int _timeLeft = 20; // Time left in seconds
   Timer? _timer;
   bool _isGameOver = false; // Tracks if the game is over
   bool _isStarted = false; // Tracks if the timer is started
+  int score = 0;
 
   @override
   void initState() {
     super.initState();
+    score =
+        LevelButtonManager.instance.levelButtons[widget.level - 1].levelScore;
   }
 
   void startTimer() {
@@ -65,6 +69,16 @@ class GameScreenState extends State<GameScreen> {
     if (mounted) {
       setState(() {
         widget.scoreUpdate(widget.level, points);
+        updateInternalScore();
+      });
+    }
+  }
+
+  void updateInternalScore() {
+    if (mounted) {
+      setState(() {
+        score = LevelButtonManager
+            .instance.levelButtons[widget.level - 1].levelScore;
       });
     }
   }
@@ -108,6 +122,7 @@ class GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final GameWrapper game = GameWrapper(
+      index: widget.level,
       onGameLoaded: gameLoaded,
       onScoreUpdate: updateScore,
       onGameCompleted: gameCompleted,
@@ -118,7 +133,7 @@ class GameScreenState extends State<GameScreen> {
         // Rendere le variabili bold
         title: Header(
             title:
-                'Level: ${widget.level} - Difficulty: ${widget.difficulty == 0 ? 'Easy' : widget.difficulty == 1 ? 'Medium' : 'Hard'} - Game: ${game.title}'),
+                'Level: ${widget.level} - Difficulty: ${widget.difficulty == 0 ? 'Easy' : widget.difficulty == 1 ? 'Medium' : 'Hard'} - Game: ${gameTitles[widget.level]}'),
       ),
       body: Stack(
         children: <Widget>[
@@ -166,7 +181,7 @@ class GameScreenState extends State<GameScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
                         Text(
-                          'Score: $_score',
+                          'Score: $score',
                           style: const TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                         ),
