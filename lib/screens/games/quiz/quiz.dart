@@ -125,12 +125,12 @@ class _QuizWidgetState extends State<QuizGame> {
                         children: <Widget>[
                           Text(
                             'Game Explanation',
-                            style: Theme.of(context).textTheme.headline5,
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
                           const SizedBox(height: 20),
                           Text(
                             'Select the correct tissue type from the options given. If your answer is correct, you will see a green button, otherwise, it will turn red. Once you have made a choice, click the "Next" button to proceed to the next question.',
-                            style: Theme.of(context).textTheme.bodyText1,
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                           const SizedBox(height: 40),
                           if (selectedAnswer != -1)

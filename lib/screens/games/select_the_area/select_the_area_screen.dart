@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
 import '../../../constants.dart';
-import '../../../models/user_data.dart';
 import '../../../utils.dart';
 import 'components/answer_widget.dart';
 import 'components/circle_painter.dart';

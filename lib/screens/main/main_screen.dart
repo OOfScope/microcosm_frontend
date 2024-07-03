@@ -27,7 +27,6 @@ class _MainScreenState extends State<MainScreen> {
   int _difficulty = 0;
   int _level = 0;
   final GlobalKey<LeaderboardState> _childKey = GlobalKey<LeaderboardState>();
-  final GlobalKey<GameScreenState> _gameKey = GlobalKey<GameScreenState>();
 
   void upNavBarId(int index) {
     setState(() {
