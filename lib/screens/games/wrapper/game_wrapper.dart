@@ -29,11 +29,13 @@ class GameWrapper extends StatelessWidget {
         onUpdate: onScoreUpdate,
         onCompleted: onGameCompleted,
         onNext: onNextLevel,
+        onGameLoaded: onGameLoaded,
       ),
       2: DragAndDropGame(
         onUpdate: onScoreUpdate,
         onCompleted: onGameCompleted,
         onNext: onNextLevel,
+        onGameLoaded: onGameLoaded,
       ),
       3: MemoryGame(
         onUpdate: onScoreUpdate,
@@ -47,7 +49,15 @@ class GameWrapper extends StatelessWidget {
       ),
     };
     // Simulate a delay for loading the game
-    Future.delayed(const Duration(seconds: 4), onGameLoaded);
+    if (games[index] is QuizGame) {
+      Future.delayed(const Duration(seconds: 4), onGameLoaded);
+    } else if (games[index] is DragAndDropGame) {
+      Future.delayed(const Duration(seconds: 26), onGameLoaded);
+    } else if (games[index] is MemoryGame) {
+      Future.delayed(const Duration(seconds: 4), onGameLoaded);
+    } else if (games[index] is SelectTheAreaGame) {
+      Future.delayed(const Duration(seconds: 4), onGameLoaded);
+    }
 
     return Center(child: games[index]);
   }

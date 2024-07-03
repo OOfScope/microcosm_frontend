@@ -203,6 +203,18 @@ class ImageResponse {
   }
 }
 
+Future<List<ImageResponse>> loadMoreImages(String url, int amout) async {
+  final List<ImageResponse> imageResponses = <ImageResponse>[];
+
+  for (int i = 0; i < amout; i++) {
+    final ImageResponse imageResponse = ImageResponse();
+    await imageResponse.loadImages(url);
+    imageResponses.add(imageResponse);
+  }
+
+  return imageResponses;
+}
+
 class LevelButtonManager {
   LevelButtonManager._internal();
 

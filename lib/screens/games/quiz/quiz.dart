@@ -8,11 +8,13 @@ class QuizGame extends StatefulWidget {
       {super.key,
       required this.onUpdate,
       required this.onCompleted,
-      required this.onNext});
+      required this.onNext,
+      required this.onGameLoaded});
 
   final void Function(int) onUpdate;
   final VoidCallback onCompleted;
   final VoidCallback onNext;
+  final VoidCallback onGameLoaded;
 
   @override
   _QuizWidgetState createState() => _QuizWidgetState();
@@ -36,6 +38,7 @@ class _QuizWidgetState extends State<QuizGame> {
     await imageHandler.loadImages(imageUrl);
     setState(() {
       _isLoading = false;
+      widget.onGameLoaded();
     });
   }
 
@@ -77,14 +80,16 @@ class _QuizWidgetState extends State<QuizGame> {
                           Color buttonColor;
                           if (selectedAnswer == -1) {
                             buttonColor = Colors.blue;
-                          } else if (selectedAnswer == index) {
-                            buttonColor = (index == imageHandler.tissueToFind)
-                                ? Colors.green
-                                : Colors.red;
+                          } else if (selectedAnswer == index + 1) {
+                            buttonColor =
+                                (index + 1 == imageHandler.tissueToFind)
+                                    ? Colors.green
+                                    : Colors.red;
                           } else {
-                            buttonColor = (index == imageHandler.tissueToFind)
-                                ? Colors.green
-                                : Colors.blue;
+                            buttonColor =
+                                (index + 1 == imageHandler.tissueToFind)
+                                    ? Colors.green
+                                    : Colors.blue;
                           }
 
                           return Padding(
@@ -95,7 +100,7 @@ class _QuizWidgetState extends State<QuizGame> {
                               onPressed: selectedAnswer == -1
                                   ? () {
                                       setState(() {
-                                        selectedAnswer = index;
+                                        selectedAnswer = index + 1;
                                         if (selectedAnswer ==
                                             imageHandler.tissueToFind) {
                                           widget.onUpdate(correctAnswerScore);
@@ -107,8 +112,7 @@ class _QuizWidgetState extends State<QuizGame> {
                                       });
                                     }
                                   : null,
-                              child:
-                                  Text(tissueTypes[index] ?? 'Unknown Tissue'),
+                              child: Text(tissueTypes[index + 1]!),
                             ),
                           );
                         }),
@@ -123,23 +127,43 @@ class _QuizWidgetState extends State<QuizGame> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
-                            'Game Explanation',
-                            style: Theme.of(context).textTheme.headlineSmall,
+                          RichText(
+                            text: TextSpan(
+                              text: 'Game Explaination:',
+                              style: DefaultTextStyle.of(context).style.apply(
+                                    fontSizeFactor: 2.2,
+                                    fontWeightDelta: 2,
+                                  ),
+                            ),
                           ),
                           const SizedBox(height: 20),
-                          Text(
+                          const Text(
                             'Select the correct tissue type from the options given. If your answer is correct, you will see a green button, otherwise, it will turn red. Once you have made a choice, click the "Next" button to proceed to the next question.',
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            style: TextStyle(
+                              fontSize: 1.1 * tissueDescriptionFontSize,
+                              overflow: TextOverflow.visible,
+                            ),
                           ),
                           const SizedBox(height: 40),
                           if (selectedAnswer != -1)
                             Center(
-                              child: ElevatedButton(
-                                onPressed: widget.onNext,
-                                child: const Text('Click Me'),
+                              child: SizedBox(
+                                height: 60,
+                                width: 170,
+                                child: FilledButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.blue),
+                                  ),
+                                  onPressed: widget.onNext,
+                                  child: const Text('Next Level',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 22, color: Colors.white)),
+                                ),
                               ),
-                            ),
+                            )
                         ],
                       ),
                     ),

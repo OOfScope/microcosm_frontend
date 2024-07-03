@@ -131,9 +131,7 @@ class GameScreenState extends State<GameScreen> {
     return Scaffold(
       appBar: AppBar(
         // Rendere le variabili bold
-        title: Header(
-            title:
-                'Level: ${widget.level} - Difficulty: ${widget.difficulty == 0 ? 'Easy' : widget.difficulty == 1 ? 'Medium' : 'Hard'} - Game: ${gameTitles[widget.level]}'),
+        title: GameScreenHeader(widget: widget),
       ),
       body: Stack(
         children: <Widget>[
@@ -232,6 +230,59 @@ class GameScreenState extends State<GameScreen> {
             ),
         ],
       ),
+    );
+  }
+}
+
+class Header extends StatelessWidget {
+  const Header({super.key, required this.title});
+  final Widget title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      child: title,
+    );
+  }
+}
+
+class GameScreenHeader extends StatelessWidget {
+  const GameScreenHeader({
+    super.key,
+    required this.widget,
+  });
+
+  final GameScreen widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Header(
+      title: Text.rich(
+          TextSpan(
+            children: [
+              const TextSpan(text: 'Level: '),
+              TextSpan(
+                text: '${widget.level}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' - Difficulty: '),
+              TextSpan(
+                text: widget.difficulty == 0
+                    ? 'Easy'
+                    : widget.difficulty == 1
+                        ? 'Medium'
+                        : 'Hard',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(text: ' - Game: '),
+              TextSpan(
+                text: '${gameTitles[widget.level]}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          style: const TextStyle(fontSize: 30, color: Colors.white)),
     );
   }
 }

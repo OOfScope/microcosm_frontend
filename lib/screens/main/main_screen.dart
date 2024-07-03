@@ -12,6 +12,7 @@ import '../games/game_screen.dart';
 import '../llmchat/llmchat.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_screen.dart';
+import 'components/chatbox.dart';
 import 'components/leaderboard.dart';
 import 'components/side_menu.dart';
 
@@ -128,6 +129,7 @@ class _MainScreenState extends State<MainScreen> {
                   const SizedBox(height: 2 * defaultPadding),
                   Leaderboard(key: _childKey),
                   const SizedBox(height: defaultPadding),
+                  //const Flexible(child: ChatBot())
                 ],
               ),
             ),

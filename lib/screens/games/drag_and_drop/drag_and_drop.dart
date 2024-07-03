@@ -1,46 +1,39 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
+import '../../../constants.dart';
+import '../../../utils.dart';
 
 typedef IndexCallback = void Function(int index);
 
-class DragAndDropGame extends StatelessWidget {
+class DragAndDropGame extends StatefulWidget {
   const DragAndDropGame({
     super.key,
     required this.onUpdate,
     required this.onCompleted,
     required this.onNext,
+    required this.onGameLoaded,
   });
 
   final IndexCallback onUpdate;
   final VoidCallback onCompleted;
   final VoidCallback onNext;
+  final VoidCallback onGameLoaded;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Drag and Drop Game'),
-      ),
-      body: const DragAndDropWidget(),
-    );
-  }
+  DragAndDropWidgetState createState() => DragAndDropWidgetState();
 }
 
-class DragAndDropWidget extends StatefulWidget {
-  const DragAndDropWidget({super.key});
-
-  @override
-  _DragAndDropWidgetState createState() => _DragAndDropWidgetState();
-}
-
-class _DragAndDropWidgetState extends State<DragAndDropWidget> {
+class DragAndDropWidgetState extends State<DragAndDropGame> {
   final String imageUrl =
-      'https://microcosm-backend.gmichele.com/get/low/random/image';
+      'https://microcosm-backend.gmichele.com/get/low/random/';
 
-  List<Image> pieces = <Image>[];
+  late List<ImageResponse> images;
+  String resultMessage = '';
+
+  bool _areAllCorrect = false;
+  bool _isLoading = true;
+  bool _isConfirmed = false;
+
   final Map<int, Image?> _currentPositions = <int, Image?>{
     0: null,
     1: null,
@@ -48,243 +41,253 @@ class _DragAndDropWidgetState extends State<DragAndDropWidget> {
     3: null
   };
 
-  String resultMessage = '';
+  Future<void> _fetchImage() async {
+    images = await loadMoreImages(imageUrl, 4);
 
-  List<String> labels = <String>[
-    'Top Left',
-    'Top Right',
-    'Bottom Left',
-    'Bottom Right'
-  ];
+    setState(() {
+      _isLoading = false;
+      widget.onGameLoaded();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _downloadAndSplitImage();
-  }
-
-  Future<void> _downloadAndSplitImage() async {
-    for (int i = 0; i < 4; i++) {
-      final http.Response response = await http.get(Uri.parse(imageUrl));
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonImageResponse =
-            jsonDecode(response.body) as Map<String, dynamic>;
-
-        final String base64Image = jsonImageResponse['rows'][0][0] as String;
-
-        final Uint8List rawImage = base64Decode(base64Image);
-
-        final Image fullImage = Image.memory(rawImage);
-        pieces.add(fullImage);
-
-        setState(() {});
-      } else {
-        throw Exception('Failed to download image');
-      }
-    }
+    _fetchImage();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          const SizedBox(height: 20),
-          Expanded(
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
+                RichText(
+                  text: TextSpan(
+                    text:
+                        'Drag and drop WSIs to their labels. Confirm to check your answers!',
+                    style: DefaultTextStyle.of(context).style.apply(
+                          fontSizeFactor: 2,
+                          fontWeightDelta: 2,
+                        ),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.blueAccent),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        height: 500,
-                        width: 500,
-                        child: GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisSpacing: 8,
-                                  mainAxisSpacing: 8,
-                                  crossAxisCount: 2),
-                          itemCount: pieces.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return DragTarget<Image>(
-                              onAcceptWithDetails:
-                                  (DragTargetDetails<Image?> draggableImage) {
-                                setState(() {
-                                  final Image? previousData =
-                                      _currentPositions[index];
-                                  final int previousIndex =
-                                      _currentPositions.keys.firstWhere(
-                                          (int key) =>
-                                              _currentPositions[key] ==
-                                              draggableImage.data,
-                                          orElse: () => -1);
-
-                                  if (previousIndex != -1) {
-                                    _currentPositions[previousIndex] =
-                                        previousData;
-                                  }
-                                  _currentPositions[index] =
-                                      draggableImage.data;
-                                });
-                              },
-                              builder: (BuildContext context,
-                                  List<Image?> candidateData,
-                                  List rejectedData) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: _currentPositions[index] != null
-                                        ? Colors.white
-                                        : Colors.grey[200],
-                                  ),
-                                  child: _currentPositions[index] != null
-                                      ? Draggable(
-                                          data: _currentPositions[index],
-                                          feedback: Center(
-                                            child: SizedBox(
-                                              width: 200,
-                                              height: 200,
-                                              child: _currentPositions[index],
-                                            ),
-                                          ),
-                                          childWhenDragging: Container(
-                                            color: Colors.grey[200],
-                                            width: 200,
-                                            height: 200,
-                                            child: Center(
-                                              child: Text(
-                                                labels[index],
-                                                style: const TextStyle(
-                                                    fontSize: 24),
-                                              ),
-                                            ),
-                                          ),
-                                          child: SizedBox(
-                                            width: 200,
-                                            height: 200,
-                                            child: _currentPositions[index],
-                                          ),
-                                        )
-                                      : Center(
-                                          child: Text(
-                                            labels[index],
-                                            style:
-                                                const TextStyle(fontSize: 24),
-                                          ),
-                                        ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 40),
-                      Center(
-                        child: SizedBox(
-                          height: 400,
-                          width: 400,
-                          child: GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
+                      _buildGameGrid(),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          _buildImageGrid(),
+                          if (_isConfirmed)
+                            Center(
+                              child: Text(
+                                resultMessage,
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  color: !_areAllCorrect
+                                      ? Colors.red
+                                      : Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                            itemCount: pieces.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Draggable<Image>(
-                                data: pieces[index],
-                                feedback: SizedBox(
-                                    width: 200,
-                                    height: 200,
-                                    child: pieces[index]),
-                                childWhenDragging:
-                                    const SizedBox(width: 200, height: 200),
-                                onDragCompleted: () {},
-                                child: !_currentPositions
-                                        .containsValue(pieces[index])
-                                    ? SizedBox(
-                                        width: 200,
-                                        height: 200,
-                                        child: pieces[index])
-                                    : const SizedBox(width: 200, height: 200),
-                              );
-                            },
-                          ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    ElevatedButton(
-                      onPressed: _checkPositions,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32.0, vertical: 16.0),
-                        backgroundColor: Colors.blue,
-                        textStyle: const TextStyle(fontSize: 20),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 25),
+                  child: Center(
+                    child: SizedBox(
+                      height: 70,
+                      width: 180,
+                      child: FilledButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32.0, vertical: 16.0),
+                          backgroundColor: Colors.blue,
+                          textStyle: const TextStyle(fontSize: 20),
+                        ),
+                        onPressed: _allImagesDragged() && !_isConfirmed
+                            ? () {
+                                _checkPositions();
+                                setState(() {
+                                  _isConfirmed = true;
+                                });
+                              }
+                            : _isConfirmed
+                                ? () {
+                                    widget.onNext();
+                                  }
+                                : null,
+                        child: _isConfirmed
+                            ? const Text('Next',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 24, color: Colors.white))
+                            : const Text(
+                                'Confirm Choices',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 22, color: Colors.white),
+                                overflow: TextOverflow.visible,
+                              ),
                       ),
-                      child: const Text('Confirm Choices'),
                     ),
-                    const SizedBox(width: 20),
-                    ElevatedButton(
-                      onPressed: () => {},
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32.0, vertical: 16.0),
-                        backgroundColor: Colors.grey,
-                        textStyle: const TextStyle(fontSize: 20),
-                      ),
-                      child: const Text('Main Menu'),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
+          );
+  }
+
+  bool _allImagesDragged() {
+    return _currentPositions.values
+            .where((Image? element) => element != null)
+            .length ==
+        4;
+  }
+
+  Widget _buildGameGrid() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.blueAccent, width: 5),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      height: 500,
+      width: 500,
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisSpacing: 8, mainAxisSpacing: 8, crossAxisCount: 2),
+        itemCount: images.length,
+        itemBuilder: (BuildContext context, int index) {
+          return DragTarget<Image>(
+            onAcceptWithDetails: (DragTargetDetails<Image?> draggableImage) {
+              setState(() {
+                final Image? previousData = _currentPositions[index];
+                final int previousIndex = _currentPositions.keys.firstWhere(
+                    (int key) => _currentPositions[key] == draggableImage.data,
+                    orElse: () => -1);
+
+                if (previousIndex != -1) {
+                  _currentPositions[previousIndex] = previousData;
+                }
+                _currentPositions[index] = draggableImage.data;
+              });
+            },
+            builder: (BuildContext context, List<Image?> candidateData,
+                List rejectedData) {
+              return Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(10),
+                  color: _currentPositions[index] != null
+                      ? Colors.white
+                      : Colors.grey[200],
+                ),
+                child: _currentPositions[index] != null
+                    ? Draggable(
+                        data: _currentPositions[index],
+                        feedback: Center(
+                          child: SizedBox(
+                            width: 200,
+                            height: 200,
+                            child: _currentPositions[index],
+                          ),
+                        ),
+                        childWhenDragging: Container(
+                          color: Colors.white,
+                          width: 200,
+                          height: 200,
+                          child: Center(
+                            child: Text(
+                              tissueTypes[images[index].tissueToFind]!,
+                              style: const TextStyle(
+                                  fontSize: 24, color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        child: SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: _currentPositions[index],
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          tissueTypes[images[index].tissueToFind]!,
+                          style: const TextStyle(
+                              fontSize: 24, color: Colors.black),
+                        ),
+                      ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildImageGrid() {
+    return Center(
+      child: SizedBox(
+        height: 400,
+        width: 400,
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
           ),
-          const SizedBox(height: 20),
-          Center(
-            child: Text(
-              resultMessage,
-              style: TextStyle(
-                fontSize: 24,
-                color:
-                    resultMessage != 'Well Done!' ? Colors.red : Colors.green,
+          itemCount: images.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Draggable<Image>(
+              data: images[index].displayedFullImage,
+              feedback: SizedBox(
+                width: 200,
+                height: 200,
+                child: images[index].displayedFullImage,
               ),
-            ),
-          ),
-        ],
+              childWhenDragging: const SizedBox(width: 200, height: 200),
+              onDragCompleted: () {},
+              child: !_currentPositions
+                      .containsValue(images[index].displayedFullImage)
+                  ? SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: images[index].displayedFullImage,
+                    )
+                  : const SizedBox(width: 200, height: 200),
+            );
+          },
+        ),
       ),
     );
   }
 
   void _checkPositions() {
-    bool allCorrect = true;
-    for (int i = 0; i < pieces.length; i++) {
-      if (_currentPositions[i] != pieces[i]) {
-        allCorrect = false;
-        break;
-      }
-    }
-
     setState(() {
-      resultMessage = allCorrect ? 'Well Done!' : 'Wrong choices';
+      widget.onCompleted();
+
+      for (int i = 0; i < images.length; i++) {
+        if (_currentPositions[i] != images[i].displayedFullImage) {
+          widget.onUpdate(wrongAnswerScore);
+          resultMessage = 'Wrong choices';
+          return;
+        }
+      }
+      widget.onUpdate(correctAnswerScore);
+      _areAllCorrect = true;
+      resultMessage = 'Well Done!';
     });
   }
 }
