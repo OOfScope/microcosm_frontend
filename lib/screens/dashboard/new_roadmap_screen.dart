@@ -25,7 +25,7 @@ class RoadmapState extends State<Roadmap> {
 
   @override
   Widget build(BuildContext context) {
-    const String assetPath = kDebugMode ? '/images' : 'asset/images';
+    const String assetPath = kDebugMode ? '/images' : 'assets/images';
 
     final List<Widget> levels = <Widget>[
       _buildLevelPath(1, 5),
