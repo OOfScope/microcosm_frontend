@@ -61,7 +61,7 @@ void main() async {
 
   final User myuser = UserManager.instance.user;
 
-  user.addScore(50);
+  // user.addScore(50);
 
   final List<LevelButton> levels = initializeLevelButtons();
   LevelButtonManager.instance.levelButtons = levels;

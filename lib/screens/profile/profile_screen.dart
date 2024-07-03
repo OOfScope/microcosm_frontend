@@ -75,7 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ElevatedButton(
               onPressed: () =>
                   <void>{_addScore(10), widget.onDebugAddScoreButtonPressed()},
-              child: const Text('Debug addScore(10)'),
+              child: const Text('Gift 10 points [TEST] :)'),
             ),
           ],
         ),
