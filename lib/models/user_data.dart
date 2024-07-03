@@ -57,7 +57,7 @@ class User {
   late String _nextLevelName;
 
   static const String assetPath =
-      kDebugMode ? 'icons/doctors' : 'assets/icons/doctors';
+      kDebugMode ? 'icons/doctors' : '/assets/assets/icons/doctors';
 
   static final List<Map<String, dynamic>> _levels = <Map<String, dynamic>>[
     <String, dynamic>{
