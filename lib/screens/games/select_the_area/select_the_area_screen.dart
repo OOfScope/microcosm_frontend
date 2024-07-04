@@ -165,7 +165,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
 
       if (coveredArea > 0.7) {
         setState(() {
-          _answer = const AnswerWidget(
+          _answer = AnswerWidget(
             text:
                 'You must select only the part of the image where the tissue is present',
             answerColor: Colors.red,
@@ -182,7 +182,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
           0.5 *
               imageHandler.totalTissuePixelFound[imageHandler.tissueToFind]!) {
         setState(() {
-          _answer = const AnswerWidget(
+          _answer = AnswerWidget(
             text: 'You have not identified all the correct tissue',
             answerColor: Colors.red,
           );
@@ -205,7 +205,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       }
 
       setState(() {
-        _answer = const AnswerWidget(
+        _answer = AnswerWidget(
           text: 'You have correctly identified the tissue!',
           answerColor: Colors.green,
         );
@@ -214,7 +214,7 @@ class CircleImageComparisonScreenState extends State<SelectTheAreaGame> {
       });
     } else {
       setState(() {
-        _answer = const AnswerWidget(
+        _answer = AnswerWidget(
           text: 'You have not identified the correct tissue!',
           answerColor: Colors.red,
         );

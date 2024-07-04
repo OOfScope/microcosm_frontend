@@ -48,6 +48,7 @@ class GameScreenState extends State<GameScreen> {
             if (mounted) {
               setState(() {
                 _isGameOver = true;
+                widget.scoreUpdate(widget.level, wrongAnswerScore);
               });
             }
             _triggerGameEnd();

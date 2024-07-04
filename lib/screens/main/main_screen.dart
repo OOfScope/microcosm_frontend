@@ -47,6 +47,9 @@ class _MainScreenState extends State<MainScreen> {
         LevelButtonManager.instance.levelButtons;
     index -= 1;
     setState(() {
+      // print(
+      //     'LevelStats: ${levelButtons[index].stars} ${levelButtons[index].status} ${levelButtons[index].isActive} ${levelButtons[index].levelScore} ${levelButtons[index].levelNumber}');
+
       if (levelButtons[index].stars < 3) {
         if (index >= 0 && index < levelButtons.length) {
           if (score != 0) {
@@ -56,6 +59,9 @@ class _MainScreenState extends State<MainScreen> {
               levelButtons[index].status = LevelStatus.completed;
               return;
             }
+
+            // print(
+            //     'LevelStats: ${levelButtons[index].stars} ${levelButtons[index].status} ${levelButtons[index].isActive} ${levelButtons[index].levelScore} ${levelButtons[index].levelNumber}');
 
             UserManager.instance.user.addScore(score);
             levelButtons[index].addLevelScore(score);

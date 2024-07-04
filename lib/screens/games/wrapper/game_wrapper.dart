@@ -60,7 +60,7 @@ class GameWrapper extends StatelessWidget {
     } else if (games[index % 5] is DragAndDropGame) {
       Future.delayed(const Duration(seconds: 26), onGameLoaded);
     } else if (games[index % 5] is MemoryGame) {
-      Future.delayed(const Duration(seconds: 10), onGameLoaded);
+      Future.delayed(const Duration(seconds: 12), onGameLoaded);
     } else if (games[index % 5] is SelectTheAreaGame) {
       Future.delayed(const Duration(seconds: 4), onGameLoaded);
     } else if (games[index % 5] is SpacedRepetitionGame) {

@@ -25,67 +25,102 @@ class MemoryGame extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (BuildContext context) => GameState()..initialize(),
-      child: Column(
-        children: <Widget>[
-          RichText(
-            text: TextSpan(
-              text:
-                  'Match the cards based on the same tissue pattern to win the game!',
-              style: DefaultTextStyle.of(context).style.apply(
-                    fontSizeFactor: 2,
-                    fontWeightDelta: 2,
-                  ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Expanded(child: MyHomePage()),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Consumer<GameState>(
-              builder:
-                  (BuildContext context, GameState gameState, Widget? child) {
-                if (gameState.allMatched) {
-                  SchedulerBinding.instance.addPostFrameCallback((_) {
-                    onCompleted();
-                    onUpdate(correctAnswerScore);
-                  });
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        const AnswerWidget(
-                          text: 'Well Done',
-                          answerColor: Colors.green,
-                        ),
-                        SizedBox(
-                          height: 60,
-                          width: 170,
-                          child: FilledButton(
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all<Color>(Colors.blue),
-                            ),
-                            onPressed: () {
-                              onNext();
-                            },
-                            child: const Text('Next',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 17, color: Colors.white)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                } else {
-                  return Container(); // Empty container if not all matched
-                }
-              },
-            ),
-          ),
-        ],
+      child: MemoryGameContent(
+        onUpdate: onUpdate,
+        onCompleted: onCompleted,
+        onNext: onNext,
       ),
+    );
+  }
+}
+
+class MemoryGameContent extends StatefulWidget {
+  const MemoryGameContent({
+    super.key,
+    required this.onUpdate,
+    required this.onCompleted,
+    required this.onNext,
+  });
+
+  final void Function(int) onUpdate;
+  final VoidCallback onCompleted;
+  final VoidCallback onNext;
+
+  @override
+  MemoryGameContentState createState() => MemoryGameContentState();
+}
+
+class MemoryGameContentState extends State<MemoryGameContent> {
+  bool _callbacksCalled = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final AnswerWidget answer = AnswerWidget(
+      text: 'Well Done',
+      answerColor: Colors.green,
+    );
+    answer.fontSize = 60;
+
+    return Column(
+      children: <Widget>[
+        RichText(
+          text: TextSpan(
+            text:
+                'Match the cards based on the same tissue pattern to win the game!',
+            style: DefaultTextStyle.of(context).style.apply(
+                  fontSizeFactor: 2,
+                  fontWeightDelta: 2,
+                ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        const Expanded(child: MyHomePage()),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Consumer<GameState>(
+            builder:
+                (BuildContext context, GameState gameState, Widget? child) {
+              if (gameState.allMatched) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  if (!_callbacksCalled) {
+                    _callbacksCalled = true;
+                    widget.onCompleted();
+                    widget.onUpdate(correctAnswerScore);
+                  }
+                });
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 30),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      answer,
+                      SizedBox(
+                        height: 60,
+                        width: 170,
+                        child: FilledButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.blue),
+                          ),
+                          onPressed: () {
+                            widget.onNext();
+                          },
+                          child: const Text('Next',
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 17, color: Colors.white)),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return Container(); // Empty container if not all matched
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 }

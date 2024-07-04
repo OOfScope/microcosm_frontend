@@ -270,7 +270,7 @@ void setOnTapMethod(
 }
 
 class AnswerWidget extends StatelessWidget {
-  const AnswerWidget({
+  AnswerWidget({
     super.key,
     required this.text,
     required this.answerColor,
@@ -278,13 +278,21 @@ class AnswerWidget extends StatelessWidget {
 
   final String text;
   final Color answerColor;
+  double fontAnswer = 0;
+
+  set fontSize(double fontSize) {
+    fontAnswer = fontSize;
+  }
+
+  double get fontSize => fontAnswer;
+
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
       style: TextStyle(
           color: answerColor,
-          fontSize: answerFontSize,
+          fontSize: fontAnswer != 0 ? answerFontSize : fontAnswer,
           fontWeight: FontWeight.bold),
       overflow: TextOverflow.visible,
     );
