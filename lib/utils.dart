@@ -330,7 +330,7 @@ class GameInfoManager {
   GameInfoManager._internal();
 
   static final GameInfoManager _instance = GameInfoManager._internal();
-  final Map<GameInfo, int> _gameInfo = {};
+  final Map<GameInfo, int> _gameInfo = <GameInfo, int>{};
 
   static GameInfoManager get instance => _instance;
 
@@ -364,7 +364,7 @@ class GameInfoManager {
     if (_gameInfo.isEmpty) return null;
 
     MapEntry<GameInfo, int>? highestFrequencyEntry;
-    for (var entry in _gameInfo.entries) {
+    for (final MapEntry<GameInfo, int> entry in _gameInfo.entries) {
       if (highestFrequencyEntry == null ||
           entry.value > highestFrequencyEntry.value) {
         highestFrequencyEntry = entry;
@@ -384,7 +384,7 @@ class GameInfoManager {
     }
 
     MapEntry<GameInfo, int>? highestFrequencyEntry;
-    for (var entry in _gameInfo.entries) {
+    for (final MapEntry<GameInfo, int> entry in _gameInfo.entries) {
       if (highestFrequencyEntry == null ||
           entry.value > highestFrequencyEntry.value) {
         highestFrequencyEntry = entry;
