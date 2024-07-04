@@ -46,8 +46,7 @@ class RoadmapState extends State<Roadmap> {
         children: <Widget>[
           Opacity(
             opacity: 0.5,
-            child: Image.asset(
-              'images/improved_rm.jpeg',
+            child: kDebugMode ? Image.asset('/images/improved_rm.jpeg') : Image.asset('assets/images/improved_rm.jpeg'),
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
