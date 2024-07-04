@@ -260,7 +260,7 @@ class GameScreenHeader extends StatelessWidget {
     return Header(
       title: Text.rich(
           TextSpan(
-            children: [
+            children: <InlineSpan>[
               const TextSpan(text: 'Level: '),
               TextSpan(
                 text: '${widget.level}',

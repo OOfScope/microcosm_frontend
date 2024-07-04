@@ -49,31 +49,34 @@ class MemoryGame extends StatelessWidget {
                     onCompleted();
                     onUpdate(correctAnswerScore);
                   });
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      const AnswerWidget(
-                        text: 'Well Done',
-                        answerColor: Colors.green,
-                      ),
-                      SizedBox(
-                        height: 60,
-                        width: 170,
-                        child: FilledButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.blue),
-                          ),
-                          onPressed: () {
-                            onNext();
-                          },
-                          child: const Text('Next',
-                              textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(fontSize: 17, color: Colors.white)),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        const AnswerWidget(
+                          text: 'Well Done',
+                          answerColor: Colors.green,
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 60,
+                          width: 170,
+                          child: FilledButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all<Color>(Colors.blue),
+                            ),
+                            onPressed: () {
+                              onNext();
+                            },
+                            child: const Text('Next',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 17, color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 } else {
                   return Container(); // Empty container if not all matched

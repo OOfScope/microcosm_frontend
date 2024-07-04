@@ -9,7 +9,7 @@ import '../select_the_area/select_the_area_screen.dart';
 import '../spaced_repetition/spaced_repetition_screen.dart';
 
 class GameWrapper extends StatelessWidget {
-  GameWrapper(
+  const GameWrapper(
       {super.key,
       required this.index,
       required this.onGameLoaded,

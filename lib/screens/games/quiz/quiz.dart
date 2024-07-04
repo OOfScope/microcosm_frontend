@@ -66,12 +66,11 @@ class _QuizWidgetState extends State<QuizGame> {
           ? const Center(child: CircularProgressIndicator())
           : Center(
               child: Row(
-                children: [
+                children: <Widget>[
                   // Left Column: Game Screen
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
                         Image.memory(imageHandler.imageBytes,
                             width: 400, height: 400),

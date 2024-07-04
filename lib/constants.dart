@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 const Color primaryColor = Color(0xFF2697FF);
 const Color secondaryColor = Color(0xFF2A2D3E);
@@ -37,7 +36,7 @@ Map<int, Color> tissueColors = <int, Color>{
   1: Colors.blue,
   2: Colors.red,
   3: Colors.green,
-  4: Color.fromRGBO(0, 255, 255, 1),
+  4: const Color.fromRGBO(0, 255, 255, 1),
 };
 
 Map<int, String> tissueDescription = <int, String>{

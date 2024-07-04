@@ -18,7 +18,7 @@ class SideMenu extends StatelessWidget {
         children: <Widget>[
           DrawerHeader(
             child: Column(
-              children: [
+              children: <Widget>[
                 SizedBox(
                   width: 150,
                   height: 110,

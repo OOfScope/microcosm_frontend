@@ -82,13 +82,13 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
   void _loadMoreImages() {
     setState(() {
       if (highLoadedIndices.length < highCount) {
-        int nextBatchEnd = highLoadedIndices.length + batchSize < highCount
+        final int nextBatchEnd = highLoadedIndices.length + batchSize < highCount
             ? highLoadedIndices.length + batchSize
             : highCount;
         highLoadedIndices.addAll(List.generate(nextBatchEnd - highLoadedIndices.length, (int index) => highLoadedIndices.length + index + 1));
       }
       if (lowLoadedIndices.length < lowCount) {
-        int nextBatchEnd = lowLoadedIndices.length + batchSize < lowCount
+        final int nextBatchEnd = lowLoadedIndices.length + batchSize < lowCount
             ? lowLoadedIndices.length + batchSize
             : lowCount;
         lowLoadedIndices.addAll(List.generate(nextBatchEnd - lowLoadedIndices.length, (int index) => lowLoadedIndices.length + index + 1));
@@ -253,7 +253,7 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
               const SizedBox(height: 20),
               Card(
                 elevation: 4,
-                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
@@ -262,14 +262,14 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
                     RichText(
                       text: TextSpan(
                         style: const TextStyle(fontSize: 20, color: Colors.black),
-                        children: [
+                        children: <InlineSpan>[
                           const TextSpan(
                             text: 'Low image count:',
                             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           TextSpan(
                             text: ' $lowCount',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
                           ),
                         ],
                       ),
@@ -277,14 +277,14 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
                     RichText(
                       text: TextSpan(
                         style: const TextStyle(fontSize: 20, color: Colors.black),
-                        children: [
+                        children: <InlineSpan>[
                           const TextSpan(
                             text: 'High image count:',
                             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           TextSpan(
                             text: ' $highCount',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
                           ),
                         ],
                       ),
@@ -292,14 +292,14 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
                     RichText(
                       text: TextSpan(
                         style: const TextStyle(fontSize: 20, color: Colors.black),
-                        children: [
+                        children: <InlineSpan>[
                           const TextSpan(
                             text: 'Total image count:',
                             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           TextSpan(
                             text: ' ${lowCount + highCount}',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
                           ),
                         ],
                       ),
@@ -307,14 +307,14 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
                     RichText(
                       text: TextSpan(
                         style: const TextStyle(fontSize: 20, color: Colors.black),
-                        children: [
+                        children: <InlineSpan>[
                           const TextSpan(
                             text: 'Classes available:',
                             style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           TextSpan(
                             text: ' ${classes.join(', ')}',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.lightBlue),
                           ),
                         ],
                       ),
@@ -364,8 +364,8 @@ class _DatasetExplorerState extends State<DatasetExplorer> {
 }
 
 class ChartData {
-  final String className;
-  final int count;
 
   ChartData(this.className, this.count);
+  final String className;
+  final int count;
 }

@@ -7,7 +7,7 @@ import 'components/dashed_line_painter.dart';
 import 'components/level_button.dart';
 
 class Roadmap extends StatefulWidget {
-  Roadmap({super.key, required this.onLevelButtonPressed});
+  const Roadmap({super.key, required this.onLevelButtonPressed});
   final void Function(int level, int difficulty) onLevelButtonPressed;
 
   @override

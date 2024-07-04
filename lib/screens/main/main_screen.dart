@@ -12,7 +12,6 @@ import '../games/game_screen.dart';
 import '../llmchat/llmchat.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_screen.dart';
-import 'components/chatbox.dart';
 import 'components/leaderboard.dart';
 import 'components/side_menu.dart';
 
