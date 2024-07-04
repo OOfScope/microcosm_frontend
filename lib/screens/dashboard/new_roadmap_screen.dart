@@ -47,7 +47,7 @@ class RoadmapState extends State<Roadmap> {
           Opacity(
             opacity: 0.5,
             child: Image.asset(
-              '/images/improved_rm.jpeg',
+              'images/improved_rm.jpeg',
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
