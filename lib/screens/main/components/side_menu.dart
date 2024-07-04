@@ -52,7 +52,9 @@ class SideMenu extends StatelessWidget {
           ),
           DrawerListTile(
             title: 'Medyc-AId LLM',
-            svgSrc: '/icons/menu_setting.svg',
+            svgSrc: kDebugMode
+                ? '/icons/menu_setting.svg'
+                : 'assets/icons/menu_setting.svg',
             press: () => onNavButtonPressed(3),
           ),
           DrawerListTile(
