@@ -255,7 +255,7 @@ List<LevelButton> initializeLevelButtons() {
       LevelButton(
         levelNumber: i,
         status: i == 1 ? LevelStatus.inProgress : LevelStatus.locked,
-        isActive: i == 1,
+        isActive: true,
       ),
     );
   }
@@ -278,7 +278,7 @@ class AnswerWidget extends StatelessWidget {
 
   final String text;
   final Color answerColor;
-  double fontAnswer = 0;
+  double fontAnswer = answerFontSize;
 
   set fontSize(double fontSize) {
     fontAnswer = fontSize;
@@ -296,5 +296,102 @@ class AnswerWidget extends StatelessWidget {
           fontWeight: FontWeight.bold),
       overflow: TextOverflow.visible,
     );
+  }
+}
+
+class GameInfo {
+  GameInfo({
+    required this.level,
+    required this.difficulty,
+  });
+
+  final int level;
+  final int difficulty;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is GameInfo &&
+        other.level == level &&
+        other.difficulty == difficulty;
+  }
+
+  @override
+  int get hashCode => level.hashCode ^ difficulty.hashCode;
+
+  @override
+  String toString() {
+    return 'GameInfo (level: $level, difficulty: $difficulty)';
+  }
+}
+
+class GameInfoManager {
+  GameInfoManager._internal();
+
+  static final GameInfoManager _instance = GameInfoManager._internal();
+  final Map<GameInfo, int> _gameInfo = {};
+
+  static GameInfoManager get instance => _instance;
+
+  set gameInfo(Map<GameInfo, int> gameInfo) {
+    _gameInfo.addAll(gameInfo);
+  }
+
+  Map<GameInfo, int> get gameInfo => _gameInfo;
+
+  void update(int index, int difficulty) {
+    final GameInfo tmp = GameInfo(level: index, difficulty: difficulty);
+
+    if (!_gameInfo.containsKey(tmp)) {
+      _gameInfo[tmp] = 1;
+
+      if (kDebugMode) {
+        print('Add level: $index with difficulty: $difficulty');
+        print('GameInfo: $_gameInfo');
+      }
+    } else {
+      _gameInfo[tmp] = _gameInfo[tmp]! + 1;
+
+      if (kDebugMode) {
+        print(
+            'Update level: $index with difficulty: $difficulty and frequency: ${_gameInfo[tmp]}');
+      }
+    }
+  }
+
+  GameInfo? getHighestFrequencyGame() {
+    if (_gameInfo.isEmpty) return null;
+
+    MapEntry<GameInfo, int>? highestFrequencyEntry;
+    for (var entry in _gameInfo.entries) {
+      if (highestFrequencyEntry == null ||
+          entry.value > highestFrequencyEntry.value) {
+        highestFrequencyEntry = entry;
+      }
+    }
+
+    if (highestFrequencyEntry != null) {
+      return highestFrequencyEntry.key;
+    }
+
+    return null;
+  }
+
+  void removeHighestFrequencyGame() {
+    if (_gameInfo.isEmpty) {
+      return;
+    }
+
+    MapEntry<GameInfo, int>? highestFrequencyEntry;
+    for (var entry in _gameInfo.entries) {
+      if (highestFrequencyEntry == null ||
+          entry.value > highestFrequencyEntry.value) {
+        highestFrequencyEntry = entry;
+      }
+    }
+    if (highestFrequencyEntry != null) {
+      _gameInfo.remove(highestFrequencyEntry.key);
+    }
   }
 }

@@ -258,6 +258,8 @@ class GameScreenHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GameInfo? highestFrequencyGame =
+        GameInfoManager.instance.getHighestFrequencyGame();
     return Header(
       title: Text.rich(
           TextSpan(
@@ -277,10 +279,21 @@ class GameScreenHeader extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const TextSpan(text: ' - Game: '),
-              TextSpan(
-                text: '${gameTitles[widget.level % 5]}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
+              if (widget.level % 5 != 0)
+                TextSpan(
+                  text: '${gameTitles[widget.level % 5]}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
+              else if (highestFrequencyGame != null)
+                TextSpan(
+                  text: '${gameTitles[highestFrequencyGame.level % 5]}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
+              else
+                const TextSpan(
+                  text: 'All Games Completed!',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
             ],
           ),
           style: const TextStyle(fontSize: 30, color: Colors.white)),

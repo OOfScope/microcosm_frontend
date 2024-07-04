@@ -66,6 +66,9 @@ void main() async {
   final List<LevelButton> levels = initializeLevelButtons();
   LevelButtonManager.instance.levelButtons = levels;
 
+  final Map<GameInfo, int> spacedRepetitionGames = <GameInfo, int>{};
+  GameInfoManager.instance.gameInfo = spacedRepetitionGames;
+
   debugPaintSizeEnabled = false;
   runApp(const MyApp());
 }

@@ -52,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
 
       if (levelButtons[index].stars < 3) {
         if (index >= 0 && index < levelButtons.length) {
-          if (score != 0) {
+          if (score != wrongAnswerScore) {
             levelButtons[index].stars += 1;
 
             if (levelButtons[index].stars == 3) {
@@ -68,9 +68,10 @@ class _MainScreenState extends State<MainScreen> {
             levelButtons[index + 1].status = LevelStatus.inProgress;
             levelButtons[index + 1].isActive = true;
             updateLeaderboardState();
+          } else {
+            // Add index and difficulty to the gameInfo for spaced Repetition
+            GameInfoManager.instance.update(index, _difficulty);
           }
-        } else {
-          // spaced repetition
         }
       }
     });

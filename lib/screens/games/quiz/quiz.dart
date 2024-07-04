@@ -156,7 +156,7 @@ class _QuizWidgetState extends State<QuizGame> {
                                             Colors.blue),
                                   ),
                                   onPressed: widget.onNext,
-                                  child: const Text('Next Level',
+                                  child: const Text('Next',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           fontSize: 22, color: Colors.white)),
