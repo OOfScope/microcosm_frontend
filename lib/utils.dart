@@ -346,57 +346,57 @@ class GameInfoManager {
     if (!_gameInfo.containsKey(tmp)) {
       _gameInfo[tmp] = 1;
 
-      if (kDebugMode) {
-        print('Add level: $index with difficulty: $difficulty');
-        print('GameInfo: $_gameInfo');
-      }
+      // if (kDebugMode) {
+      //   print('Add level: $index with difficulty: $difficulty');
+      //   print('GameInfo: $_gameInfo');
+      // }
     } else {
       _gameInfo[tmp] = _gameInfo[tmp]! + 1;
 
-      if (kDebugMode) {
-        print(
-            'Update level: $index with difficulty: $difficulty and frequency: ${_gameInfo[tmp]}');
-      }
+      // if (kDebugMode) {
+      //   print(
+      //       'Update level: $index with difficulty: $difficulty and frequency: ${_gameInfo[tmp]}');
+      // }
     }
   }
 
   GameInfo? getHighestFrequencyGame() {
     // Print the current state of _gameInfo
-    if (kDebugMode) {
-      print('Current _gameInfo map: $_gameInfo');
-    }
+    // if (kDebugMode) {
+    //   print('Current _gameInfo map: $_gameInfo');
+    // }
 
     if (_gameInfo.isEmpty) {
-      if (kDebugMode) {
-        print('The _gameInfo map is empty.');
-      }
+      // if (kDebugMode) {
+      //   print('The _gameInfo map is empty.');
+      // }
       return null;
     }
 
     MapEntry<GameInfo, int>? highestFrequencyEntry;
     for (final MapEntry<GameInfo, int> entry in _gameInfo.entries) {
-      if (kDebugMode) {
-        print('Checking entry: $entry');
-      }
+      // if (kDebugMode) {
+      //   print('Checking entry: $entry');
+      // }
       if (highestFrequencyEntry == null ||
           entry.value > highestFrequencyEntry.value) {
         highestFrequencyEntry = entry;
-        if (kDebugMode) {
-          print('New highest frequency entry: $highestFrequencyEntry');
-        }
+        // if (kDebugMode) {
+        //   print('New highest frequency entry: $highestFrequencyEntry');
+        // }
       }
     }
 
     if (highestFrequencyEntry != null) {
-      if (kDebugMode) {
-        print('Highest frequency GameInfo: ${highestFrequencyEntry.key}');
-      }
+      // if (kDebugMode) {
+      //   print('Highest frequency GameInfo: ${highestFrequencyEntry.key}');
+      // }
       return highestFrequencyEntry.key;
     }
 
-    if (kDebugMode) {
-      print('No highest frequency GameInfo found.');
-    }
+    // if (kDebugMode) {
+    //   print('No highest frequency GameInfo found.');
+    // }
     return null;
   }
 

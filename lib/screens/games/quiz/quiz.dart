@@ -137,7 +137,7 @@ class _QuizWidgetState extends State<QuizGame> {
                           ),
                           const SizedBox(height: 20),
                           const Text(
-                            'Select the correct tissue type from the options given. If your answer is correct, you will see a green button, otherwise, it will turn red. Once you have made a choice, click the "Next" button to proceed to the next question.',
+                            'Select the correct tissue type from the options given.',
                             style: TextStyle(
                               fontSize: 1.1 * tissueDescriptionFontSize,
                               overflow: TextOverflow.visible,

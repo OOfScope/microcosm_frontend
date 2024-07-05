@@ -12,6 +12,7 @@ import '../games/game_screen.dart';
 import '../llmchat/llmchat.dart';
 import '../profile/profile_screen.dart';
 import '../settings/settings_screen.dart';
+import 'components/chatbox.dart';
 import 'components/leaderboard.dart';
 import 'components/side_menu.dart';
 
@@ -65,8 +66,15 @@ class _MainScreenState extends State<MainScreen> {
 
             UserManager.instance.user.addScore(score);
             levelButtons[index].addLevelScore(score);
-            levelButtons[index + 1].status = LevelStatus.inProgress;
+            if (((index + 1) % 5 == 0) &&
+                GameInfoManager.instance.getHighestFrequencyGame() == null) {
+              // if there is no game in GameInfoManager, then unlock the next level
+              levelButtons[index + 1].status = LevelStatus.completed;
+            } else {
+              levelButtons[index + 1].status = LevelStatus.inProgress;
+            }
             levelButtons[index + 1].isActive = true;
+
             updateLeaderboardState();
           } else {
             // Add index and difficulty to the gameInfo for spaced Repetition
@@ -137,7 +145,7 @@ class _MainScreenState extends State<MainScreen> {
                   const SizedBox(height: 2 * defaultPadding),
                   Leaderboard(key: _childKey),
                   const SizedBox(height: defaultPadding),
-                  //const Flexible(child: ChatBot())
+                  Flexible(child: ChatBox())
                 ],
               ),
             ),
