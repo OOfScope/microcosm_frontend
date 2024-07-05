@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../utils.dart';
 import '../main/components/header.dart';
@@ -45,14 +46,16 @@ class RoadmapState extends State<Roadmap> {
       body: Stack(
         children: <Widget>[
           Opacity(
-            opacity: 0.5,
-            child: kDebugMode ? Image.asset('/images/improved_rm.jpeg') : Image.asset('assets/images/improved_rm.jpeg'),
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-              scale: 2,
-            ),
-          ),
+              opacity: 0.5,
+              child: Image.asset(
+                kDebugMode
+                    ? '/images/improved_rm.jpeg'
+                    : 'assets/images/improved_rm.jpeg',
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: double.infinity,
+                scale: 2,
+              )),
           SingleChildScrollView(
             child: Column(
               children: levels,
