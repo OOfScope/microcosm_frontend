@@ -61,6 +61,8 @@ class _MainScreenState extends State<MainScreen> {
               return;
             }
 
+            if ((index + 1) % 5 == 0) {}
+
             // print(
             //     'LevelStats: ${levelButtons[index].stars} ${levelButtons[index].status} ${levelButtons[index].isActive} ${levelButtons[index].levelScore} ${levelButtons[index].levelNumber}');
 
@@ -68,17 +70,27 @@ class _MainScreenState extends State<MainScreen> {
             levelButtons[index].addLevelScore(score);
             if (((index + 1) % 5 == 0) &&
                 GameInfoManager.instance.getHighestFrequencyGame() == null) {
-              // if there is no game in GameInfoManager, then unlock the next level
               levelButtons[index + 1].status = LevelStatus.completed;
-            } else {
               levelButtons[index + 1].status = LevelStatus.inProgress;
+              // if there is no game in GameInfoManager, then unlock the next level
+            } else {
+              Future.delayed(const Duration(seconds: 4), () {
+                GameInfoManager.instance.removeHighestFrequencyGame();
+                if (GameInfoManager.instance.getHighestFrequencyGame() ==
+                    null) {
+                  levelButtons[index].status = LevelStatus.completed;
+                  levelButtons[index + 1].status = LevelStatus.inProgress;
+                }
+              });
             }
             levelButtons[index + 1].isActive = true;
 
             updateLeaderboardState();
           } else {
             // Add index and difficulty to the gameInfo for spaced Repetition
-            GameInfoManager.instance.update(index, _difficulty);
+            if (index % 5 + 1 != 0) {
+              GameInfoManager.instance.update(index, _difficulty);
+            }
           }
         }
       }

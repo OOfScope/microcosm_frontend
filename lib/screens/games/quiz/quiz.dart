@@ -137,7 +137,7 @@ class _QuizWidgetState extends State<QuizGame> {
                           ),
                           const SizedBox(height: 20),
                           const Text(
-                            'Select the correct tissue type from the options given.',
+                            'Select the the most abundant and visible tissue from the options given.',
                             style: TextStyle(
                               fontSize: 1.1 * tissueDescriptionFontSize,
                               overflow: TextOverflow.visible,
