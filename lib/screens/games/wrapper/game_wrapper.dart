@@ -26,6 +26,8 @@ class GameWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final GameInfo? highestFrequencyGame =
+        GameInfoManager.instance.getHighestFrequencyGame();
     final Map<int, Widget> games = <int, Widget>{
       1: QuizGame(
         onUpdate: onScoreUpdate,
@@ -52,16 +54,12 @@ class GameWrapper extends StatelessWidget {
     };
 
     if (index % 5 == 0) {
-      final GameInfo? highestFrequencyGame =
-          GameInfoManager.instance.getHighestFrequencyGame();
-      GameInfoManager.instance.removeHighestFrequencyGame();
-
       if (highestFrequencyGame != null) {
         if (kDebugMode) {
           print('Highest frequency game: ${highestFrequencyGame.level % 5}');
-          print(games[highestFrequencyGame.level % 5]);
-        }
-        return Center(child: games[highestFrequencyGame.level % 5]);
+          print(games[(highestFrequencyGame.level % 5) + 1]);
+        } //FIX THIS INDEX
+        return Center(child: games[(highestFrequencyGame.level % 5) + 1]);
       } else {
         // No games to play screen
         return NoGamesLeftScreen(onNextLevel: onNextLevel);

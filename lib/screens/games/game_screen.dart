@@ -286,7 +286,7 @@ class GameScreenHeader extends StatelessWidget {
                 )
               else if (highestFrequencyGame != null)
                 TextSpan(
-                  text: '${gameTitles[highestFrequencyGame.level % 5]}',
+                  text: '${gameTitles[(highestFrequencyGame.level % 5) + 1]}',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 )
               else

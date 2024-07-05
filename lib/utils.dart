@@ -255,7 +255,7 @@ List<LevelButton> initializeLevelButtons() {
       LevelButton(
         levelNumber: i,
         status: i == 1 ? LevelStatus.inProgress : LevelStatus.locked,
-        isActive: i == 1,
+        isActive: true,
       ),
     );
   }
@@ -361,20 +361,42 @@ class GameInfoManager {
   }
 
   GameInfo? getHighestFrequencyGame() {
-    if (_gameInfo.isEmpty) return null;
+    // Print the current state of _gameInfo
+    if (kDebugMode) {
+      print('Current _gameInfo map: $_gameInfo');
+    }
+
+    if (_gameInfo.isEmpty) {
+      if (kDebugMode) {
+        print('The _gameInfo map is empty.');
+      }
+      return null;
+    }
 
     MapEntry<GameInfo, int>? highestFrequencyEntry;
     for (final MapEntry<GameInfo, int> entry in _gameInfo.entries) {
+      if (kDebugMode) {
+        print('Checking entry: $entry');
+      }
       if (highestFrequencyEntry == null ||
           entry.value > highestFrequencyEntry.value) {
         highestFrequencyEntry = entry;
+        if (kDebugMode) {
+          print('New highest frequency entry: $highestFrequencyEntry');
+        }
       }
     }
 
     if (highestFrequencyEntry != null) {
+      if (kDebugMode) {
+        print('Highest frequency GameInfo: ${highestFrequencyEntry.key}');
+      }
       return highestFrequencyEntry.key;
     }
 
+    if (kDebugMode) {
+      print('No highest frequency GameInfo found.');
+    }
     return null;
   }
 
