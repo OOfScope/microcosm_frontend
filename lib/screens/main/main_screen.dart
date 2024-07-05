@@ -61,28 +61,31 @@ class _MainScreenState extends State<MainScreen> {
               return;
             }
 
-            if ((index + 1) % 5 == 0) {}
-
             // print(
             //     'LevelStats: ${levelButtons[index].stars} ${levelButtons[index].status} ${levelButtons[index].isActive} ${levelButtons[index].levelScore} ${levelButtons[index].levelNumber}');
 
             UserManager.instance.user.addScore(score);
             levelButtons[index].addLevelScore(score);
-            if (((index + 1) % 5 == 0) &&
-                GameInfoManager.instance.getHighestFrequencyGame() == null) {
-              levelButtons[index + 1].status = LevelStatus.completed;
-              levelButtons[index + 1].status = LevelStatus.inProgress;
-              // if there is no game in GameInfoManager, then unlock the next level
+
+            if ((index + 1) % 5 == 0) {
+              if (GameInfoManager.instance.getHighestFrequencyGame() == null) {
+                levelButtons[index + 1].status = LevelStatus.completed;
+                levelButtons[index + 1].status = LevelStatus.inProgress;
+                // if there is no game in GameInfoManager, then unlock the next level
+              } else {
+                Future.delayed(const Duration(seconds: 4), () {
+                  GameInfoManager.instance.removeHighestFrequencyGame();
+                  if (GameInfoManager.instance.getHighestFrequencyGame() ==
+                      null) {
+                    levelButtons[index].status = LevelStatus.completed;
+                    levelButtons[index + 1].status = LevelStatus.inProgress;
+                  }
+                });
+              }
             } else {
-              Future.delayed(const Duration(seconds: 4), () {
-                GameInfoManager.instance.removeHighestFrequencyGame();
-                if (GameInfoManager.instance.getHighestFrequencyGame() ==
-                    null) {
-                  levelButtons[index].status = LevelStatus.completed;
-                  levelButtons[index + 1].status = LevelStatus.inProgress;
-                }
-              });
+              levelButtons[index + 1].status = LevelStatus.inProgress;
             }
+
             levelButtons[index + 1].isActive = true;
 
             updateLeaderboardState();
