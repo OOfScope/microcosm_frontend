@@ -71,6 +71,10 @@ class SideMenu extends StatelessWidget {
                 : 'assets/icons/menu_setting.svg',
             press: () => onNavButtonPressed(9),
           ),
+
+          
+
+
         ],
       ),
     );

@@ -15,6 +15,7 @@ class ChatBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 270,
+      height: 1000,
       padding: EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: secondaryColor,

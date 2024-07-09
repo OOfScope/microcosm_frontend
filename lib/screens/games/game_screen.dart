@@ -23,8 +23,8 @@ class GameScreen extends StatefulWidget {
 
 class GameScreenState extends State<GameScreen> {
   double _progress = 1.0; // Progress for the timer (1.0 means 100%)
-  int _timeLeft = 20; // Time left in seconds
-  final int _totalTime = 20; // Total time in seconds
+  int _timeLeft = 60; // Time left in seconds
+  final int _totalTime = 60; // Total time in seconds
   Timer? _timer;
   bool _isGameOver = false; // Tracks if the game is over
   bool _isStarted = false; // Tracks if the timer is started

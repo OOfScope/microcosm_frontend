@@ -147,23 +147,17 @@ class _MainScreenState extends State<MainScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             if (Responsive.isDesktop(context))
-              Expanded(
-                child: SideMenu(onNavButtonPressed: upNavBarId),
-              ),
+              Column(children: [
+                Expanded(
+                  child: SideMenu(onNavButtonPressed: upNavBarId),
+                ),
+                Leaderboard(key: _childKey),
+              ]),
             Expanded(
               flex: 4,
               child: page,
             ),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  const SizedBox(height: 2 * defaultPadding),
-                  Leaderboard(key: _childKey),
-                  const SizedBox(height: defaultPadding),
-                  Flexible(child: ChatBox())
-                ],
-              ),
-            ),
+            const Expanded(child: ChatBox())
           ],
         ),
       ),
